@@ -1,7 +1,7 @@
 # Microsoft Power BI visuals InteractivityUtils
 [![Build Status](https://travis-ci.org/Microsoft/powerbi-visuals-utils-interactivityutils.svg?branch=master)](https://travis-ci.org/Microsoft/powerbi-visuals-utils-interactivityutils) [![npm version](https://img.shields.io/npm/v/powerbi-visuals-utils-interactivityutils.svg)](https://www.npmjs.com/package/powerbi-visuals-utils-interactivityutils) [![npm](https://img.shields.io/npm/dm/powerbi-visuals-utils-interactivityutils.svg)](https://www.npmjs.com/package/powerbi-visuals-utils-interactivityutils)
 
-> Interactivity utility interfaces for creating powerbi custom visuals
+> InteractivityUtils is a set of functions and classes in order to simplify implementation of cross-selection and cross-filtering for Power BI custom visuals
 
 ## Usage
 Learn how to install and use the InteractivityUtils in your custom visuals:
