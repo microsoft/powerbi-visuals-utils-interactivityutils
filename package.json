@@ -1,6 +1,6 @@
 {
   "name": "powerbi-visuals-utils-interactivityutils",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "InteractivityUtils",
   "main": "lib/index.js",
   "repository": {
@@ -39,14 +39,14 @@
     "karma-typescript-preprocessor": "0.3.0",
     "less": "2.7.1",
     "powerbi-visuals-tools": "1.2.1",
-    "powerbi-visuals-utils-testutils": "0.1.0",
+    "powerbi-visuals-utils-testutils": "^0.2.0",
     "tslint": "3.15.1",
     "typescript": "1.8.10",
     "typings": "2.0.0"
   },
   "dependencies": {
     "d3": "3.5.5",
-    "powerbi-visuals-utils-svgutils": "0.1.0",
-    "powerbi-visuals-utils-typeutils": "0.1.0"
+    "powerbi-visuals-utils-svgutils": "^0.2.0",
+    "powerbi-visuals-utils-typeutils": "^0.2.0"
   }
 }
