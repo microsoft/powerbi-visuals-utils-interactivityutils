@@ -3,12 +3,12 @@
 
 The ```powerbi.extensibility.utils.interactivity``` module provides the following functions and interfaces:
 
-* [createInteractivityService](#createInteractivityService)
-* [appendClearCatcher](#appendClearCatcher)
-* [applySelectionStateToData](#applySelectionStateToData)
-* [hasSelection](#hasSelection)
-* [legendHasSelection](#legendHasSelection)
-* [handleSelection](#handleSelection)
+* [createInteractivityService](#createinteractivityservice)
+* [appendClearCatcher](#appendclearcatcher)
+* [applySelectionStateToData](#applyselectionstatetodata)
+* [hasSelection](#hasselection)
+* [legendHasSelection](#legendhasselection)
+* [handleSelection](#handleselection)
 
 ## createInteractivityService
 Method to create an IInteractivityService instance.

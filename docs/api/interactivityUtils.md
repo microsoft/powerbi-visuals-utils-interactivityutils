@@ -3,9 +3,9 @@
 
 The ```powerbi.extensibility.utils.interactivity.interactivityUtils``` module provides the following functions and interfaces:
 
-* [getPositionOfLastInputEvent](#getPositionOfLastInputEvent)
-* [registerStandardSelectionHandler](#registerStandardSelectionHandler)
-* [registerGroupSelectionHandler](#registerGroupSelectionHandler)
+* [getPositionOfLastInputEvent](#getpositionoflastinputevent)
+* [registerStandardSelectionHandler](#registerstandardselectionhandler)
+* [registerGroupSelectionHandler](#registergroupselectionhandler)
 
 ## getPositionOfLastInputEvent
 Returns position of the last input event
