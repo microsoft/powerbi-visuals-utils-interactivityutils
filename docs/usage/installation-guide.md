@@ -55,7 +55,7 @@ As a result you will have the following file structure:
 
 ## Including JavaScript artifacts to the custom visual
 To use the package with your custom visuals your should add the following files to the ```externalJS``` property of ```pbiviz.json``` :
-* ```"node_modules/d3/d3.min.js",```
+* ```node_modules/d3/d3.min.js```
 * ```node_modules/powerbi-visuals-utils-typeutils/lib/index.js```
 * ```node_modules/powerbi-visuals-utils-svgutils/lib/index.js```
 * ```node_modules/powerbi-visuals-utils-interactivityutils/lib/index.js```
@@ -68,7 +68,7 @@ As a result you will have the following file structure:
   "author": {...},
   "assets": {...},
   "externalJS": [
-    ""node_modules/d3/d3.min.js",",
+    "node_modules/d3/d3.min.js",
     "node_modules/powerbi-visuals-utils-typeutils/lib/index.js",
     "node_modules/powerbi-visuals-utils-svgutils/lib/index.js"
     "node_modules/powerbi-visuals-utils-interactivityutils/lib/index.js"
