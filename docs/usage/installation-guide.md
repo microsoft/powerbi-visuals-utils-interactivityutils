@@ -28,7 +28,7 @@ npm install typings -g
 
 After that, you should run the following command in the directory with your current custom visual:
 ```bash
-typings install --save --global dt~d3
+typings install --save --global dt~d3#0.0.0+20160907005744
 ```
 
 This command installs type declarations to the ```typings``` directory. These declarations are necessary for TypeScript compiler and Intellisense.
@@ -45,7 +45,7 @@ As a result you will have the following file structure:
 {
   "compilerOptions": {...},
   "files": [
-    "node_modules/typings/index.d.ts",
+    "typings/index.d.ts",
     "node_modules/powerbi-visuals-utils-typeutils/lib/index.d.ts",
     "node_modules/powerbi-visuals-utils-svgutils/lib/index.d.ts",
     "node_modules/powerbi-visuals-utils-interactivityutils/lib/index.d.ts"
@@ -70,7 +70,7 @@ As a result you will have the following file structure:
   "externalJS": [
     "node_modules/d3/d3.min.js",
     "node_modules/powerbi-visuals-utils-typeutils/lib/index.js",
-    "node_modules/powerbi-visuals-utils-svgutils/lib/index.js"
+    "node_modules/powerbi-visuals-utils-svgutils/lib/index.js",
     "node_modules/powerbi-visuals-utils-interactivityutils/lib/index.js"
   ],
   "style": ...,
