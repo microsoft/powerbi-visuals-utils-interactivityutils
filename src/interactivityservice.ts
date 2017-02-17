@@ -115,22 +115,6 @@ module powerbi.extensibility.utils.interactivity {
 
         /** Checks whether the selection mode is inverted or normal */
         isSelectionModeInverted(): boolean;
-
-        /**
-         * Sets whether the selection mode is inverted or normal
-         * TODO: Implement it
-         */
-        // setSelectionModeInverted(inverted: boolean): void;
-
-        /**
-         * TODO: Implement it
-         */
-        // setDefaultValueMode(useDefaultValue: boolean): void;
-
-        /**
-         * TODO: Implement it
-         */
-        // isDefaultValueEnabled(): boolean;
     }
 
     export interface ISelectionHandler {
@@ -141,41 +125,13 @@ module powerbi.extensibility.utils.interactivity {
          */
         handleSelection(dataPoint: SelectableDataPoint, multiSelect: boolean): void;
 
-        /**
-         * Handles a selection event for multiple data points
-         * TODO: Implement it
-        */
-        // handleMultipleSelection(dataPoints: SelectableDataPoint[], mode: MultiSelectMode): void;
-
-        /**
-         * Handles a request for a context menu.
-         * We can't implement it right now because there's no ability in the new API
-         * TODO: Implement it
-         */
-        // handleContextMenu(dataPoint: SelectableDataPoint, position: IPoint): void;
-
         /** Handles a selection clear, clearing all selection state */
         handleClearSelection(): void;
 
         /**
-         * Toggles the selection mode between normal and inverted; returns true if the new mode is inverted
-         * TODO: Implement it
-         */
-        // toggleSelectionModeInversion(): boolean;
-
-        /**
          * Sends the selection state to the host
-         * We can't implement it right now because there's no ability in the new API
-         * TODO: Implement it
-         * */
-        // persistSelectionFilter(filterPropertyIdentifier: DataViewObjectPropertyIdentifier): void;
-
-        /**
-         * Sends selfFilter to the host
-         * We can't implement it right now because there's no ability in the new API
-         * TODO: Implement it
          */
-        // persistSelfFilter(filterPropertyIdentifier: DataViewObjectPropertyIdentifier, selfFilter: SemanticFilter): void;
+        applySelectionFilter(): void;
     }
 
     export class InteractivityService implements IInteractivityService, ISelectionHandler {
@@ -294,6 +250,14 @@ module powerbi.extensibility.utils.interactivity {
         }
 
         // ISelectionHandler Implementation
+
+        public applySelectionFilter(): void {
+            if (!this.selectionManager) {
+                return;
+            }
+
+            this.selectionManager.applySelectionFilter();
+        }
 
         public handleSelection(dataPoint: SelectableDataPoint, multiSelect: boolean): void {
             // defect 7067397: should not happen so assert but also don't continue as it's

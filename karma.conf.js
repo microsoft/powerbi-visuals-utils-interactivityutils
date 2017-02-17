@@ -93,7 +93,8 @@ module.exports = (config) => {
         remapIstanbulReporter: {
             reports: {
                 lcovonly: coverageFolder + '/lcov.info',
-                html: coverageFolder
+                html: coverageFolder,
+                'text-summary': null
             }
         }
     });

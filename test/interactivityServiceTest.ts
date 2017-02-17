@@ -75,6 +75,27 @@ module powerbi.extensibility.utils.interactivity.test {
             behavior = new MockBehavior(selectableDataPoints);
         });
 
+        describe("applySelectionFilter", () => {
+            it("shouldn't throw any exceptions if the selectionManager is undefined", () => {
+                interactivityService["selectionManager"] = null;
+
+                expect(() => {
+                    interactivityService.applySelectionFilter();
+                }).not.toThrow();
+            });
+
+            it("the selectionManager.applySelectionFilter should be called", () => {
+                (interactivityService["selectionManager"] as ISelectionManager).applySelectionFilter = () => {};
+
+                spyOn(interactivityService["selectionManager"], "applySelectionFilter");
+
+                interactivityService.applySelectionFilter();
+
+                expect((interactivityService["selectionManager"] as ISelectionManager).applySelectionFilter)
+                    .toHaveBeenCalled();
+            });
+        });
+
         describe("Binding", () => {
 
             it("Basic binding", () => {
