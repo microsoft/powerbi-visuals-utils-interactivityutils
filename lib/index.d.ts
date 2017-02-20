@@ -1,3 +1,4 @@
+/// <reference types="d3" />
 declare module powerbi.extensibility.utils.interactivity {
     import IVisualHost = powerbi.extensibility.visual.IVisualHost;
     import ExtensibilityISelectionId = powerbi.extensibility.ISelectionId;
@@ -62,17 +63,12 @@ declare module powerbi.extensibility.utils.interactivity {
          * exists, it will still be sent to the host.
          */
         handleSelection(dataPoint: SelectableDataPoint, multiSelect: boolean): void;
-        /**
-         * Handles a selection event for multiple data points
-         * TODO: Implement it
-        */
-        /**
-         * Handles a request for a context menu.
-         * We can't implement it right now because there's no ability in the new API
-         * TODO: Implement it
-         */
         /** Handles a selection clear, clearing all selection state */
         handleClearSelection(): void;
+        /**
+         * Sends the selection state to the host
+         */
+        applySelectionFilter(): void;
     }
     class InteractivityService implements IInteractivityService, ISelectionHandler {
         private selectionManager;
@@ -103,6 +99,7 @@ declare module powerbi.extensibility.utils.interactivity {
         legendHasSelection(): boolean;
         labelsHasSelection(): boolean;
         isSelectionModeInverted(): boolean;
+        applySelectionFilter(): void;
         handleSelection(dataPoint: SelectableDataPoint, multiSelect: boolean): void;
         handleClearSelection(): void;
         private renderAll();
