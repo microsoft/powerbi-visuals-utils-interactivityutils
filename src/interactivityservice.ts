@@ -367,7 +367,7 @@ module powerbi.extensibility.utils.interactivity {
          *
          * If the data is not compatible with the current service's current selection state,
          * the state is cleared and the cleared selection is sent to the host.
-         * 
+         *
          * Ignores series for now, since we don't support series selection at the moment.
          */
         private syncSelectionState(didThePreviousStateHaveSelectedIds: boolean = false): void {
