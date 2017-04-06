@@ -1,6 +1,6 @@
 {
   "name": "powerbi-visuals-utils-interactivityutils",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "InteractivityUtils",
   "main": "lib/index.js",
   "repository": {
@@ -20,11 +20,12 @@
     "lib"
   ],
   "scripts": {
+    "build:map": "tsc --sourceMap",
     "build": "tsc",
     "postbuild": "npm run lessc",
     "test": "karma start",
-    "pretest": "npm run build",
-    "lint": "tslint \"+(src|test)/**/*.ts\"",
+    "pretest": "npm run build:map",
+    "lint": "tslint -r \"node_modules/tslint-microsoft-contrib\"  \"+(src|test)/**/*.ts\"",
     "lessc": "lessc src/styles/clearCatcher.less lib/index.css"
   },
   "devDependencies": {
@@ -43,7 +44,8 @@
     "less": "2.7.1",
     "powerbi-visuals-tools": "1.5.0",
     "powerbi-visuals-utils-testutils": "0.2.2",
-    "tslint": "3.15.1",
+    "tslint": "4.4.2",
+    "tslint-microsoft-contrib": "^4.0.1",
     "typescript": "2.1.6"
   },
   "dependencies": {
