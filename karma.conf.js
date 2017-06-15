@@ -58,7 +58,7 @@ module.exports = (config) => {
         ],
         singleRun: true,
         files: [
-            'node_modules/lodash/lodash.min.js',
+            'node_modules/lodash/index.js',
             'node_modules/jquery/dist/jquery.min.js',
             'node_modules/powerbi-visuals-utils-typeutils/lib/index.js',
             'node_modules/powerbi-visuals-utils-svgutils/lib/index.js',
