@@ -454,5 +454,5 @@ module powerbi.extensibility.utils.interactivity {
         private removeSelectionIdsExceptOnlyMeasures() {
             this.selectedIds = this.selectedIds.filter((identity) => !identity.hasIdentity());
         }
-    };
+    }
 }
