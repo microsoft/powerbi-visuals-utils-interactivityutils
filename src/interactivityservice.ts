@@ -132,6 +132,11 @@ module powerbi.extensibility.utils.interactivity {
          * Sends the selection state to the host
          */
         applySelectionFilter(): void;
+
+        /**
+         * Sync data points with current selection state
+         */
+        syncSelectionState(didThePreviousStateHaveSelectedIds?: boolean): void;
     }
 
     export class InteractivityService implements IInteractivityService, ISelectionHandler {
