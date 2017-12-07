@@ -62,7 +62,7 @@ declare module powerbi.extensibility.utils.interactivity {
          * identity is undefined, the selection state is cleared. In this case, if specificIdentity
          * exists, it will still be sent to the host.
          */
-        handleSelection(dataPoint: SelectableDataPoint, multiSelect: boolean): void;
+        handleSelection(dataPoint: SelectableDataPoint, multiSelect: boolean, skipSync?: boolean): void;
         /** Handles a selection clear, clearing all selection state */
         handleClearSelection(): void;
         /**
@@ -100,14 +100,8 @@ declare module powerbi.extensibility.utils.interactivity {
         labelsHasSelection(): boolean;
         isSelectionModeInverted(): boolean;
         applySelectionFilter(): void;
-        handleSelection(dataPoint: SelectableDataPoint, multiSelect: boolean): void;
+        handleSelection(dataPoint: SelectableDataPoint, multiSelect: boolean, skipSync?: boolean): void;
         handleClearSelection(): void;
-        private renderAll();
-        /** Marks a data point as selected and syncs selection with the host. */
-        private select(d, multiSelect);
-        private removeId(toRemove);
-        private sendSelectionToHost(dataPoint?, multiSelection?);
-        private takeSelectionStateFromDataPoints(dataPoints);
         /**
          * Syncs the selection state for all data points that have the same category. Returns
          * true if the selection state was out of sync and corrections were made; false if
@@ -118,7 +112,13 @@ declare module powerbi.extensibility.utils.interactivity {
          *
          * Ignores series for now, since we don't support series selection at the moment.
          */
-        private syncSelectionState(didThePreviousStateHaveSelectedIds?);
+        syncSelectionState(didThePreviousStateHaveSelectedIds?: boolean): void;
+        private renderAll();
+        /** Marks a data point as selected and syncs selection with the host. */
+        private select(d, multiSelect, skipSync?);
+        private removeId(toRemove);
+        private sendSelectionToHost(dataPoint?, multiSelection?);
+        private takeSelectionStateFromDataPoints(dataPoints);
         private applyToAllSelectableDataPoints(action);
         private static updateSelectableDataPointsBySelectedIds(selectableDataPoints, selectedIds);
         private static checkDatapointAgainstSelectedIds(datapoint, selectedIds);
