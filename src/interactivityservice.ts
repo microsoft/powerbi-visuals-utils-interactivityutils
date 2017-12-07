@@ -123,7 +123,7 @@ module powerbi.extensibility.utils.interactivity {
          * identity is undefined, the selection state is cleared. In this case, if specificIdentity
          * exists, it will still be sent to the host.
          */
-        handleSelection(dataPoint: SelectableDataPoint, multiSelect: boolean): void;
+        handleSelection(dataPoint: SelectableDataPoint, multiSelect: boolean, skipSync?: boolean): void;
 
         /** Handles a selection clear, clearing all selection state */
         handleClearSelection(): void;
@@ -259,7 +259,7 @@ module powerbi.extensibility.utils.interactivity {
             this.selectionManager.applySelectionFilter();
         }
 
-        public handleSelection(dataPoint: SelectableDataPoint, multiSelect: boolean): void {
+        public handleSelection(dataPoint: SelectableDataPoint, multiSelect: boolean, skipSync?: boolean): void {
             // defect 7067397: should not happen so assert but also don't continue as it's
             // causing a lot of error telemetry in desktop.
             if (!dataPoint)
@@ -269,7 +269,7 @@ module powerbi.extensibility.utils.interactivity {
                 this.handleClearSelection();
             }
             else {
-                this.select(dataPoint, multiSelect);
+                this.select(dataPoint, multiSelect, skipSync);
                 this.sendSelectionToHost(dataPoint, multiSelect);
                 this.renderAll();
             }
@@ -278,86 +278,6 @@ module powerbi.extensibility.utils.interactivity {
         public handleClearSelection(): void {
             this.clearSelection();
             this.sendSelectionToHost();
-        }
-
-        // Private utility methods
-
-        private renderAll(): void {
-            this.renderSelectionInVisual();
-            this.renderSelectionInLegend();
-            this.renderSelectionInLabels();
-        }
-
-        /** Marks a data point as selected and syncs selection with the host. */
-        private select(d: SelectableDataPoint, multiSelect: boolean): void {
-            let id = d.identity as ISelectionId;
-
-            if (!id)
-                return;
-
-            let selected = !d.selected || (!multiSelect && this.selectedIds.length > 1);
-
-            // If we have a multiselect flag, we attempt a multiselect
-            if (multiSelect) {
-                if (selected) {
-                    d.selected = true;
-                    this.selectedIds.push(id);
-                    if (id.hasIdentity()) {
-                        this.removeSelectionIdsWithOnlyMeasures();
-                    }
-                    else {
-                        this.removeSelectionIdsExceptOnlyMeasures();
-                    }
-                }
-                else {
-                    d.selected = false;
-                    this.removeId(id);
-                }
-            }
-            // We do a single select if we didn't do a multiselect or if we find out that the multiselect is invalid.
-            if (!multiSelect) {
-                this.clearSelection();
-                if (selected) {
-                    d.selected = true;
-                    this.selectedIds.push(id);
-                }
-            }
-
-            this.syncSelectionState();
-        }
-
-        private removeId(toRemove: ISelectionId): void {
-            let selectedIds = this.selectedIds;
-            for (let i = selectedIds.length - 1; i > -1; i--) {
-                let currentId = selectedIds[i];
-
-                if (toRemove.includes(currentId))
-                    selectedIds.splice(i, 1);
-            }
-        }
-
-        private sendSelectionToHost(dataPoint?: SelectableDataPoint, multiSelection?: boolean) {
-            if (!this.selectionManager) {
-                return;
-            }
-
-            if (dataPoint && dataPoint.identity) {
-                this.selectionManager.select(dataPoint.identity, multiSelection);
-            } else {
-                this.selectionManager.clear();
-            }
-        }
-
-        private takeSelectionStateFromDataPoints(dataPoints: SelectableDataPoint[]): void {
-            let selectedIds: ISelectionId[] = this.selectedIds;
-
-            // Replace the existing selectedIds rather than merging.
-            ArrayExtensions.clear(selectedIds);
-
-            for (let dataPoint of dataPoints) {
-                if (dataPoint.selected)
-                    selectedIds.push(dataPoint.identity as ISelectionId);
-            }
         }
 
         /**
@@ -370,7 +290,7 @@ module powerbi.extensibility.utils.interactivity {
          *
          * Ignores series for now, since we don't support series selection at the moment.
          */
-        private syncSelectionState(didThePreviousStateHaveSelectedIds: boolean = false): void {
+        public syncSelectionState(didThePreviousStateHaveSelectedIds: boolean = false): void {
             let selectedIds = this.selectedIds;
             let selectableDataPoints = this.selectableDataPoints;
             let selectableLegendDataPoints = this.selectableLegendDataPoints;
@@ -404,6 +324,88 @@ module powerbi.extensibility.utils.interactivity {
             if (!foundMatchingId && (selectedIds.length > 0 || didThePreviousStateHaveSelectedIds)) {
                 this.clearSelection();
                 this.sendSelectionToHost();
+            }
+        }
+
+        // Private utility methods
+
+        private renderAll(): void {
+            this.renderSelectionInVisual();
+            this.renderSelectionInLegend();
+            this.renderSelectionInLabels();
+        }
+
+        /** Marks a data point as selected and syncs selection with the host. */
+        private select(d: SelectableDataPoint, multiSelect: boolean, skipSync?: boolean): void {
+            let id = d.identity as ISelectionId;
+
+            if (!id)
+                return;
+
+            let selected = !d.selected || (!multiSelect && this.selectedIds.length > 1);
+
+            // If we have a multiselect flag, we attempt a multiselect
+            if (multiSelect) {
+                if (selected) {
+                    d.selected = true;
+                    this.selectedIds.push(id);
+                    if (id.hasIdentity()) {
+                        this.removeSelectionIdsWithOnlyMeasures();
+                    }
+                    else {
+                        this.removeSelectionIdsExceptOnlyMeasures();
+                    }
+                }
+                else {
+                    d.selected = false;
+                    this.removeId(id);
+                }
+            }
+            // We do a single select if we didn't do a multiselect or if we find out that the multiselect is invalid.
+            if (!multiSelect) {
+                this.clearSelection();
+                if (selected) {
+                    d.selected = true;
+                    this.selectedIds.push(id);
+                }
+            }
+
+            if (!skipSync) {
+                this.syncSelectionState();
+            }
+        }
+
+        private removeId(toRemove: ISelectionId): void {
+            let selectedIds = this.selectedIds;
+            for (let i = selectedIds.length - 1; i > -1; i--) {
+                let currentId = selectedIds[i];
+
+                if (toRemove.includes(currentId))
+                    selectedIds.splice(i, 1);
+            }
+        }
+
+        private sendSelectionToHost(dataPoint?: SelectableDataPoint, multiSelection?: boolean) {
+            if (!this.selectionManager) {
+                return;
+            }
+
+            if (dataPoint && dataPoint.identity) {
+                this.selectionManager.select(dataPoint.identity, multiSelection);
+            } else {
+                this.selectionManager.clear();
+            }
+        }
+
+        private takeSelectionStateFromDataPoints(dataPoints: SelectableDataPoint[]): void {
+            let selectedIds: ISelectionId[] = this.selectedIds;
+
+            // Replace the existing selectedIds rather than merging.
+            ArrayExtensions.clear(selectedIds);
+
+            for (let dataPoint of dataPoints) {
+                if (dataPoint.selected)
+                    selectedIds.push(dataPoint.identity as ISelectionId);
             }
         }
 
