@@ -26,11 +26,15 @@
 
 'use strict';
 
-const testRecursivePath = 'test/**/*.ts'
-    , srcOriginalRecursivePath = 'src/**/*.ts'
-    , srcRecursivePath = 'lib/**/*.js'
-    , srcCssRecursivePath = 'lib/**/*.css'
-    , coverageFolder = 'coverage';
+import * as webpack from "webpack";
+
+import { Config, ConfigOptions } from "karma";
+
+const testRecursivePath = "test/**/*.ts"
+    , srcOriginalRecursivePath = "src/**/*.ts"
+    , srcRecursivePath = "lib/**/*.js"
+    , coverageFolder = "coverage"
+    , srcCssRecursivePath = 'lib/**/*.css';
 
 module.exports = (config) => {
     let browsers = [];
@@ -73,17 +77,40 @@ module.exports = (config) => {
             }
         ],
         preprocessors: {
-            [testRecursivePath]: ['typescript'],
-            [srcRecursivePath]: ['sourcemap', 'coverage']
+            "node_modules/powerbi-visuals-utils-testutils/lib/**/*.js": ["webpack"],
+            [testRecursivePath]: ['typescript', "webpack", "sourcemap"],
+            [srcRecursivePath]: ["webpack", 'sourcemap', 'coverage']
         },
-        typescriptPreprocessor: {
-            options: {
-                sourceMap: false,
-                target: 'ES5',
-                removeComments: false,
-                concatenateOutput: false
-            }
-        },
+        webpack: <webpack.Configuration>{
+            target: "web",
+            devtool: "inline-source-map",
+            resolve: {
+                extensions: [".webpack.js", ".web.js", ".js", ".ts", ".tsx"]
+            },
+            externals: [
+                {
+                    sinon: "sinon",
+                    chai: "chai"
+                },
+            ],
+            module: {
+                rules: [
+                    {
+                        test: /\.jsx?$/,
+                    },
+                    {
+                        test: /\.tsx?$/,
+                        loader: "ts-loader",
+                    }
+                ]
+            },
+            output: {
+                filename: "index.build.js",
+                // path: path.resolve(__dirname, "lib")
+            },
+            plugins: [
+            ]
+        },       
         coverageReporter: {
             dir: coverageFolder,
             reporters: [

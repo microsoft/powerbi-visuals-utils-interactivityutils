@@ -23,33 +23,31 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
+import { select, event, Selection } from "d3-selection";
+import { IPoint } from "powerbi-visuals-utils-svgutils";
+import { SelectableDataPoint, ISelectionHandler } from "./interactivityservice"
+export module interactivityUtils {
+    export function getPositionOfLastInputEvent(): IPoint {
+        return {
+            x: (event as MouseEvent).clientX,
+            y: (event as MouseEvent).clientY
+        };
+    }
 
-module powerbi.extensibility.utils.interactivity {
-    import IPoint = powerbi.extensibility.utils.svg.shapes.IPoint;
+    export function registerStandardSelectionHandler(selection: Selection<any, any, any, any>, selectionHandler: ISelectionHandler): void {
+        selection.on("click", (d: SelectableDataPoint) => handleSelection(d, selectionHandler));
+    }
 
-    export module interactivityUtils {
-        export function getPositionOfLastInputEvent(): IPoint {
-            return {
-                x: (d3.event as MouseEvent).clientX,
-                y: (d3.event as MouseEvent).clientY
-            };
-        }
+    export function registerGroupSelectionHandler(group: Selection<any, any, any, any>, selectionHandler: ISelectionHandler): void {
+        group.on("click", () => {
+            let target: EventTarget = (event as MouseEvent).target,
+                d: SelectableDataPoint = select(target).datum();
 
-        export function registerStandardSelectionHandler(selection: d3.Selection<any>, selectionHandler: ISelectionHandler): void {
-            selection.on("click", (d: SelectableDataPoint) => handleSelection(d, selectionHandler));
-        }
+            handleSelection(d, selectionHandler);
+        });
+    }
 
-        export function registerGroupSelectionHandler(group: d3.Selection<any>, selectionHandler: ISelectionHandler): void {
-            group.on("click", () => {
-                let target = (d3.event as MouseEvent).target,
-                    d: SelectableDataPoint = d3.select(target).datum();
-
-                handleSelection(d, selectionHandler);
-            });
-        }
-
-        function handleSelection(d: SelectableDataPoint, selectionHandler: ISelectionHandler): void {
-            selectionHandler.handleSelection(d, (d3.event as MouseEvent).ctrlKey);
-        }
+    function handleSelection(d: SelectableDataPoint, selectionHandler: ISelectionHandler): void {
+        selectionHandler.handleSelection(d, (event as MouseEvent).ctrlKey);
     }
 }
