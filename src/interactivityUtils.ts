@@ -26,28 +26,27 @@
 import { select, event, Selection, EnterElement, BaseType } from "d3-selection";
 import { IPoint } from "powerbi-visuals-utils-svgutils";
 import { SelectableDataPoint, ISelectionHandler } from "./interactivityService";
-export module interactivityUtils {
-    export function getPositionOfLastInputEvent(): IPoint {
-        return {
-            x: (event as MouseEvent).clientX,
-            y: (event as MouseEvent).clientY
-        };
-    }
 
-    export function registerStandardSelectionHandler(selection: Selection<any, any, any, any>, selectionHandler: ISelectionHandler): void {
-        selection.on("click", (d: SelectableDataPoint) => handleSelection(d, selectionHandler));
-    }
+export function getPositionOfLastInputEvent(): IPoint {
+    return {
+        x: (event as MouseEvent).clientX,
+        y: (event as MouseEvent).clientY
+    };
+}
 
-    export function registerGroupSelectionHandler(group: Selection<any, any, any, any>, selectionHandler: ISelectionHandler): void {
-        group.on("click", () => {
-            let target: EventTarget = (event as MouseEvent).target,
+export function registerStandardSelectionHandler(selection: Selection<any, any, any, any>, selectionHandler: ISelectionHandler): void {
+    selection.on("click", (d: SelectableDataPoint) => handleSelection(d, selectionHandler));
+}
+
+export function registerGroupSelectionHandler(group: Selection<any, any, any, any>, selectionHandler: ISelectionHandler): void {
+    group.on("click", () => {
+        let target: EventTarget = (event as MouseEvent).target,
             d: SelectableDataPoint = <SelectableDataPoint>select(target as BaseType).datum();
 
-            handleSelection(d, selectionHandler);
-        });
-    }
+        handleSelection(d, selectionHandler);
+    });
+}
 
-    function handleSelection(d: SelectableDataPoint, selectionHandler: ISelectionHandler): void {
-        selectionHandler.handleSelection(d, (event as MouseEvent).ctrlKey);
-    }
+function handleSelection(d: SelectableDataPoint, selectionHandler: ISelectionHandler): void {
+    selectionHandler.handleSelection(d, (event as MouseEvent).ctrlKey);
 }
