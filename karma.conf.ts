@@ -60,7 +60,7 @@ module.exports = (config: Config) => {
             'coverage',
             'karma-remap-istanbul'
         ],
-        singleRun: false,
+        singleRun: true,
         files: [
             'node_modules/lodash/index.js',
             'node_modules/jquery/dist/jquery.min.js',
@@ -77,6 +77,7 @@ module.exports = (config: Config) => {
             }
         ],
         preprocessors: {
+            "node_modules/lodash/index.js": ["webpack"],
             "node_modules/powerbi-visuals-utils-testutils/lib/**/*.js": ["webpack"],
             "node_modules/powerbi-visuals-utils-svgutils/lib/**/*.js": ["webpack"],
             [testRecursivePath]: ['typescript', "webpack", "sourcemap"],

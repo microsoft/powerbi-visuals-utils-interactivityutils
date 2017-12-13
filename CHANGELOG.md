@@ -1,3 +1,6 @@
+## 3.0.1
+* Moved to webpack 3, commonjs style.
+
 ## 2.0.1
 * UPD: syncSelectionState function declaration was added to ISelectionHandler interface
 

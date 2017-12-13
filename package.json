@@ -1,6 +1,6 @@
 {
   "name": "powerbi-visuals-utils-interactivityutils",
-  "version": "2.0.1",
+  "version": "3.0.1",
   "description": "InteractivityUtils",
   "main": "lib/index.js",
   "repository": {
@@ -35,6 +35,7 @@
     "@types/jasmine-jquery": "^1.5.32",
     "@types/karma": "^1.7.2",
     "@types/webpack": "^3.8.1",
+    "@types/lodash": "^4.14.86",
     "coveralls": "2.13.1",
     "jquery": "^3.2.1",
     "jasmine": "2.6.0",
