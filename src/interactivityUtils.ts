@@ -23,9 +23,9 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
-import { select, event, Selection } from "d3-selection";
+import { select, event, Selection, EnterElement, BaseType } from "d3-selection";
 import { IPoint } from "powerbi-visuals-utils-svgutils";
-import { SelectableDataPoint, ISelectionHandler } from "./interactivityservice"
+import { SelectableDataPoint, ISelectionHandler } from "./interactivityService";
 export module interactivityUtils {
     export function getPositionOfLastInputEvent(): IPoint {
         return {
@@ -41,7 +41,7 @@ export module interactivityUtils {
     export function registerGroupSelectionHandler(group: Selection<any, any, any, any>, selectionHandler: ISelectionHandler): void {
         group.on("click", () => {
             let target: EventTarget = (event as MouseEvent).target,
-                d: SelectableDataPoint = select(target).datum();
+            d: SelectableDataPoint = <SelectableDataPoint>select(target as BaseType).datum();
 
             handleSelection(d, selectionHandler);
         });

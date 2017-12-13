@@ -24,7 +24,7 @@
  *  THE SOFTWARE.
  */
 import { select, event, Selection } from "d3-selection";
-import {BoundingRect} from "powerbi-visuals-utils-svgutils"
+import {BoundingRect} from "powerbi-visuals-utils-svgutils";
 
     // powerbi.extensibility
     import IVisualHost = powerbi.extensibility.visual.IVisualHost;

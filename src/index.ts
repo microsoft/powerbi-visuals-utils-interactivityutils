@@ -1,3 +1,3 @@
-import * as interactivityservice from "./interactivityservice";
+import * as interactivityService from "./interactivityService";
 import * as interactivityUtils from "./interactivityUtils";
-export { interactivityservice, interactivityUtils };
+export { interactivityService, interactivityUtils };

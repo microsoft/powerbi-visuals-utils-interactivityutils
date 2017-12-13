@@ -24,7 +24,7 @@
  *  THE SOFTWARE.
  */
 
-'use strict';
+"use strict";
 
 import * as webpack from "webpack";
 
@@ -36,7 +36,7 @@ const testRecursivePath = "test/**/*.ts"
     , coverageFolder = "coverage"
     , srcCssRecursivePath = 'lib/**/*.css';
 
-module.exports = (config) => {
+module.exports = (config: Config) => {
     let browsers = [];
 
     if (process.env.TRAVIS) {
@@ -45,7 +45,7 @@ module.exports = (config) => {
         browsers.push('Chrome');
     }
 
-    config.set({
+    config.set(<ConfigOptions>{
         customLaunchers: {
             ChromeTravisCI: {
                 base: 'Chrome',
@@ -60,7 +60,7 @@ module.exports = (config) => {
             'coverage',
             'karma-remap-istanbul'
         ],
-        singleRun: true,
+        singleRun: false,
         files: [
             'node_modules/lodash/index.js',
             'node_modules/jquery/dist/jquery.min.js',
@@ -78,6 +78,7 @@ module.exports = (config) => {
         ],
         preprocessors: {
             "node_modules/powerbi-visuals-utils-testutils/lib/**/*.js": ["webpack"],
+            "node_modules/powerbi-visuals-utils-svgutils/lib/**/*.js": ["webpack"],
             [testRecursivePath]: ['typescript', "webpack", "sourcemap"],
             [srcRecursivePath]: ["webpack", 'sourcemap', 'coverage']
         },
@@ -90,7 +91,8 @@ module.exports = (config) => {
             externals: [
                 {
                     sinon: "sinon",
-                    chai: "chai"
+                    chai: "chai",
+                    jQuery: "jQuery"
                 },
             ],
             module: {

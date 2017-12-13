@@ -24,20 +24,15 @@
  *  THE SOFTWARE.
  */
 
-import {SelectableDataPoint, ISelectionHandler, IInteractiveBehavior, InteractivityService} from "../src/interactivityservice";
+import {SelectableDataPoint, ISelectionHandler, IInteractiveBehavior, InteractivityService, createInteractivityService} from "../src/interactivityService";
+import {MockBehavior} from "./mocks/mockInteractiveBehavior";
+import {createVisualHost, createSelectionId} from "powerbi-visuals-utils-testutils";
 // powerbi.visuals
 import ISelectionIdExtended = powerbi.visuals.ISelectionId;
 // powerbi.extensibility
 import ISelectionId = powerbi.extensibility.ISelectionId;
 import IVisualHost = powerbi.extensibility.visual.IVisualHost;
-
-// powerbi.extensibility.utils.interactivity
-
-import createInteractivityService = powerbi.extensibility.utils.interactivity.createInteractivityService;
-import MockBehavior = powerbi.extensibility.utils.interactivity.test.mocks.MockBehavior;
-
-import createVisualHost = powerbi.extensibility.utils.test.mocks.createVisualHost;
-import createSelectionId = powerbi.extensibility.utils.test.mocks.createSelectionId;
+import ISelectionManager = powerbi.extensibility.ISelectionManager;
 
 describe("Interactivity service", () => {
     let host: IVisualHost,
