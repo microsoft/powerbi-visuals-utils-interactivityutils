@@ -23,15 +23,8 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
-
-/// <reference path="../_references.ts" />
-
-module powerbi.extensibility.utils.interactivity.test.mocks {
+import {SelectableDataPoint, ISelectionHandler, IInteractiveBehavior} from "../../src/interactivityService";
     // powerbi.extensibility.utils.interactivity
-    import SelectableDataPoint = powerbi.extensibility.utils.interactivity.SelectableDataPoint;
-    import IInteractiveBehavior = powerbi.extensibility.utils.interactivity.IInteractiveBehavior;
-    import ISelectionHandler = powerbi.extensibility.utils.interactivity.ISelectionHandler;
-
     export class MockBehavior implements IInteractiveBehavior {
         private selectableDataPoints: SelectableDataPoint[];
         private selectionHandler: ISelectionHandler;
@@ -101,4 +94,3 @@ module powerbi.extensibility.utils.interactivity.test.mocks {
             return selections;
         }
     }
-}

@@ -23,8 +23,9 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
+import { select, event, Selection } from "d3-selection";
+import {BoundingRect} from "powerbi-visuals-utils-svgutils";
 
-module powerbi.extensibility.utils.interactivity {
     // powerbi.extensibility
     import IVisualHost = powerbi.extensibility.visual.IVisualHost;
     import ISelectionManager = powerbi.extensibility.ISelectionManager;
@@ -37,7 +38,7 @@ module powerbi.extensibility.utils.interactivity {
     import ArrayExtensions = powerbi.extensibility.utils.type.ArrayExtensions;
 
     // powerbi.extensibility.utils.svg
-    import BoundingRect = powerbi.extensibility.utils.svg.shapes.BoundingRect;
+  //  import BoundingRect = powerbi.extensibility.utils.svg.shapes.BoundingRect;
 
     export interface SelectableDataPoint {
         selected: boolean;
@@ -61,11 +62,12 @@ module powerbi.extensibility.utils.interactivity {
     /**
     * Creates a clear an svg rect to catch clear clicks.
     */
-    export function appendClearCatcher(selection: d3.Selection<any>): d3.Selection<any> {
+    export function appendClearCatcher(selection: Selection<any, any, any, any>): Selection<any, any, any, any> {
         return selection
             .append("rect")
             .classed("clearCatcher", true)
-            .attr({ width: "100%", height: "100%" });
+            .attr("width", "100%")
+            .attr("height", "100%");
     }
 
     export function dataHasSelection(data: SelectableDataPoint[]): boolean {
@@ -462,4 +464,3 @@ module powerbi.extensibility.utils.interactivity {
             this.selectedIds = this.selectedIds.filter((identity) => !identity.hasIdentity());
         }
     }
-}
