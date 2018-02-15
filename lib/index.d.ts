@@ -1,4 +1,70 @@
 /// <reference types="d3" />
+declare module powerbi.extensibility.utils.filter {
+    interface AppliedFilter {
+        whereItems: {
+            condition: any;
+        }[];
+    }
+    interface Expression {
+        left: Expression;
+        right: Expression;
+    }
+    enum SQExprKind {
+        Entity = 0,
+        SubqueryRef = 1,
+        ColumnRef = 2,
+        MeasureRef = 3,
+        Aggregation = 4,
+        PropertyVariationSource = 5,
+        Hierarchy = 6,
+        HierarchyLevel = 7,
+        And = 8,
+        Between = 9,
+        In = 10,
+        Or = 11,
+        Contains = 12,
+        Compare = 13,
+        StartsWith = 14,
+        Exists = 15,
+        Not = 16,
+        Constant = 17,
+        DateSpan = 18,
+        DateAdd = 19,
+        Now = 20,
+        AnyValue = 21,
+        DefaultValue = 22,
+        Arithmetic = 23,
+        FillRule = 24,
+        ResourcePackageItem = 25,
+        ScopedEval = 26,
+        WithRef = 27,
+        Percentile = 28,
+        SelectRef = 29,
+        TransformTableRef = 30,
+        TransformOutputRoleRef = 31,
+        ThemeDataColor = 32,
+        GroupRef = 33,
+        Floor = 34,
+        RoleRef = 35,
+        Discretize = 36,
+        NamedQueryRef = 37,
+        Member = 38,
+        FilteredEval = 39,
+        Conditional = 40,
+    }
+    enum QueryComparisonKind {
+        Equal = 0,
+        GreaterThan = 1,
+        GreaterThanOrEqual = 2,
+        LessThan = 3,
+        LessThanOrEqual = 4,
+    }
+}
+declare module powerbi.extensibility.utils.filter {
+    class FilterManager {
+        static restoreSelectionIds(filter: AppliedFilter): visuals.ISelectionId[];
+    }
+}
 declare module powerbi.extensibility.utils.interactivity {
     import IVisualHost = powerbi.extensibility.visual.IVisualHost;
     import ExtensibilityISelectionId = powerbi.extensibility.ISelectionId;

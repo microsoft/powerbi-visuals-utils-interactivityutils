@@ -1,3 +1,6 @@
+## 2.0.2
+* New FilterManager class with restoreSelectionIds method for converting AppliedFilter to ISelectionId
+
 ## 2.0.1
 * UPD: syncSelectionState function declaration was added to ISelectionHandler interface
 
