@@ -1,11 +1,11 @@
 module powerbi.extensibility.utils.filter {
     export class FilterManager {
-                /*
+        /*
             Restore SelectionID's from filter
         */
         public static restoreSelectionIds(filter: AppliedFilter): visuals.ISelectionId[] {
+            let selectionIds: visuals.ISelectionId[] = [];
             try {
-                let selectionIds: visuals.ISelectionId[] = [];
                 if (filter
                     && filter.whereItems
                     && filter.whereItems.length > 0
@@ -43,15 +43,10 @@ module powerbi.extensibility.utils.filter {
 
                         selectionIds = selectionIds.concat(selectionId);
                     });
-                    return selectionIds;
-                }
-                else {
-                    return selectionIds;
                 }
             }
-            catch (ex) {
-                return [];
-            }
+            catch (ex) {}
+            return selectionIds;
         }
     }
 }
