@@ -121,6 +121,10 @@ declare module powerbi.extensibility.utils.interactivity {
         legendHasSelection(): boolean;
         /** Checks whether the selection mode is inverted or normal */
         isSelectionModeInverted(): boolean;
+        /** Apply new selections to change internal statate of interactivity service from filter*/
+        applySelectionFromFitler(filter: filter.AppliedFilter): void;
+        /** Apply new selections to change internal statate of interactivity service */
+        restoreSelection(selectionIds: ISelectionId[]): void;
     }
     interface ISelectionHandler {
         /**
@@ -162,6 +166,8 @@ declare module powerbi.extensibility.utils.interactivity {
          */
         clearSelection(): void;
         applySelectionStateToData(dataPoints: SelectableDataPoint[], hasHighlights?: boolean): boolean;
+        applySelectionFromFitler(filter: filter.AppliedFilter): void;
+        restoreSelection(selectionIds: ISelectionId[]): void;
         /**
          * Checks whether there is at least one item selected.
          */
