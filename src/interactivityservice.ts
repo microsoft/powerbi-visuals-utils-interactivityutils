@@ -38,6 +38,7 @@ module powerbi.extensibility.utils.interactivity {
 
     // powerbi.extensibility.utils.svg
     import BoundingRect = powerbi.extensibility.utils.svg.shapes.BoundingRect;
+    import FilterManager = filter.FilterManager;
 
     export interface SelectableDataPoint {
         selected: boolean;
@@ -115,6 +116,12 @@ module powerbi.extensibility.utils.interactivity {
 
         /** Checks whether the selection mode is inverted or normal */
         isSelectionModeInverted(): boolean;
+
+        /** Apply new selections to change internal statate of interactivity service from filter */
+        applySelectionFromFitler(filter: filter.AppliedFilter): void;
+
+        /** Apply new selections to change internal statate of interactivity service */
+        restoreSelection(selectionIds: ISelectionId[]): void;
     }
 
     export interface ISelectionHandler {
@@ -233,6 +240,23 @@ module powerbi.extensibility.utils.interactivity {
             }
 
             return this.hasSelection();
+        }
+
+        /**
+         * Apply new selections to change internal statate of interactivity service from filter
+         */
+        public applySelectionFromFitler(filter: filter.AppliedFilter) {
+            this.restoreSelection(FilterManager.restoreSelectionIds(filter));
+        }
+
+        /**
+         * Apply new selections to change internal statate of interactivity service
+         */
+        public restoreSelection(selectionIds: ISelectionId[]) {
+            this.clearSelection();
+            this.selectedIds = selectionIds;
+            this.syncSelectionState();
+            this.renderAll();
         }
 
         /**
