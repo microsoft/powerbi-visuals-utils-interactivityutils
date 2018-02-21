@@ -46,7 +46,8 @@
     "powerbi-visuals-utils-testutils": "^1.0.0",
     "tslint": "5.4.3",
     "tslint-microsoft-contrib": "5.0.0",
-    "typescript": "2.1.4"
+    "typescript": "2.1.4",
+    "powerbi-models": "1.0.2"
   },
   "dependencies": {
     "d3": "3.5.5",
