@@ -65,9 +65,9 @@ module powerbi.extensibility.utils.filter {
                 return undefined;
             }
 
-            let basicFilterOperator: BasicFilterOperators = FilterManager.getBasicFilterOperator(expr.kind);
+            let basicFilterOperator: BasicFilterOperators = FilterManager.getBasicFilterOperator(expr._kind);
             if (
-                expr.values &&
+                (expr.values || expr.arg && expr.arg.values) &&
                 (
                     basicFilterOperator === "In" ||
                     basicFilterOperator === "All" ||
@@ -84,7 +84,7 @@ module powerbi.extensibility.utils.filter {
             Restores AdvancedFilter instance from filter
         */
         private static restoreAdvancedFilter(expr): IAdvancedFilter {
-            let logicalOperator: AdvancedFilterLogicalOperators = FilterManager.getLogicalOperatorNameByKind(expr.kind);
+            let logicalOperator: AdvancedFilterLogicalOperators = FilterManager.getLogicalOperatorNameByKind(expr._kind);
             let conditions: IAdvancedFilterCondition[];
             if (logicalOperator === "And" || logicalOperator === "Or") {
                 conditions = FilterManager.getConditions([expr.left, expr.right]);
@@ -101,8 +101,8 @@ module powerbi.extensibility.utils.filter {
             Restores BasicFilter instance from filter
         */
         private static restoreBasicFilter(expr): IBasicFilter {
-            let basicFilterOperator: BasicFilterOperators = FilterManager.getBasicFilterOperator(expr.kind);
-            let basicFilter: BasicFilter = new window["powerbi-models"].BasicFilter (null, basicFilterOperator, expr.values) as BasicFilter;
+            let basicFilterOperator: BasicFilterOperators = FilterManager.getBasicFilterOperator(expr._kind);
+            let basicFilter: BasicFilter = new window["powerbi-models"].BasicFilter (null, basicFilterOperator, expr.values || expr.arg && expr.arg.values) as BasicFilter;
             return basicFilter.toJSON();
         }
 
@@ -115,10 +115,10 @@ module powerbi.extensibility.utils.filter {
                         (expr.left && expr.right || expr.arg) &&
                         typeof expr.comparison === "undefined" &&
                         (
-                            expr.kind === QueryComparisonKind.Contains ||
-                            expr.kind === QueryComparisonKind.Is ||
-                            expr.kind === QueryComparisonKind.DoesNotContain ||
-                            expr.kind === QueryComparisonKind.StartsWith
+                            expr._kind === QueryComparisonKind.Contains ||
+                            expr._kind === QueryComparisonKind.Is ||
+                            expr._kind === QueryComparisonKind.DoesNotContain ||
+                            expr._kind === QueryComparisonKind.StartsWith
                         )
                     ) {
                         let internal = FilterManager
@@ -138,14 +138,24 @@ module powerbi.extensibility.utils.filter {
                                 }
                             });
                             // check DoesNotStartsWith as  DoesNotContain values as StartsWith value
-                            if (internal.every(con => con.operator === "StartsWith") && expr.kind === QueryComparisonKind.DoesNotContain ) {
+                            if (internal.every(con => con.operator === "StartsWith") && expr._kind === QueryComparisonKind.DoesNotContain ) {
                                 internal.forEach(con => {
                                     con.operator = "DoesNotStartWith";
                                 });
                             }
-                            if (internal.every(con => con.operator === "Contains") && expr.kind === QueryComparisonKind.DoesNotContain ) {
+                            if (internal.every(con => con.operator === "Contains") && expr._kind === QueryComparisonKind.DoesNotContain ) {
                                 internal.forEach(con => {
                                     con.operator = "DoesNotContain";
+                                });
+                            }
+                            if (internal.every(con => con.operator === "Is") && expr._kind === QueryComparisonKind.DoesNotContain ) {
+                                internal.forEach(con => {
+                                    con.operator = "IsNot";
+                                });
+                            }
+                            if (internal.every(con => con.operator === "IsBlank") && expr._kind === QueryComparisonKind.DoesNotContain ) {
+                                internal.forEach(con => {
+                                    con.operator = "IsNotBlank";
                                 });
                             }
                             conditions = conditions.concat(internal);
@@ -164,11 +174,11 @@ module powerbi.extensibility.utils.filter {
                 return undefined;
             }
 
-            if (expr.kind === SQExprKind.Constant) {
+            if (expr._kind === SQExprKind.Constant) {
                 return expr.value;
             }
 
-            if (expr.kind === SQExprKind.Contains) {
+            if (expr._kind === SQExprKind.Contains) {
                 ​return expr.value;
             }
 
@@ -225,6 +235,9 @@ module powerbi.extensibility.utils.filter {
 
         private static getCondictionOperatorByComparison(comparison: QueryComparisonKind): AdvancedFilterConditionOperators {
             switch (comparison) {
+                case QueryComparisonKind.Equal: {
+                    return "Is";
+                }
                 case QueryComparisonKind.Is: {
                     return "Is";
                 }

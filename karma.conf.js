@@ -60,6 +60,7 @@ module.exports = (config) => {
         files: [
             'node_modules/lodash/index.js',
             'node_modules/jquery/dist/jquery.min.js',
+            'node_modules/powerbi-models/dist/models.min.js',
             'node_modules/powerbi-visuals-utils-typeutils/lib/index.js',
             'node_modules/powerbi-visuals-utils-svgutils/lib/index.js',
             'node_modules/powerbi-visuals-utils-testutils/lib/index.js',
