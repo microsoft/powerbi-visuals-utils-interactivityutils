@@ -1,3 +1,6 @@
+## 3.0.0
+* New restoreFilter method of FilterManager class for converting AppliedFilter to IFilter (Basic or Advanced filter)
+
 ## 2.0.2
 * New FilterManager class with restoreSelectionIds method for converting AppliedFilter to ISelectionId
 

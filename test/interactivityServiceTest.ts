@@ -620,9 +620,5 @@ module powerbi.extensibility.utils.interactivity.test {
                 done();
             });
         });
-
-        describe("restore advanced filter with two conditions", () => {
-
-        });
     });
 }

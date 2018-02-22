@@ -61,10 +61,6 @@ module powerbi.extensibility.utils.filter {
 
             let expr = filter.whereItems[0].condition;
 
-            if (!expr) {
-                return undefined;
-            }
-
             let basicFilterOperator: BasicFilterOperators = FilterManager.getBasicFilterOperator(expr._kind);
             if (
                 (expr.values || expr.arg && expr.arg.values) &&
