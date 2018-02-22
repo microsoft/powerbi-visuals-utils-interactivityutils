@@ -50,7 +50,7 @@ module powerbi.extensibility.utils.filter {
             return selectionIds;
         }
 
-        static restoreFilter(filter: AppliedFilter): IFilter {
+        public static restoreFilter(filter: AppliedFilter): IFilter {
             if (!filter
                 || !filter.whereItems
                 || !filter.whereItems[0]
@@ -59,18 +59,31 @@ module powerbi.extensibility.utils.filter {
                 return undefined;
             }
 
-            return FilterManager.restoreAdvancedFilter(filter.whereItems[0].condition);
-        }
+            let expr = filter.whereItems[0].condition;
 
-        /**
-         * TODO: Some condictions might be out of scope
-         * We must check it against all of possible Advanced Filters
-         */
-        private static restoreAdvancedFilter(expr): IAdvancedFilter {
             if (!expr) {
                 return undefined;
             }
 
+            let basicFilterOperator: BasicFilterOperators = FilterManager.getBasicFilterOperator(expr.kind);
+            if (
+                expr.values &&
+                (
+                    basicFilterOperator === "In" ||
+                    basicFilterOperator === "All" ||
+                    basicFilterOperator === "NotIn"
+                )
+            ) {
+                return FilterManager.restoreBasicFilter(expr);
+            }
+
+            return FilterManager.restoreAdvancedFilter(expr);
+        }
+
+        /*
+            Restores AdvancedFilter instance from filter
+        */
+        private static restoreAdvancedFilter(expr): IAdvancedFilter {
             let logicalOperator: AdvancedFilterLogicalOperators = FilterManager.getLogicalOperatorNameByKind(expr.kind);
             let conditions: IAdvancedFilterCondition[];
             if (logicalOperator === "And" || logicalOperator === "Or") {
@@ -79,27 +92,18 @@ module powerbi.extensibility.utils.filter {
                 logicalOperator = "And";
                 conditions = FilterManager.getConditions([expr]);
             }
-            let filter: AdvancedFilter = new window["powerbi-models"].AdvancedFilter(null, logicalOperator, conditions) as AdvancedFilter;
+            let advancedFilter: AdvancedFilter = new window["powerbi-models"].AdvancedFilter(null, logicalOperator, conditions) as AdvancedFilter;
 
-            return filter.toJSON();
+            return advancedFilter.toJSON();
         }
 
-        private static restoreBasicFilter(expr): IAdvancedFilter {
-            if (!expr) {
-                return undefined;
-            }
-
-            let conditions: IAdvancedFilterCondition[] = FilterManager.getConditions([expr.left, expr.right]);
-            let logicalOperator: BasicFilterOperators = FilterManager.getBasicFilterOperator(expr.kind);
-            let filter: BasicFilter = new window["powerbi-models"].AdvancedFilter(null, logicalOperator, conditions.map(cond => cond.value)) as BasicFilter;
-
-            return {
-                $schema: null,
-                target: null,
-                filterType: FilterType.Basic,
-                logicalOperator: FilterManager.getLogicalOperatorNameByKind(expr.kind),
-                conditions: FilterManager.getConditions([expr.left, expr.right]),
-            };
+        /*
+            Restores BasicFilter instance from filter
+        */
+        private static restoreBasicFilter(expr): IBasicFilter {
+            let basicFilterOperator: BasicFilterOperators = FilterManager.getBasicFilterOperator(expr.kind);
+            let basicFilter: BasicFilter = new window["powerbi-models"].BasicFilter (null, basicFilterOperator, expr.values) as BasicFilter;
+            return basicFilter.toJSON();
         }
 
         private static getConditions(exprs: any[]): IAdvancedFilterCondition[] {
@@ -202,7 +206,7 @@ module powerbi.extensibility.utils.filter {
                     return "NotIn";
                 }
                 default:
-                    return "In";
+                    return null;
             }
         }
 
@@ -224,9 +228,6 @@ module powerbi.extensibility.utils.filter {
                 case QueryComparisonKind.Is: {
                     return "Is";
                 }
-                // case QueryComparisonKind.IsNot: {
-                //     return "IsNot";
-                // }
                 case QueryComparisonKind.GreaterThan: {
                     return "GreaterThan";
                 }
@@ -248,15 +249,6 @@ module powerbi.extensibility.utils.filter {
                 case QueryComparisonKind.StartsWith: {
                     return "StartsWith";
                 }
-                // case QueryComparisonKind.DoesNotStartWith: {
-                //     return "DoesNotStartWith";
-                // }
-                // case QueryComparisonKind.IsBlank: {
-                //     return "IsBlank";
-                // }
-                // case QueryComparisonKind.IsNotBlank: {
-                //     return "IsNotBlank";
-                // }
             }
 
             return "None";

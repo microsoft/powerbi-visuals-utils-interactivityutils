@@ -74,10 +74,6 @@ declare module powerbi.extensibility.utils.filter {
     class FilterManager {
         static restoreSelectionIds(filter: AppliedFilter): visuals.ISelectionId[];
         static restoreFilter(filter: AppliedFilter): IFilter;
-        /**
-         * TODO: Some condictions might be out of scope
-         * We must check it against all of possible Advanced Filters
-         */
         private static restoreAdvancedFilter(expr);
         private static restoreBasicFilter(expr);
         private static getConditions(exprs);
