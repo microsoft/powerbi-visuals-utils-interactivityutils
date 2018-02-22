@@ -78,7 +78,7 @@ declare module powerbi.extensibility.utils.filter {
         private static restoreBasicFilter(expr);
         private static getConditions(exprs);
         private static getValue(expr);
-        static getCondiction(expr: any): IAdvancedFilterCondition;
+        static getCondition(expr: any): IAdvancedFilterCondition;
         private static getBasicFilterOperator(kind);
         private static getLogicalOperatorNameByKind(kind);
         private static getCondictionOperatorByComparison(comparison);

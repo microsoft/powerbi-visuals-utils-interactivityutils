@@ -389,9 +389,6 @@ module powerbi.extensibility.utils.interactivity.test {
     });
 
     describe("FilterManager", () => {
-        describe("restore selectionIDs", () => {
-
-        });
 
         describe("basic filter", () => {
             // In [1000, 2000] basic filter sample

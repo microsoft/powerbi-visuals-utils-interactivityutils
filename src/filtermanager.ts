@@ -158,7 +158,7 @@ module powerbi.extensibility.utils.filter {
                             return;
                     }
 
-                    conditions.push(FilterManager.getCondiction(expr));
+                    conditions.push(FilterManager.getCondition(expr));
                 }
             });
 
@@ -193,7 +193,7 @@ module powerbi.extensibility.utils.filter {
             }
         }
 
-        public static getCondiction(expr): IAdvancedFilterCondition {
+        public static getCondition(expr): IAdvancedFilterCondition {
             return {
                 value: FilterManager.getValue(expr),
                 operator: FilterManager.getCondictionOperatorByComparison(expr.comparison),
