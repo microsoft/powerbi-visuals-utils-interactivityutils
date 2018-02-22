@@ -25,6 +25,7 @@
  */
 
 /// <reference path="../lib/index.d.ts" />
+/// <reference path="../node_modules/powerbi-models/dist/models-noexports.d.ts" />
 /// <reference path="../node_modules/powerbi-visuals-tools/templates/visuals/.api/v1.6.0/PowerBI-visuals.d.ts" />
 /// <reference path="../node_modules/powerbi-visuals-utils-testutils/lib/index.d.ts" />
 /// <reference path="mocks/mockInteractiveBehavior.ts" />

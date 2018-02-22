@@ -9,6 +9,7 @@ declare module powerbi.extensibility.utils.filter {
         left: Expression;
         right: Expression;
     }
+    type BasicFilterOperators = "In" | "NotIn" | "All";
     enum SQExprKind {
         Entity = 0,
         SubqueryRef = 1,
@@ -58,11 +59,29 @@ declare module powerbi.extensibility.utils.filter {
         GreaterThanOrEqual = 2,
         LessThan = 3,
         LessThanOrEqual = 4,
+        Contains = 12,
+        Is = 13,
+        StartsWith = 14,
+        DoesNotContain = 16,
+    }
+    interface AppliedFilter {
+        whereItems: {
+            condition: any;
+        }[];
     }
 }
 declare module powerbi.extensibility.utils.filter {
     class FilterManager {
         static restoreSelectionIds(filter: AppliedFilter): visuals.ISelectionId[];
+        static restoreFilter(filter: AppliedFilter): IFilter;
+        private static restoreAdvancedFilter(expr);
+        private static restoreBasicFilter(expr);
+        private static getConditions(exprs);
+        private static getValue(expr);
+        static getCondition(expr: any): IAdvancedFilterCondition;
+        private static getBasicFilterOperator(kind);
+        private static getLogicalOperatorNameByKind(kind);
+        private static getCondictionOperatorByComparison(comparison);
     }
 }
 declare module powerbi.extensibility.utils.interactivity {
@@ -121,7 +140,7 @@ declare module powerbi.extensibility.utils.interactivity {
         legendHasSelection(): boolean;
         /** Checks whether the selection mode is inverted or normal */
         isSelectionModeInverted(): boolean;
-        /** Apply new selections to change internal statate of interactivity service from filter*/
+        /** Apply new selections to change internal statate of interactivity service from filter */
         applySelectionFromFitler(filter: filter.AppliedFilter): void;
         /** Apply new selections to change internal statate of interactivity service */
         restoreSelection(selectionIds: ISelectionId[]): void;
@@ -166,7 +185,13 @@ declare module powerbi.extensibility.utils.interactivity {
          */
         clearSelection(): void;
         applySelectionStateToData(dataPoints: SelectableDataPoint[], hasHighlights?: boolean): boolean;
+        /**
+         * Apply new selections to change internal statate of interactivity service from filter
+         */
         applySelectionFromFitler(filter: filter.AppliedFilter): void;
+        /**
+         * Apply new selections to change internal statate of interactivity service
+         */
         restoreSelection(selectionIds: ISelectionId[]): void;
         /**
          * Checks whether there is at least one item selected.

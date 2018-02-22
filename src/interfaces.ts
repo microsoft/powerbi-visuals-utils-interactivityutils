@@ -11,6 +11,8 @@ module powerbi.extensibility.utils.filter {
         right: Expression;
     }
 
+    export type BasicFilterOperators = "In" | "NotIn" | "All";
+
     export enum SQExprKind {
         Entity,
         SubqueryRef,
@@ -52,7 +54,7 @@ module powerbi.extensibility.utils.filter {
         NamedQueryRef,
         Member,
         FilteredEval,
-        Conditional,
+        Conditional
     }
 
     export enum QueryComparisonKind {
@@ -61,5 +63,16 @@ module powerbi.extensibility.utils.filter {
         GreaterThanOrEqual = 2,
         LessThan = 3,
         LessThanOrEqual = 4,
+        Contains = 12,
+        Is = 13,
+        StartsWith = 14,
+        DoesNotContain = 16
+    }
+
+    // aka SematicFilter
+    export interface AppliedFilter {
+        whereItems: {
+            condition: any
+        }[];
     }
 }

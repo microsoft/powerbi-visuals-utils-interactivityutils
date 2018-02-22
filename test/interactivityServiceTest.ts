@@ -36,6 +36,7 @@ module powerbi.extensibility.utils.interactivity.test {
 
     // powerbi.extensibility.utils.interactivity
     import InteractivityService = powerbi.extensibility.utils.interactivity.InteractivityService;
+    import FilterManager = powerbi.extensibility.utils.filter.FilterManager;
     import SelectableDataPoint = powerbi.extensibility.utils.interactivity.SelectableDataPoint;
     import createInteractivityService = powerbi.extensibility.utils.interactivity.createInteractivityService;
     import MockBehavior = powerbi.extensibility.utils.interactivity.test.mocks.MockBehavior;
@@ -383,6 +384,237 @@ module powerbi.extensibility.utils.interactivity.test {
                 behavior.verifySingleSelectedAt(1);
                 labelBehavior.verifyCleared();
                 expect(interactivityService.hasSelection()).toBeTruthy();
+            });
+        });
+    });
+
+    describe("FilterManager", () => {
+
+        describe("basic filter", () => {
+            // In [1000, 2000] basic filter sample
+            let filterIn10002000: string =
+            `{"fromValue":{"items":{"a":{"entity":"Annual Revenue"}}},` +
+            `"whereItems":[{"condition":{"_kind":10,"args":[{"_kind":2,"source":{"_kind":0,"entity":"Annual Revenue","variable":"a"},"ref":"Year"}],` +
+            `"values":[[{"_kind":17,"type":{"underlyingType":260,"category":null},"value":1000,"typeEncodedValue":"1000L"}],` +
+            `[{"_kind":17,"type":{"underlyingType":260,"category":null},"value":2000,"typeEncodedValue":"2000L"}]]}}]}`;
+
+            let filterNotIn10002000: string =
+            `{"fromValue":{"items":{"a":{"entity":"Annual Revenue"}}},` +
+            `"whereItems":[{"condition":{"_kind":16,"arg":{"_kind":10,"args":[{"_kind":2,"source":{"_kind":0,"entity":"Annual Revenue","variable":"a"},"ref":"Year"}],` +
+            `"values":[[{"_kind":17,"type":{"underlyingType":260,"category":null},"value":1000,"typeEncodedValue":"1000L"}],` +
+            `[{"_kind":17,"type":{"underlyingType":260,"category":null},"value":2000,"typeEncodedValue":"2000L"}]]}}}]}`;
+
+            it("restore 'In' condition filter", (done) => {
+                let filter = JSON.parse(filterIn10002000);
+                let restoredFilter = FilterManager.restoreFilter(filter) as IBasicFilter;
+
+                expect(restoredFilter.operator).toBe("In");
+                expect(restoredFilter.values.length).toBe(2);
+                expect(restoredFilter.filterType).toBe(1 /* FilterType.Basic*/);
+                expect(restoredFilter.values[0][0].value).toBe(1000);
+                expect(restoredFilter.values[1][0].value).toBe(2000);
+                done();
+            });
+
+            it("restore 'NotIn' condition filter", (done) => {
+                let filter = JSON.parse(filterNotIn10002000);
+                let restoredFilter = FilterManager.restoreFilter(filter) as IBasicFilter;
+
+                expect(restoredFilter.operator).toBe("NotIn");
+                expect(restoredFilter.values.length).toBe(2);
+                expect(restoredFilter.filterType).toBe(1 /* FilterType.Basic*/);
+                expect(restoredFilter.values[0][0].value).toBe(1000);
+                expect(restoredFilter.values[1][0].value).toBe(2000);
+                done();
+            });
+        });
+
+        describe("restore advanced filter with one condition", () => {
+            let filterContaints1000 =
+                `{"fromValue":{"items":{"a":{"entity":"Annual Revenue"}}},` +
+                `"whereItems":[{"condition":{"_kind":12,"left":{"_kind":2,"source":{"_kind":0,"entity":"Annual Revenue","variable":"a"},"ref":"Year"},` +
+                `"right":{"_kind":17,"type":{"underlyingType":259,"category":null},"value":1000,"typeEncodedValue":"1000D"}}}]}`;
+
+            let filterDoesNotContain1000: string =
+                `{"fromValue":{"items":{"a":{"entity":"Annual Revenue"}}},` +
+                `"whereItems":[{"condition":{"_kind":16,"arg":{"_kind":12,"left":{"_kind":2,"source":{"_kind":0,"entity":"Annual Revenue","variable":"a"},"ref":"Year"},` +
+                `"right":{"_kind":17,"type":{"underlyingType":259,"category":null},"value":1000,"typeEncodedValue":"1000D"}}}}]}`;
+
+            let filterDoesNotStartWith1000: string =
+                `{"fromValue":{"items":{"a":{"entity":"Annual Revenue"}}},` +
+                `"whereItems":[{"condition":{"_kind":16,"arg":{"_kind":14,"left":{"_kind":2,"source":{"_kind":0,"entity":"Annual Revenue","variable":"a"},"ref":"Year"},` +
+                `"right":{"_kind":17,"type":{"underlyingType":259,"category":null},"value":1000,"typeEncodedValue":"1000D"}}}}]}`;
+
+            let filterGreaterThan1000: string =
+                `{"fromValue":{"items":{"a":{"entity":"Annual Revenue"}}},` +
+                `"whereItems":[{"condition":{"_kind":13,"comparison":1,"left":{"_kind":2,"source":{"_kind":0,"entity":"Annual Revenue","variable":"a"},"ref":"Year"},` +
+                `"right":{"_kind":17,"type":{"underlyingType":259,"category":null},"value":1000,"typeEncodedValue":"1000D"}}}]}`;
+
+            let filterGreaterThanOrEqual1000: string =
+                `{"fromValue":{"items":{"a":{"entity":"Annual Revenue"}}},` +
+                `"whereItems":[{"condition":{"_kind":13,"comparison":2,"left":{"_kind":2,"source":{"_kind":0,"entity":"Annual Revenue","variable":"a"},"ref":"Year"},` +
+                `"right":{"_kind":17,"type":{"underlyingType":259,"category":null},"value":1000,"typeEncodedValue":"1000D"}}}]}`;
+
+            let filterIs1000: string =
+                `{"fromValue":{"items":{"a":{"entity":"Annual Revenue"}}},` +
+                `"whereItems":[{"condition":{"_kind":13,"comparison":0,"left":{"_kind":2,"source":{"_kind":0,"entity":"Annual Revenue","variable":"a"},"ref":"Year"},` +
+                `"right":{"_kind":17,"type":{"underlyingType":259,"category":null},"value":1000,"typeEncodedValue":"1000D"}}}]}`;
+
+            let filterIsBlank1000: string =
+                `{"fromValue":{"items":{"a":{"entity":"Annual Revenue"}}},` +
+                `"whereItems":[{"condition":{"_kind":13,"comparison":0,"left":{"_kind":2,"source":{"_kind":0,"entity":"Annual Revenue","variable":"a"},"ref":"Year"},` +
+                `"right":{"_kind":17,"type":{"underlyingType":0,"category":null},"value":null,"typeEncodedValue":"null"}}}]}`;
+
+            let filterIsNot1000: string =
+                `{"fromValue":{"items":{"a":{"entity":"Annual Revenue"}}},` +
+                `"whereItems":[{"condition":{"_kind":16,"arg":{"_kind":13,"comparison":0,"left":{"_kind":2,"source":{"_kind":0,"entity":"Annual Revenue","variable":"a"},` +
+                `"ref":"Year"},"right":{"_kind":17,"type":{"underlyingType":259,"category":null},"value":1000,"typeEncodedValue":"1000D"}}}}]}`;
+
+            let filterIsNotBlank1000: string =
+                `{"fromValue":{"items":{"a":{"entity":"Annual Revenue"}}},` +
+                `"whereItems":[{"condition":{"_kind":16,"arg":{"_kind":13,"comparison":0,"left":{"_kind":2,"source":{"_kind":0,"entity":"Annual Revenue","variable":"a"},` +
+                `"ref":"Year"},"right":{"_kind":17,"type":{"underlyingType":0,"category":null},"value":null,"typeEncodedValue":"null"}}}}]}`;
+
+            let filterLessThan1000: string =
+                `{"fromValue":{"items":{"a":{"entity":"Annual Revenue"}}},` +
+                `"whereItems":[{"condition":{"_kind":13,"comparison":3,"left":{"_kind":2,"source":{"_kind":0,"entity":"Annual Revenue","variable":"a"},"ref":"Year"},` +
+                `"right":{"_kind":17,"type":{"underlyingType":259,"category":null},"value":1000,"typeEncodedValue":"1000D"}}}]}`;
+
+            let filterLessThanOrEqual1000: string =
+                `{"fromValue":{"items":{"a":{"entity":"Annual Revenue"}}},` +
+                `"whereItems":[{"condition":{"_kind":13,"comparison":4,"left":{"_kind":2,"source":{"_kind":0,"entity":"Annual Revenue","variable":"a"},"ref":"Year"},` +
+                `"right":{"_kind":17,"type":{"underlyingType":259,"category":null},"value":1000,"typeEncodedValue":"1000D"}}}]}`;
+
+            it("restore 'Contains' operator filter", (done) => {
+                let filter = JSON.parse(filterContaints1000);
+                let restoredFilter = FilterManager.restoreFilter(filter) as IAdvancedFilter;
+
+                expect(restoredFilter.logicalOperator).toBe("And");
+                expect(restoredFilter.conditions.length).toBe(1);
+                expect(restoredFilter.filterType).toBe(0 /* FilterType.Advanced*/);
+                expect(restoredFilter.conditions[0].operator).toBe("Contains");
+                expect(restoredFilter.conditions[0].value).toBe(1000);
+                done();
+            });
+
+            it("restore 'DoesNotContain' operator filter", (done) => {
+                let filter = JSON.parse(filterDoesNotContain1000);
+                let restoredFilter = FilterManager.restoreFilter(filter) as IAdvancedFilter;
+
+                expect(restoredFilter.logicalOperator).toBe("And");
+                expect(restoredFilter.conditions.length).toBe(1);
+                expect(restoredFilter.filterType).toBe(0 /* FilterType.Advanced*/);
+                expect(restoredFilter.conditions[0].operator).toBe("DoesNotContain");
+                expect(restoredFilter.conditions[0].value).toBe(1000);
+                done();
+            });
+
+            it("restore 'DoesNotStartWith' operator filter", (done) => {
+                let filter = JSON.parse(filterDoesNotStartWith1000);
+                let restoredFilter = FilterManager.restoreFilter(filter) as IAdvancedFilter;
+
+                expect(restoredFilter.logicalOperator).toBe("And");
+                expect(restoredFilter.conditions.length).toBe(1);
+                expect(restoredFilter.filterType).toBe(0 /* FilterType.Advanced*/);
+                expect(restoredFilter.conditions[0].operator).toBe("DoesNotStartWith");
+                expect(restoredFilter.conditions[0].value).toBe(1000);
+                done();
+            });
+
+            it("restore 'GreaterThan' operator filter", (done) => {
+                let filter = JSON.parse(filterGreaterThan1000);
+                let restoredFilter = FilterManager.restoreFilter(filter) as IAdvancedFilter;
+
+                expect(restoredFilter.logicalOperator).toBe("And");
+                expect(restoredFilter.conditions.length).toBe(1);
+                expect(restoredFilter.filterType).toBe(0 /* FilterType.Advanced*/);
+                expect(restoredFilter.conditions[0].operator).toBe("GreaterThan");
+                expect(restoredFilter.conditions[0].value).toBe(1000);
+                done();
+            });
+
+            it("restore 'GreaterThanOrEqual' operator filter", (done) => {
+                let filter = JSON.parse(filterGreaterThanOrEqual1000);
+                let restoredFilter = FilterManager.restoreFilter(filter) as IAdvancedFilter;
+
+                expect(restoredFilter.logicalOperator).toBe("And");
+                expect(restoredFilter.conditions.length).toBe(1);
+                expect(restoredFilter.filterType).toBe(0 /* FilterType.Advanced*/);
+                expect(restoredFilter.conditions[0].operator).toBe("GreaterThanOrEqual");
+                expect(restoredFilter.conditions[0].value).toBe(1000);
+                done();
+            });
+
+            it("restore 'Is' operator filter", (done) => {
+                let filter = JSON.parse(filterIs1000);
+                let restoredFilter = FilterManager.restoreFilter(filter) as IAdvancedFilter;
+
+                expect(restoredFilter.logicalOperator).toBe("And");
+                expect(restoredFilter.conditions.length).toBe(1);
+                expect(restoredFilter.filterType).toBe(0 /* FilterType.Advanced*/);
+                expect(restoredFilter.conditions[0].operator).toBe("Is");
+                expect(restoredFilter.conditions[0].value).toBe(1000);
+                done();
+            });
+
+            it("restore 'IsNot' operator filter", (done) => {
+                let filter = JSON.parse(filterIsNot1000);
+                let restoredFilter = FilterManager.restoreFilter(filter) as IAdvancedFilter;
+
+                expect(restoredFilter.logicalOperator).toBe("And");
+                expect(restoredFilter.conditions.length).toBe(1);
+                expect(restoredFilter.filterType).toBe(0 /* FilterType.Advanced*/);
+                expect(restoredFilter.conditions[0].operator).toBe("IsNot");
+                expect(restoredFilter.conditions[0].value).toBe(1000);
+                done();
+            });
+
+            it("restore 'IsBlank' operator filter", (done) => {
+                let filter = JSON.parse(filterIsBlank1000);
+                let restoredFilter = FilterManager.restoreFilter(filter) as IAdvancedFilter;
+
+                expect(restoredFilter.logicalOperator).toBe("And");
+                expect(restoredFilter.conditions.length).toBe(1);
+                expect(restoredFilter.filterType).toBe(0 /* FilterType.Advanced*/);
+                expect(restoredFilter.conditions[0].operator).toBe("Is");
+                expect(restoredFilter.conditions[0].value).toBeNull();
+                done();
+            });
+
+            it("restore 'IsNotBlank' operator filter", (done) => {
+                let filter = JSON.parse(filterIsNotBlank1000);
+                let restoredFilter = FilterManager.restoreFilter(filter) as IAdvancedFilter;
+
+                expect(restoredFilter.logicalOperator).toBe("And");
+                expect(restoredFilter.conditions.length).toBe(1);
+                expect(restoredFilter.filterType).toBe(0 /* FilterType.Advanced*/);
+                expect(restoredFilter.conditions[0].operator).toBe("IsNotBlank");
+                expect(restoredFilter.conditions[0].value).toBeNull();
+                done();
+            });
+
+            it("restore 'LessThan' operator filter", (done) => {
+                let filter = JSON.parse(filterLessThan1000);
+                let restoredFilter = FilterManager.restoreFilter(filter) as IAdvancedFilter;
+
+                expect(restoredFilter.logicalOperator).toBe("And");
+                expect(restoredFilter.conditions.length).toBe(1);
+                expect(restoredFilter.filterType).toBe(0 /* FilterType.Advanced*/);
+                expect(restoredFilter.conditions[0].operator).toBe("LessThan");
+                expect(restoredFilter.conditions[0].value).toBe(1000);
+                done();
+            });
+
+            it("restore 'LessThanOrEqual' operator filter", (done) => {
+                let filter = JSON.parse(filterLessThanOrEqual1000);
+                let restoredFilter = FilterManager.restoreFilter(filter) as IAdvancedFilter;
+
+                expect(restoredFilter.logicalOperator).toBe("And");
+                expect(restoredFilter.conditions.length).toBe(1);
+                expect(restoredFilter.filterType).toBe(0 /* FilterType.Advanced*/);
+                expect(restoredFilter.conditions[0].operator).toBe("LessThanOrEqual");
+                expect(restoredFilter.conditions[0].value).toBe(1000);
+                done();
             });
         });
     });
