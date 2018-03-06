@@ -118,7 +118,7 @@ module powerbi.extensibility.utils.interactivity {
         isSelectionModeInverted(): boolean;
 
         /** Apply new selections to change internal statate of interactivity service from filter */
-        applySelectionFromFitler(filter: filter.AppliedFilter): void;
+        applySelectionFromFilter(filter: filter.AppliedFilter): void;
 
         /** Apply new selections to change internal statate of interactivity service */
         restoreSelection(selectionIds: ISelectionId[]): void;
@@ -245,7 +245,7 @@ module powerbi.extensibility.utils.interactivity {
         /**
          * Apply new selections to change internal statate of interactivity service from filter
          */
-        public applySelectionFromFitler(filter: filter.AppliedFilter) {
+        public applySelectionFromFilter(filter: filter.AppliedFilter) {
             this.restoreSelection(FilterManager.restoreSelectionIds(filter));
         }
 

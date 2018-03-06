@@ -141,7 +141,7 @@ declare module powerbi.extensibility.utils.interactivity {
         /** Checks whether the selection mode is inverted or normal */
         isSelectionModeInverted(): boolean;
         /** Apply new selections to change internal statate of interactivity service from filter */
-        applySelectionFromFitler(filter: filter.AppliedFilter): void;
+        applySelectionFromFilter(filter: filter.AppliedFilter): void;
         /** Apply new selections to change internal statate of interactivity service */
         restoreSelection(selectionIds: ISelectionId[]): void;
     }
@@ -188,7 +188,7 @@ declare module powerbi.extensibility.utils.interactivity {
         /**
          * Apply new selections to change internal statate of interactivity service from filter
          */
-        applySelectionFromFitler(filter: filter.AppliedFilter): void;
+        applySelectionFromFilter(filter: filter.AppliedFilter): void;
         /**
          * Apply new selections to change internal statate of interactivity service
          */
