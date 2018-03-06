@@ -1,3 +1,6 @@
+## 3.0.1
+* Rename `applySelectionFromFitler` to `applySelectionFromFilter`
+
 ## 3.0.0
 * New restoreFilter method of FilterManager class for converting AppliedFilter to IFilter (Basic or Advanced filter)
 
