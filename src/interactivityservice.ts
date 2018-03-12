@@ -38,7 +38,6 @@ module powerbi.extensibility.utils.interactivity {
 
     // powerbi.extensibility.utils.svg
     import BoundingRect = powerbi.extensibility.utils.svg.shapes.BoundingRect;
-    import FilterManager = filter.FilterManager;
 
     export interface SelectableDataPoint {
         selected: boolean;
@@ -117,10 +116,10 @@ module powerbi.extensibility.utils.interactivity {
         /** Checks whether the selection mode is inverted or normal */
         isSelectionModeInverted(): boolean;
 
-        /** Apply new selections to change internal statate of interactivity service from filter */
-        applySelectionFromFilter(filter: filter.AppliedFilter): void;
+        /** Apply new selections to change internal state of interactivity service from filter */
+        applySelectionFromFilter(appliedFilter: filter.AppliedFilter): void;
 
-        /** Apply new selections to change internal statate of interactivity service */
+        /** Apply new selections to change internal state of interactivity service */
         restoreSelection(selectionIds: ISelectionId[]): void;
     }
 
@@ -130,7 +129,7 @@ module powerbi.extensibility.utils.interactivity {
          * identity is undefined, the selection state is cleared. In this case, if specificIdentity
          * exists, it will still be sent to the host.
          */
-        handleSelection(dataPoint: SelectableDataPoint, multiSelect: boolean, skipSync?: boolean): void;
+        handleSelection(dataPoint: SelectableDataPoint, multiSelect: boolean): void;
 
         /** Handles a selection clear, clearing all selection state */
         handleClearSelection(): void;
@@ -165,8 +164,6 @@ module powerbi.extensibility.utils.interactivity {
         public selectableLegendDataPoints: SelectableDataPoint[];
         public selectableLabelsDataPoints: SelectableDataPoint[];
 
-        private dataPointObjectName = "dataPoint";
-
         constructor(hostServices: IVisualHost) {
             this.hostService = hostServices;
 
@@ -175,7 +172,7 @@ module powerbi.extensibility.utils.interactivity {
 
         // IInteractivityService Implementation
 
-        /** Binds the vsiual to the interactivityService */
+        /** Binds the visual to the interactivityService */
         public bind(dataPoints: SelectableDataPoint[], behavior: IInteractiveBehavior, behaviorOptions: any, options?: InteractivityServiceOptions): void {
             const didThePreviousStateHaveSelectedIds: boolean = this.selectedIds.length > 0;
 
@@ -214,7 +211,7 @@ module powerbi.extensibility.utils.interactivity {
             this.behavior = behavior;
             behavior.bindEvents(behaviorOptions, this);
             // Sync data points with current selection state
-            this.syncSelectionState(didThePreviousStateHaveSelectedIds);
+            this.syncSelectionState();
         }
 
         /**
@@ -243,14 +240,14 @@ module powerbi.extensibility.utils.interactivity {
         }
 
         /**
-         * Apply new selections to change internal statate of interactivity service from filter
+         * Apply new selections to change internal state of interactivity service from filter
          */
-        public applySelectionFromFilter(filter: filter.AppliedFilter) {
-            this.restoreSelection(FilterManager.restoreSelectionIds(filter));
+        public applySelectionFromFilter(appliedFilter: filter.AppliedFilter): void {
+            this.restoreSelection(filter.FilterManager.restoreSelectionIds(appliedFilter));
         }
 
         /**
-         * Apply new selections to change internal statate of interactivity service
+         * Apply new selections to change internal state of interactivity service
          */
         public restoreSelection(selectionIds: ISelectionId[]) {
             this.clearSelection();
@@ -288,18 +285,19 @@ module powerbi.extensibility.utils.interactivity {
             this.selectionManager.applySelectionFilter();
         }
 
-        public handleSelection(dataPoint: SelectableDataPoint, multiSelect: boolean, skipSync?: boolean): void {
+        public handleSelection(dataPoint: SelectableDataPoint, multiSelect: boolean): void {
             // defect 7067397: should not happen so assert but also don't continue as it's
             // causing a lot of error telemetry in desktop.
-            if (!dataPoint)
+            if (!dataPoint) {
                 return;
+            }
 
             if (!dataPoint.identity) {
                 this.handleClearSelection();
             }
             else {
-                this.select(dataPoint, multiSelect, skipSync);
-                this.sendSelectionToHost(dataPoint, multiSelect);
+                this.select(dataPoint, multiSelect);
+                this.sendSelectionToHost();
                 this.renderAll();
             }
         }
@@ -319,40 +317,25 @@ module powerbi.extensibility.utils.interactivity {
          *
          * Ignores series for now, since we don't support series selection at the moment.
          */
-        public syncSelectionState(didThePreviousStateHaveSelectedIds: boolean = false): void {
-            let selectedIds = this.selectedIds;
-            let selectableDataPoints = this.selectableDataPoints;
-            let selectableLegendDataPoints = this.selectableLegendDataPoints;
-            let selectableLabelsDataPoints = this.selectableLabelsDataPoints;
-            let foundMatchingId = false; // Checked only against the visual's data points; it's possible to have stuff selected in the visual that's not in the legend, but not vice-verse
-
-            if (!selectableDataPoints && !selectableLegendDataPoints)
+        public syncSelectionState(): void {
+            if (!this.selectableDataPoints && !this.selectableLegendDataPoints) {
                 return;
-
-            if (selectableDataPoints) {
-                if (InteractivityService.updateSelectableDataPointsBySelectedIds(selectableDataPoints, selectedIds))
-                    foundMatchingId = true;
             }
 
-            if (selectableLegendDataPoints) {
-                if (InteractivityService.updateSelectableDataPointsBySelectedIds(selectableLegendDataPoints, selectedIds))
-                    foundMatchingId = true;
+            if (this.selectableDataPoints) {
+                InteractivityService.updateSelectableDataPointsBySelectedIds(this.selectableDataPoints, this.selectedIds);
             }
 
-            if (selectableLabelsDataPoints) {
-                let labelsDataPoint: SelectableDataPoint;
-                for (let i = 0, ilen = selectableLabelsDataPoints.length; i < ilen; i++) {
-                    labelsDataPoint = selectableLabelsDataPoints[i];
-                    if (selectedIds.some((value: ISelectionId) => value.includes(labelsDataPoint.identity as ISelectionId)))
-                        labelsDataPoint.selected = true;
-                    else
-                        labelsDataPoint.selected = false;
+            if (this.selectableLegendDataPoints) {
+                InteractivityService.updateSelectableDataPointsBySelectedIds(this.selectableLegendDataPoints, this.selectedIds);
+            }
+
+            if (this.selectableLabelsDataPoints) {
+                for (let labelsDataPoint of this.selectableLabelsDataPoints) {
+                    labelsDataPoint.selected = this.selectedIds.some((value: ISelectionId) => {
+                        return value.includes(labelsDataPoint.identity as ISelectionId);
+                    });
                 }
-            }
-
-            if (!foundMatchingId && (selectedIds.length > 0 || didThePreviousStateHaveSelectedIds)) {
-                this.clearSelection();
-                this.sendSelectionToHost();
             }
         }
 
@@ -365,11 +348,12 @@ module powerbi.extensibility.utils.interactivity {
         }
 
         /** Marks a data point as selected and syncs selection with the host. */
-        private select(d: SelectableDataPoint, multiSelect: boolean, skipSync?: boolean): void {
+        private select(d: SelectableDataPoint, multiSelect: boolean): void {
             let id = d.identity as ISelectionId;
 
-            if (!id)
+            if (!id) {
                 return;
+            }
 
             let selected = !d.selected || (!multiSelect && this.selectedIds.length > 1);
 
@@ -399,9 +383,7 @@ module powerbi.extensibility.utils.interactivity {
                 }
             }
 
-            if (!skipSync) {
-                this.syncSelectionState();
-            }
+            this.syncSelectionState();
         }
 
         private removeId(toRemove: ISelectionId): void {
@@ -414,13 +396,13 @@ module powerbi.extensibility.utils.interactivity {
             }
         }
 
-        private sendSelectionToHost(dataPoint?: SelectableDataPoint, multiSelection?: boolean) {
+        private sendSelectionToHost() {
             if (!this.selectionManager) {
                 return;
             }
 
-            if (dataPoint && dataPoint.identity) {
-                this.selectionManager.select(dataPoint.identity, multiSelection);
+            if (this.selectedIds && this.selectedIds.length) {
+                this.selectionManager.select(this.selectedIds);
             } else {
                 this.selectionManager.clear();
             }

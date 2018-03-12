@@ -140,9 +140,9 @@ declare module powerbi.extensibility.utils.interactivity {
         legendHasSelection(): boolean;
         /** Checks whether the selection mode is inverted or normal */
         isSelectionModeInverted(): boolean;
-        /** Apply new selections to change internal statate of interactivity service from filter */
-        applySelectionFromFilter(filter: filter.AppliedFilter): void;
-        /** Apply new selections to change internal statate of interactivity service */
+        /** Apply new selections to change internal state of interactivity service from filter */
+        applySelectionFromFilter(appliedFilter: filter.AppliedFilter): void;
+        /** Apply new selections to change internal state of interactivity service */
         restoreSelection(selectionIds: ISelectionId[]): void;
     }
     interface ISelectionHandler {
@@ -151,7 +151,7 @@ declare module powerbi.extensibility.utils.interactivity {
          * identity is undefined, the selection state is cleared. In this case, if specificIdentity
          * exists, it will still be sent to the host.
          */
-        handleSelection(dataPoint: SelectableDataPoint, multiSelect: boolean, skipSync?: boolean): void;
+        handleSelection(dataPoint: SelectableDataPoint, multiSelect: boolean): void;
         /** Handles a selection clear, clearing all selection state */
         handleClearSelection(): void;
         /**
@@ -176,9 +176,8 @@ declare module powerbi.extensibility.utils.interactivity {
         selectableDataPoints: SelectableDataPoint[];
         selectableLegendDataPoints: SelectableDataPoint[];
         selectableLabelsDataPoints: SelectableDataPoint[];
-        private dataPointObjectName;
         constructor(hostServices: IVisualHost);
-        /** Binds the vsiual to the interactivityService */
+        /** Binds the visual to the interactivityService */
         bind(dataPoints: SelectableDataPoint[], behavior: IInteractiveBehavior, behaviorOptions: any, options?: InteractivityServiceOptions): void;
         /**
          * Sets the selected state of all selectable data points to false and invokes the behavior's select command.
@@ -186,11 +185,11 @@ declare module powerbi.extensibility.utils.interactivity {
         clearSelection(): void;
         applySelectionStateToData(dataPoints: SelectableDataPoint[], hasHighlights?: boolean): boolean;
         /**
-         * Apply new selections to change internal statate of interactivity service from filter
+         * Apply new selections to change internal state of interactivity service from filter
          */
-        applySelectionFromFilter(filter: filter.AppliedFilter): void;
+        applySelectionFromFilter(appliedFilter: filter.AppliedFilter): void;
         /**
-         * Apply new selections to change internal statate of interactivity service
+         * Apply new selections to change internal state of interactivity service
          */
         restoreSelection(selectionIds: ISelectionId[]): void;
         /**
@@ -201,7 +200,7 @@ declare module powerbi.extensibility.utils.interactivity {
         labelsHasSelection(): boolean;
         isSelectionModeInverted(): boolean;
         applySelectionFilter(): void;
-        handleSelection(dataPoint: SelectableDataPoint, multiSelect: boolean, skipSync?: boolean): void;
+        handleSelection(dataPoint: SelectableDataPoint, multiSelect: boolean): void;
         handleClearSelection(): void;
         /**
          * Syncs the selection state for all data points that have the same category. Returns
@@ -213,12 +212,12 @@ declare module powerbi.extensibility.utils.interactivity {
          *
          * Ignores series for now, since we don't support series selection at the moment.
          */
-        syncSelectionState(didThePreviousStateHaveSelectedIds?: boolean): void;
+        syncSelectionState(): void;
         private renderAll();
         /** Marks a data point as selected and syncs selection with the host. */
-        private select(d, multiSelect, skipSync?);
+        private select(d, multiSelect);
         private removeId(toRemove);
-        private sendSelectionToHost(dataPoint?, multiSelection?);
+        private sendSelectionToHost();
         private takeSelectionStateFromDataPoints(dataPoints);
         private applyToAllSelectableDataPoints(action);
         private static updateSelectableDataPointsBySelectedIds(selectableDataPoints, selectedIds);

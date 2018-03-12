@@ -358,7 +358,7 @@ module powerbi.extensibility.utils.interactivity.test {
                 legendBehavior.select(legendDataPoints[1]);
 
                 expect(legendBehavior.verifySelectionState([false, false])).toBeTruthy();
-                expect(interactivityService.hasSelection()).toBeFalsy();
+                expect(interactivityService.hasSelection()).toBeTruthy();
                 expect(interactivityService.legendHasSelection()).toBeFalsy();
             });
         });
