@@ -208,7 +208,7 @@ declare module powerbi.extensibility.utils.interactivity {
          *
          * Ignores series for now, since we don't support series selection at the moment.
          */
-        private syncSelectionState();
+        syncSelectionState(): void;
         private syncSelectionStateInverted();
         private renderAll();
         /** Marks a data point as selected and syncs selection with the host. */
