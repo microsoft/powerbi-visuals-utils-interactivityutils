@@ -321,7 +321,7 @@ module powerbi.extensibility.utils.interactivity {
             if (this.isInvertedSelectionMode) {
                 return this.syncSelectionStateInverted();
             }
-        
+
             if (!this.selectableDataPoints && !this.selectableLegendDataPoints) {
                 return;
             }
@@ -342,7 +342,7 @@ module powerbi.extensibility.utils.interactivity {
                 }
             }
         }
-        
+
         private syncSelectionStateInverted(): void {
             let selectedIds = this.selectedIds;
             let selectableDataPoints = this.selectableDataPoints;
