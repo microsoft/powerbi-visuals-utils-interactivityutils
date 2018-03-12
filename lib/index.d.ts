@@ -92,13 +92,13 @@ declare module powerbi.extensibility.utils.interactivity {
     interface SelectableDataPoint {
         selected: boolean;
         /** Identity for identifying the selectable data point for selection purposes */
-        identity: ISelectionId | ExtensibilityISelectionId;
+        identity: ExtensibilityISelectionId;
         /**
          * A specific identity for when data points exist at a finer granularity than
          * selection is performed.  For example, if your data points should select based
          * only on series even if they exist as category/series intersections.
          */
-        specificIdentity?: ISelectionId | ExtensibilityISelectionId;
+        specificIdentity?: ExtensibilityISelectionId;
     }
     /**
      * Factory method to create an IInteractivityService instance.
@@ -158,10 +158,6 @@ declare module powerbi.extensibility.utils.interactivity {
          * Sends the selection state to the host
          */
         applySelectionFilter(): void;
-        /**
-         * Sync data points with current selection state
-         */
-        syncSelectionState(didThePreviousStateHaveSelectedIds?: boolean): void;
     }
     class InteractivityService implements IInteractivityService, ISelectionHandler {
         private selectionManager;
@@ -212,7 +208,8 @@ declare module powerbi.extensibility.utils.interactivity {
          *
          * Ignores series for now, since we don't support series selection at the moment.
          */
-        syncSelectionState(): void;
+        private syncSelectionState();
+        private syncSelectionStateInverted();
         private renderAll();
         /** Marks a data point as selected and syncs selection with the host. */
         private select(d, multiSelect);
