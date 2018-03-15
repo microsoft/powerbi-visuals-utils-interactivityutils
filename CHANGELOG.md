@@ -1,3 +1,6 @@
+## 3.1.0
+* ADD: ability to support Power BI bookmarks
+
 ## 3.0.1
 * Rename `applySelectionFromFitler` to `applySelectionFromFilter`
 

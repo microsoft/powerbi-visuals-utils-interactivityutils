@@ -42,13 +42,13 @@ module powerbi.extensibility.utils.interactivity {
     export interface SelectableDataPoint {
         selected: boolean;
         /** Identity for identifying the selectable data point for selection purposes */
-        identity: ISelectionId | ExtensibilityISelectionId;
+        identity: ExtensibilityISelectionId;
         /**
          * A specific identity for when data points exist at a finer granularity than
          * selection is performed.  For example, if your data points should select based
          * only on series even if they exist as category/series intersections.
          */
-        specificIdentity?: ISelectionId | ExtensibilityISelectionId;
+        specificIdentity?: ExtensibilityISelectionId;
     }
 
     /**
@@ -138,11 +138,6 @@ module powerbi.extensibility.utils.interactivity {
          * Sends the selection state to the host
          */
         applySelectionFilter(): void;
-
-        /**
-         * Sync data points with current selection state
-         */
-        syncSelectionState(didThePreviousStateHaveSelectedIds?: boolean): void;
     }
 
     export class InteractivityService implements IInteractivityService, ISelectionHandler {
@@ -168,14 +163,18 @@ module powerbi.extensibility.utils.interactivity {
             this.hostService = hostServices;
 
             this.selectionManager = hostServices.createSelectionManager();
+
+            if ((this.selectionManager as any).registerOnSelectCallback) {
+                (this.selectionManager as any).registerOnSelectCallback(() => {
+                    this.restoreSelection([...this.selectionManager.getSelectionIds() as ISelectionId[]]);
+                });
+            }
         }
 
         // IInteractivityService Implementation
 
         /** Binds the visual to the interactivityService */
         public bind(dataPoints: SelectableDataPoint[], behavior: IInteractiveBehavior, behaviorOptions: any, options?: InteractivityServiceOptions): void {
-            const didThePreviousStateHaveSelectedIds: boolean = this.selectedIds.length > 0;
-
             // Bind the data
             if (options && options.overrideSelectionFromData) {
                 // Override selection state from data points if needed
@@ -201,6 +200,7 @@ module powerbi.extensibility.utils.interactivity {
                 if (options.hasSelectionOverride != null) {
                     this.hasSelectionOverride = options.hasSelectionOverride;
                 }
+
             }
             else {
                 this.selectableDataPoints = dataPoints;
@@ -318,6 +318,10 @@ module powerbi.extensibility.utils.interactivity {
          * Ignores series for now, since we don't support series selection at the moment.
          */
         public syncSelectionState(): void {
+            if (this.isInvertedSelectionMode) {
+                return this.syncSelectionStateInverted();
+            }
+
             if (!this.selectableDataPoints && !this.selectableLegendDataPoints) {
                 return;
             }
@@ -335,6 +339,29 @@ module powerbi.extensibility.utils.interactivity {
                     labelsDataPoint.selected = this.selectedIds.some((value: ISelectionId) => {
                         return value.includes(labelsDataPoint.identity as ISelectionId);
                     });
+                }
+            }
+        }
+
+        private syncSelectionStateInverted(): void {
+            let selectedIds = this.selectedIds;
+            let selectableDataPoints = this.selectableDataPoints;
+            if (!selectableDataPoints)
+                return;
+
+            if (selectedIds.length === 0) {
+                for (let dataPoint of selectableDataPoints) {
+                    dataPoint.selected = false;
+                }
+            }
+            else {
+                for (let dataPoint of selectableDataPoints) {
+                    if (selectedIds.some((value: ISelectionId) => value.includes(dataPoint.identity as ISelectionId))) {
+                        dataPoint.selected = true;
+                    }
+                    else if (dataPoint.selected) {
+                        dataPoint.selected = false;
+                    }
                 }
             }
         }
@@ -402,7 +429,7 @@ module powerbi.extensibility.utils.interactivity {
             }
 
             if (this.selectedIds && this.selectedIds.length) {
-                this.selectionManager.select(this.selectedIds);
+                this.selectionManager.select([...this.selectedIds]);
             } else {
                 this.selectionManager.clear();
             }
@@ -415,8 +442,9 @@ module powerbi.extensibility.utils.interactivity {
             ArrayExtensions.clear(selectedIds);
 
             for (let dataPoint of dataPoints) {
-                if (dataPoint.selected)
+                if (dataPoint.selected) {
                     selectedIds.push(dataPoint.identity as ISelectionId);
+                }
             }
         }
 
