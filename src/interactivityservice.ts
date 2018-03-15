@@ -166,7 +166,7 @@ module powerbi.extensibility.utils.interactivity {
 
             if ((this.selectionManager as any).registerOnSelectCallback) {
                 (this.selectionManager as any).registerOnSelectCallback(() => {
-                    this.restoreSelection(this.selectionManager.getSelectionIds() as ISelectionId[]);
+                    this.restoreSelection([...this.selectionManager.getSelectionIds() as ISelectionId[]]);
                 });
             }
         }
@@ -429,7 +429,7 @@ module powerbi.extensibility.utils.interactivity {
             }
 
             if (this.selectedIds && this.selectedIds.length) {
-                this.selectionManager.select(this.selectedIds);
+                this.selectionManager.select([...this.selectedIds]);
             } else {
                 this.selectionManager.clear();
             }
