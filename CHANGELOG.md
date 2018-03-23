@@ -1,3 +1,6 @@
+## 3.2.0
+* UPD: ability to select multiple data points via `handleSelection` method
+
 ## 3.1.0
 * ADD: ability to support Power BI bookmarks
 

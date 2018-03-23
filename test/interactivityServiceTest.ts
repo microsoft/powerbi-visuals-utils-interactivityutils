@@ -86,7 +86,7 @@ module powerbi.extensibility.utils.interactivity.test {
             });
 
             it("the selectionManager.applySelectionFilter should be called", () => {
-                (interactivityService["selectionManager"] as ISelectionManager).applySelectionFilter = () => {};
+                (interactivityService["selectionManager"] as ISelectionManager).applySelectionFilter = () => { };
 
                 spyOn(interactivityService["selectionManager"], "applySelectionFilter");
 
@@ -179,6 +179,43 @@ module powerbi.extensibility.utils.interactivity.test {
                 for (let i = 0, ilen = selectableDataPoints.length; i < ilen; i++) {
                     behavior.selectIndex(i, false);
                     expect(behavior.verifySingleSelectedAt(i)).toBeTruthy();
+                }
+            });
+
+            describe("Multiple selects", () => {
+                it("should select all of data points if multiSelect is false", () => {
+                    interactivityService.bind(selectableDataPoints, behavior, null);
+                    interactivityService.handleSelection(selectableDataPoints, false);
+
+                    for (let dataPointIndex = 0; dataPointIndex < selectableDataPoints.length; dataPointIndex++) {
+                        expect(behavior.verifySingleSelectedAt(dataPointIndex)).toBeTruthy();
+                    }
+                });
+
+                it("should select all of data point if multiSelect is true and dataPoints are applied by small groups", () => {
+                    interactivityService.bind(selectableDataPoints, behavior, null);
+
+                    const amountOfDataPoints: number = selectableDataPoints.length;
+
+                    const firstGroup: SelectableDataPoint[] = selectableDataPoints.slice(0, amountOfDataPoints / 2);
+                    const secondGroup: SelectableDataPoint[] = selectableDataPoints.slice(amountOfDataPoints / 2, amountOfDataPoints);
+
+                    interactivityService.handleSelection(firstGroup, true);
+                    interactivityService.handleSelection(secondGroup, true);
+
+                    for (let dataPointIndex = 0; dataPointIndex < selectableDataPoints.length; dataPointIndex++) {
+                        expect(behavior.verifySingleSelectedAt(dataPointIndex)).toBeTruthy();
+                    }
+                });
+            });
+
+            it("should select nothing if dataPoints are empty", () => {
+                interactivityService.bind(selectableDataPoints, behavior, null);
+
+                interactivityService.handleSelection(null, null);
+
+                for (let dataPointIndex = 0; dataPointIndex < selectableDataPoints.length; dataPointIndex++) {
+                    expect(behavior.verifySingleSelectedAt(dataPointIndex)).toBeFalsy();
                 }
             });
 
@@ -393,16 +430,16 @@ module powerbi.extensibility.utils.interactivity.test {
         describe("basic filter", () => {
             // In [1000, 2000] basic filter sample
             let filterIn10002000: string =
-            `{"fromValue":{"items":{"a":{"entity":"Annual Revenue"}}},` +
-            `"whereItems":[{"condition":{"_kind":10,"args":[{"_kind":2,"source":{"_kind":0,"entity":"Annual Revenue","variable":"a"},"ref":"Year"}],` +
-            `"values":[[{"_kind":17,"type":{"underlyingType":260,"category":null},"value":1000,"typeEncodedValue":"1000L"}],` +
-            `[{"_kind":17,"type":{"underlyingType":260,"category":null},"value":2000,"typeEncodedValue":"2000L"}]]}}]}`;
+                `{"fromValue":{"items":{"a":{"entity":"Annual Revenue"}}},` +
+                `"whereItems":[{"condition":{"_kind":10,"args":[{"_kind":2,"source":{"_kind":0,"entity":"Annual Revenue","variable":"a"},"ref":"Year"}],` +
+                `"values":[[{"_kind":17,"type":{"underlyingType":260,"category":null},"value":1000,"typeEncodedValue":"1000L"}],` +
+                `[{"_kind":17,"type":{"underlyingType":260,"category":null},"value":2000,"typeEncodedValue":"2000L"}]]}}]}`;
 
             let filterNotIn10002000: string =
-            `{"fromValue":{"items":{"a":{"entity":"Annual Revenue"}}},` +
-            `"whereItems":[{"condition":{"_kind":16,"arg":{"_kind":10,"args":[{"_kind":2,"source":{"_kind":0,"entity":"Annual Revenue","variable":"a"},"ref":"Year"}],` +
-            `"values":[[{"_kind":17,"type":{"underlyingType":260,"category":null},"value":1000,"typeEncodedValue":"1000L"}],` +
-            `[{"_kind":17,"type":{"underlyingType":260,"category":null},"value":2000,"typeEncodedValue":"2000L"}]]}}}]}`;
+                `{"fromValue":{"items":{"a":{"entity":"Annual Revenue"}}},` +
+                `"whereItems":[{"condition":{"_kind":16,"arg":{"_kind":10,"args":[{"_kind":2,"source":{"_kind":0,"entity":"Annual Revenue","variable":"a"},"ref":"Year"}],` +
+                `"values":[[{"_kind":17,"type":{"underlyingType":260,"category":null},"value":1000,"typeEncodedValue":"1000L"}],` +
+                `[{"_kind":17,"type":{"underlyingType":260,"category":null},"value":2000,"typeEncodedValue":"2000L"}]]}}}]}`;
 
             it("restore 'In' condition filter", (done) => {
                 let filter = JSON.parse(filterIn10002000);
