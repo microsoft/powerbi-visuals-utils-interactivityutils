@@ -53,8 +53,8 @@ module powerbi.extensibility.utils.interactivity.test.mocks {
             this.selectionHandler.handleSelection(this.selectableDataPoints[index], !!multiSelect);
         }
 
-        public select(datapoint: SelectableDataPoint, multiSelect?: boolean): void {
-            this.selectionHandler.handleSelection(datapoint, !!multiSelect);
+        public select(dataPoints: SelectableDataPoint | SelectableDataPoint[], multiSelect?: boolean): void {
+            this.selectionHandler.handleSelection(dataPoints, !!multiSelect);
         }
 
         public clear(): void {

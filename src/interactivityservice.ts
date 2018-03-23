@@ -129,7 +129,7 @@ module powerbi.extensibility.utils.interactivity {
          * identity is undefined, the selection state is cleared. In this case, if specificIdentity
          * exists, it will still be sent to the host.
          */
-        handleSelection(dataPoint: SelectableDataPoint, multiSelect: boolean): void;
+        handleSelection(dataPoints: SelectableDataPoint | SelectableDataPoint[], multiSelect: boolean): void;
 
         /** Handles a selection clear, clearing all selection state */
         handleClearSelection(): void;
@@ -144,7 +144,6 @@ module powerbi.extensibility.utils.interactivity {
         private selectionManager: ISelectionManager;
 
         // References
-        private hostService: IVisualHost;
         private renderSelectionInVisual = () => { };
         private renderSelectionInLegend = () => { };
         private renderSelectionInLabels = () => { };
@@ -160,12 +159,10 @@ module powerbi.extensibility.utils.interactivity {
         public selectableLabelsDataPoints: SelectableDataPoint[];
 
         constructor(hostServices: IVisualHost) {
-            this.hostService = hostServices;
-
             this.selectionManager = hostServices.createSelectionManager();
 
-            if ((this.selectionManager as any).registerOnSelectCallback) {
-                (this.selectionManager as any).registerOnSelectCallback(() => {
+            if (this.selectionManager.registerOnSelectCallback) {
+                this.selectionManager.registerOnSelectCallback(() => {
                     this.restoreSelection([...this.selectionManager.getSelectionIds() as ISelectionId[]]);
                 });
             }
@@ -214,12 +211,16 @@ module powerbi.extensibility.utils.interactivity {
             this.syncSelectionState();
         }
 
+        private clearSelectedIds(): void {
+            this.hasSelectionOverride = undefined;
+            ArrayExtensions.clear(this.selectedIds);
+        }
+
         /**
          * Sets the selected state of all selectable data points to false and invokes the behavior's select command.
          */
         public clearSelection(): void {
-            this.hasSelectionOverride = undefined;
-            ArrayExtensions.clear(this.selectedIds);
+            this.clearSelectedIds();
             this.applyToAllSelectableDataPoints((dataPoint: SelectableDataPoint) => dataPoint.selected = false);
             this.renderAll();
         }
@@ -233,7 +234,7 @@ module powerbi.extensibility.utils.interactivity {
             }
 
             for (let dataPoint of dataPoints) {
-                dataPoint.selected = InteractivityService.checkDatapointAgainstSelectedIds(dataPoint, this.selectedIds);
+                dataPoint.selected = InteractivityService.isDataPointSelected(dataPoint, this.selectedIds);
             }
 
             return this.hasSelection();
@@ -285,21 +286,16 @@ module powerbi.extensibility.utils.interactivity {
             this.selectionManager.applySelectionFilter();
         }
 
-        public handleSelection(dataPoint: SelectableDataPoint, multiSelect: boolean): void {
+        public handleSelection(dataPoints: SelectableDataPoint | SelectableDataPoint[], multiSelect: boolean): void {
             // defect 7067397: should not happen so assert but also don't continue as it's
             // causing a lot of error telemetry in desktop.
-            if (!dataPoint) {
+            if (!dataPoints) {
                 return;
             }
 
-            if (!dataPoint.identity) {
-                this.handleClearSelection();
-            }
-            else {
-                this.select(dataPoint, multiSelect);
-                this.sendSelectionToHost();
-                this.renderAll();
-            }
+            this.select(dataPoints, multiSelect);
+            this.sendSelectionToHost();
+            this.renderAll();
         }
 
         public handleClearSelection(): void {
@@ -375,42 +371,45 @@ module powerbi.extensibility.utils.interactivity {
         }
 
         /** Marks a data point as selected and syncs selection with the host. */
-        private select(d: SelectableDataPoint, multiSelect: boolean): void {
-            let id = d.identity as ISelectionId;
+        private select(dataPoints: SelectableDataPoint | SelectableDataPoint[], multiSelect: boolean): void {
+            const selectableDataPoints: SelectableDataPoint[] = [].concat(dataPoints);
 
-            if (!id) {
+            const originalSelectedIds = [...this.selectedIds];
+
+            if (!multiSelect || !selectableDataPoints.length) {
+                this.clearSelectedIds();
+            }
+
+            selectableDataPoints.forEach((dataPoint: SelectableDataPoint) => {
+                const shouldDataPointBeSelected: boolean = !InteractivityService.isDataPointSelected(dataPoint, originalSelectedIds);
+
+                this.selectSingleDataPoint(dataPoint, shouldDataPointBeSelected);
+            });
+
+            this.syncSelectionState();
+        }
+
+        private selectSingleDataPoint(dataPoint: SelectableDataPoint, shouldDataPointBeSelected: boolean): void {
+            if (!dataPoint || !dataPoint.identity) {
                 return;
             }
 
-            let selected = !d.selected || (!multiSelect && this.selectedIds.length > 1);
+            const identity: ISelectionId = dataPoint.identity as ISelectionId;
 
-            // If we have a multiselect flag, we attempt a multiselect
-            if (multiSelect) {
-                if (selected) {
-                    d.selected = true;
-                    this.selectedIds.push(id);
-                    if (id.hasIdentity()) {
-                        this.removeSelectionIdsWithOnlyMeasures();
-                    }
-                    else {
-                        this.removeSelectionIdsExceptOnlyMeasures();
-                    }
+            if (shouldDataPointBeSelected) {
+                dataPoint.selected = true;
+                this.selectedIds.push(identity);
+                if (identity.hasIdentity()) {
+                    this.removeSelectionIdsWithOnlyMeasures();
                 }
                 else {
-                    d.selected = false;
-                    this.removeId(id);
+                    this.removeSelectionIdsExceptOnlyMeasures();
                 }
             }
-            // We do a single select if we didn't do a multiselect or if we find out that the multiselect is invalid.
-            if (!multiSelect) {
-                this.clearSelection();
-                if (selected) {
-                    d.selected = true;
-                    this.selectedIds.push(id);
-                }
+            else {
+                dataPoint.selected = false;
+                this.removeId(identity);
             }
-
-            this.syncSelectionState();
         }
 
         private removeId(toRemove: ISelectionId): void {
@@ -475,7 +474,7 @@ module powerbi.extensibility.utils.interactivity {
             let foundMatchingId = false;
 
             for (let dataPoint of selectableDataPoints) {
-                dataPoint.selected = InteractivityService.checkDatapointAgainstSelectedIds(dataPoint, selectedIds);
+                dataPoint.selected = InteractivityService.isDataPointSelected(dataPoint, selectedIds);
 
                 if (dataPoint.selected)
                     foundMatchingId = true;
@@ -484,8 +483,8 @@ module powerbi.extensibility.utils.interactivity {
             return foundMatchingId;
         }
 
-        private static checkDatapointAgainstSelectedIds(datapoint: SelectableDataPoint, selectedIds: ISelectionId[]): boolean {
-            return selectedIds.some((value: ISelectionId) => value.includes(datapoint.identity as ISelectionId));
+        private static isDataPointSelected(dataPoint: SelectableDataPoint, selectedIds: ISelectionId[]): boolean {
+            return selectedIds.some((value: ISelectionId) => value.includes(dataPoint.identity as ISelectionId));
         }
 
         private removeSelectionIdsWithOnlyMeasures() {

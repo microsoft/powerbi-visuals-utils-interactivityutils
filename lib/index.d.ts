@@ -151,7 +151,7 @@ declare module powerbi.extensibility.utils.interactivity {
          * identity is undefined, the selection state is cleared. In this case, if specificIdentity
          * exists, it will still be sent to the host.
          */
-        handleSelection(dataPoint: SelectableDataPoint, multiSelect: boolean): void;
+        handleSelection(dataPoints: SelectableDataPoint | SelectableDataPoint[], multiSelect: boolean): void;
         /** Handles a selection clear, clearing all selection state */
         handleClearSelection(): void;
         /**
@@ -161,7 +161,6 @@ declare module powerbi.extensibility.utils.interactivity {
     }
     class InteractivityService implements IInteractivityService, ISelectionHandler {
         private selectionManager;
-        private hostService;
         private renderSelectionInVisual;
         private renderSelectionInLegend;
         private renderSelectionInLabels;
@@ -175,6 +174,7 @@ declare module powerbi.extensibility.utils.interactivity {
         constructor(hostServices: IVisualHost);
         /** Binds the visual to the interactivityService */
         bind(dataPoints: SelectableDataPoint[], behavior: IInteractiveBehavior, behaviorOptions: any, options?: InteractivityServiceOptions): void;
+        private clearSelectedIds();
         /**
          * Sets the selected state of all selectable data points to false and invokes the behavior's select command.
          */
@@ -196,7 +196,7 @@ declare module powerbi.extensibility.utils.interactivity {
         labelsHasSelection(): boolean;
         isSelectionModeInverted(): boolean;
         applySelectionFilter(): void;
-        handleSelection(dataPoint: SelectableDataPoint, multiSelect: boolean): void;
+        handleSelection(dataPoints: SelectableDataPoint | SelectableDataPoint[], multiSelect: boolean): void;
         handleClearSelection(): void;
         /**
          * Syncs the selection state for all data points that have the same category. Returns
@@ -212,13 +212,14 @@ declare module powerbi.extensibility.utils.interactivity {
         private syncSelectionStateInverted();
         private renderAll();
         /** Marks a data point as selected and syncs selection with the host. */
-        private select(d, multiSelect);
+        private select(dataPoints, multiSelect);
+        private selectSingleDataPoint(dataPoint, shouldDataPointBeSelected);
         private removeId(toRemove);
         private sendSelectionToHost();
         private takeSelectionStateFromDataPoints(dataPoints);
         private applyToAllSelectableDataPoints(action);
         private static updateSelectableDataPointsBySelectedIds(selectableDataPoints, selectedIds);
-        private static checkDatapointAgainstSelectedIds(datapoint, selectedIds);
+        private static isDataPointSelected(dataPoint, selectedIds);
         private removeSelectionIdsWithOnlyMeasures();
         private removeSelectionIdsExceptOnlyMeasures();
     }
