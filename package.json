@@ -2,7 +2,8 @@
   "name": "powerbi-visuals-utils-interactivityutils",
   "version": "3.0.1",
   "description": "InteractivityUtils",
-  "main": "lib/index.js",
+  "main": "lib/index",
+  "types": "lib/index",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Microsoft/powerbi-visuals-utils-interactivityutils.git"
