@@ -1,18 +1,21 @@
+/// <reference types="powerbi-visuals-tools" />
 import { Selection } from "d3-selection";
-import { BoundingRect } from "powerbi-visuals-utils-svgutils";
+import { shapesInterfaces } from "powerbi-visuals-utils-svgutils";
+import { AppliedFilter } from "./interfaces";
 import IVisualHost = powerbi.extensibility.visual.IVisualHost;
 import ExtensibilityISelectionId = powerbi.extensibility.ISelectionId;
 import ISelectionId = powerbi.visuals.ISelectionId;
+import BoundingRect = shapesInterfaces.BoundingRect;
 export interface SelectableDataPoint {
     selected: boolean;
     /** Identity for identifying the selectable data point for selection purposes */
-    identity: ISelectionId | ExtensibilityISelectionId;
+    identity: ExtensibilityISelectionId;
     /**
      * A specific identity for when data points exist at a finer granularity than
      * selection is performed.  For example, if your data points should select based
      * only on series even if they exist as category/series intersections.
      */
-    specificIdentity?: ISelectionId | ExtensibilityISelectionId;
+    specificIdentity?: ExtensibilityISelectionId;
 }
 /**
  * Factory method to create an IInteractivityService instance.
@@ -54,6 +57,10 @@ export interface IInteractivityService {
     legendHasSelection(): boolean;
     /** Checks whether the selection mode is inverted or normal */
     isSelectionModeInverted(): boolean;
+    /** Apply new selections to change internal state of interactivity service from filter */
+    applySelectionFromFilter(appliedFilter: AppliedFilter): void;
+    /** Apply new selections to change internal state of interactivity service */
+    restoreSelection(selectionIds: ISelectionId[]): void;
 }
 export interface ISelectionHandler {
     /**
@@ -61,21 +68,16 @@ export interface ISelectionHandler {
      * identity is undefined, the selection state is cleared. In this case, if specificIdentity
      * exists, it will still be sent to the host.
      */
-    handleSelection(dataPoint: SelectableDataPoint, multiSelect: boolean, skipSync?: boolean): void;
+    handleSelection(dataPoints: SelectableDataPoint | SelectableDataPoint[], multiSelect: boolean): void;
     /** Handles a selection clear, clearing all selection state */
     handleClearSelection(): void;
     /**
      * Sends the selection state to the host
      */
     applySelectionFilter(): void;
-    /**
-     * Sync data points with current selection state
-     */
-    syncSelectionState(didThePreviousStateHaveSelectedIds?: boolean): void;
 }
 export declare class InteractivityService implements IInteractivityService, ISelectionHandler {
     private selectionManager;
-    private hostService;
     private renderSelectionInVisual;
     private renderSelectionInLegend;
     private renderSelectionInLabels;
@@ -86,15 +88,23 @@ export declare class InteractivityService implements IInteractivityService, ISel
     selectableDataPoints: SelectableDataPoint[];
     selectableLegendDataPoints: SelectableDataPoint[];
     selectableLabelsDataPoints: SelectableDataPoint[];
-    private dataPointObjectName;
     constructor(hostServices: IVisualHost);
-    /** Binds the vsiual to the interactivityService */
+    /** Binds the visual to the interactivityService */
     bind(dataPoints: SelectableDataPoint[], behavior: IInteractiveBehavior, behaviorOptions: any, options?: InteractivityServiceOptions): void;
+    private clearSelectedIds();
     /**
      * Sets the selected state of all selectable data points to false and invokes the behavior's select command.
      */
     clearSelection(): void;
     applySelectionStateToData(dataPoints: SelectableDataPoint[], hasHighlights?: boolean): boolean;
+    /**
+     * Apply new selections to change internal state of interactivity service from filter
+     */
+    applySelectionFromFilter(appliedFilter: AppliedFilter): void;
+    /**
+     * Apply new selections to change internal state of interactivity service
+     */
+    restoreSelection(selectionIds: ISelectionId[]): void;
     /**
      * Checks whether there is at least one item selected.
      */
@@ -103,7 +113,7 @@ export declare class InteractivityService implements IInteractivityService, ISel
     labelsHasSelection(): boolean;
     isSelectionModeInverted(): boolean;
     applySelectionFilter(): void;
-    handleSelection(dataPoint: SelectableDataPoint, multiSelect: boolean, skipSync?: boolean): void;
+    handleSelection(dataPoints: SelectableDataPoint | SelectableDataPoint[], multiSelect: boolean): void;
     handleClearSelection(): void;
     /**
      * Syncs the selection state for all data points that have the same category. Returns
@@ -115,16 +125,18 @@ export declare class InteractivityService implements IInteractivityService, ISel
      *
      * Ignores series for now, since we don't support series selection at the moment.
      */
-    syncSelectionState(didThePreviousStateHaveSelectedIds?: boolean): void;
+    syncSelectionState(): void;
+    private syncSelectionStateInverted();
     private renderAll();
     /** Marks a data point as selected and syncs selection with the host. */
-    private select(d, multiSelect, skipSync?);
+    private select(dataPoints, multiSelect);
+    private selectSingleDataPoint(dataPoint, shouldDataPointBeSelected);
     private removeId(toRemove);
-    private sendSelectionToHost(dataPoint?, multiSelection?);
+    private sendSelectionToHost();
     private takeSelectionStateFromDataPoints(dataPoints);
     private applyToAllSelectableDataPoints(action);
     private static updateSelectableDataPointsBySelectedIds(selectableDataPoints, selectedIds);
-    private static checkDatapointAgainstSelectedIds(datapoint, selectedIds);
+    private static isDataPointSelected(dataPoint, selectedIds);
     private removeSelectionIdsWithOnlyMeasures();
     private removeSelectionIdsExceptOnlyMeasures();
 }
