@@ -30,6 +30,7 @@
     "lessc": "lessc src/styles/clearCatcher.less lib/index.css"
   },
   "devDependencies": {
+    "@types/powerbi-visuals-tools": "1.11.0",
     "@types/d3-selection": "^1.2.0",
     "@types/jasmine": "2.5.51",
     "@types/jquery": "^3.2.1",
@@ -62,7 +63,8 @@
   },
   "dependencies": {
     "d3-selection": "^1.2.0",
-    "powerbi-visuals-utils-svgutils": "git://github.com/Microsoft/powerbi-visuals-utils-svgutils.git#ea5fa2ce461e072e3d97b0e42d3dd09ab1f59c63",
-    "powerbi-visuals-utils-typeutils": "^1.0.0"
+    "powerbi-models": "1.0.3",
+    "powerbi-visuals-utils-svgutils": "Microsoft/powerbi-visuals-utils-svgutils#es2015",
+    "powerbi-visuals-utils-typeutils": "Microsoft/powerbi-visuals-utils-typeutils#es2015"
   }
 }

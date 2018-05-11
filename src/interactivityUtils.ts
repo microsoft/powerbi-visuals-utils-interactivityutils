@@ -24,8 +24,10 @@
  *  THE SOFTWARE.
  */
 import { select, event, Selection, EnterElement, BaseType } from "d3-selection";
-import { IPoint } from "powerbi-visuals-utils-svgutils";
+import { shapesInterfaces } from "powerbi-visuals-utils-svgutils";
 import { SelectableDataPoint, ISelectionHandler } from "./interactivityService";
+
+import IPoint = shapesInterfaces.IPoint;
 
 export function getPositionOfLastInputEvent(): IPoint {
     return {
