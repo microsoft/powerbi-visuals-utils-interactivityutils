@@ -13,6 +13,7 @@ import {
 } from "powerbi-models";
 
 // powerbi.visuals
+import powerbi from "powerbi-visuals-tools";
 import ISelectionId = powerbi.visuals.ISelectionId;
 
 export class FilterManager {

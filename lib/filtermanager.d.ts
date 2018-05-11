@@ -1,6 +1,7 @@
 /// <reference types="powerbi-visuals-tools" />
 import { AppliedFilter } from "./interfaces";
 import { IFilter, IAdvancedFilterCondition } from "powerbi-models";
+import powerbi from "powerbi-visuals-tools";
 import ISelectionId = powerbi.visuals.ISelectionId;
 export declare class FilterManager {
     static restoreSelectionIds(filter: AppliedFilter): ISelectionId[];

@@ -30,9 +30,9 @@ import { AppliedFilter } from "./interfaces";
 import { FilterManager } from "./filtermanager";
 
 // powerbi.extensibility
+import powerbi from "powerbi-visuals-tools";
 import IVisualHost = powerbi.extensibility.visual.IVisualHost;
 import ISelectionManager = powerbi.extensibility.ISelectionManager;
-import ExtensibilityISelectionId = powerbi.extensibility.ISelectionId;
 
 // powerbi.visuals
 import ISelectionId = powerbi.visuals.ISelectionId;
@@ -46,13 +46,13 @@ import BoundingRect = shapesInterfaces.BoundingRect;
 export interface SelectableDataPoint {
     selected: boolean;
     /** Identity for identifying the selectable data point for selection purposes */
-    identity: ExtensibilityISelectionId;
+    identity: {};
     /**
      * A specific identity for when data points exist at a finer granularity than
      * selection is performed.  For example, if your data points should select based
      * only on series even if they exist as category/series intersections.
      */
-    specificIdentity?: ExtensibilityISelectionId;
+    specificIdentity?: {};
 }
 
 /**

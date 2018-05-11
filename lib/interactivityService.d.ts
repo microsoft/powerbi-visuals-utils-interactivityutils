@@ -2,20 +2,20 @@
 import { Selection } from "d3-selection";
 import { shapesInterfaces } from "powerbi-visuals-utils-svgutils";
 import { AppliedFilter } from "./interfaces";
+import powerbi from "powerbi-visuals-tools";
 import IVisualHost = powerbi.extensibility.visual.IVisualHost;
-import ExtensibilityISelectionId = powerbi.extensibility.ISelectionId;
 import ISelectionId = powerbi.visuals.ISelectionId;
 import BoundingRect = shapesInterfaces.BoundingRect;
 export interface SelectableDataPoint {
     selected: boolean;
     /** Identity for identifying the selectable data point for selection purposes */
-    identity: ExtensibilityISelectionId;
+    identity: {};
     /**
      * A specific identity for when data points exist at a finer granularity than
      * selection is performed.  For example, if your data points should select based
      * only on series even if they exist as category/series intersections.
      */
-    specificIdentity?: ExtensibilityISelectionId;
+    specificIdentity?: {};
 }
 /**
  * Factory method to create an IInteractivityService instance.
