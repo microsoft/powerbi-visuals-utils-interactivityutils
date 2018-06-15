@@ -23,7 +23,7 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
-import { select, event, Selection, EnterElement, BaseType } from "d3-selection";
+import { select, Selection, EnterElement, BaseType } from "d3-selection";
 import { shapesInterfaces } from "powerbi-visuals-utils-svgutils";
 import { SelectableDataPoint, ISelectionHandler } from "./interactivityService";
 
@@ -50,5 +50,5 @@ export function registerGroupSelectionHandler(group: Selection<any, any, any, an
 }
 
 function handleSelection(d: SelectableDataPoint, selectionHandler: ISelectionHandler): void {
-    selectionHandler.handleSelection(d, (event as MouseEvent).ctrlKey);
+    selectionHandler.handleSelection(d, (window.event as MouseEvent).ctrlKey);
 }
