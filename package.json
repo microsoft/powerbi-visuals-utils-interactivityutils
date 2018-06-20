@@ -1,6 +1,6 @@
 {
   "name": "powerbi-visuals-utils-interactivityutils",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "InteractivityUtils",
   "main": "lib/index",
   "types": "lib/index",
@@ -65,7 +65,7 @@
   "dependencies": {
     "d3": "5.5.0",
     "powerbi-models": "1.0.3",
-    "powerbi-visuals-utils-svgutils": "Microsoft/powerbi-visuals-utils-svgutils#es2015",
-    "powerbi-visuals-utils-typeutils": "Microsoft/powerbi-visuals-utils-typeutils#es2015"
+    "powerbi-visuals-utils-svgutils": "2.0.0",
+    "powerbi-visuals-utils-typeutils": "2.0.0"
   }
 }
