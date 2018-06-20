@@ -26,49 +26,56 @@
 
 "use strict";
 
-import * as webpack from "webpack";
+const webpackConfig = require("./webpack.config.js");
+const tsconfig = require("./tsconfig.json");
 
 import { Config, ConfigOptions } from "karma";
 
 const testRecursivePath = "test/**/*.ts"
     , srcOriginalRecursivePath = "src/**/*.ts"
     , srcRecursivePath = "lib/**/*.js"
-    , coverageFolder = "coverage"
-    , srcCssRecursivePath = 'lib/**/*.css';
+    , srcCssRecursivePath = "lib/**/*.css"
+    , coverageFolder = "coverage";
 
 module.exports = (config: Config) => {
     let browsers = [];
 
     if (process.env.TRAVIS) {
-        browsers.push('ChromeTravisCI');
+        browsers.push("ChromeTravisCI");
     } else {
-        browsers.push('Chrome');
+        browsers.push("Chrome");
     }
 
     config.set(<ConfigOptions>{
         customLaunchers: {
             ChromeTravisCI: {
-                base: 'Chrome',
-                flags: ['--no-sandbox']
+                base: "Chrome",
+                flags: ["--no-sandbox"]
             }
         },
         browsers: browsers,
         colors: true,
-        frameworks: ['jasmine'],
+        frameworks: ["jasmine"],
         reporters: [
-            'progress',
-            'coverage',
-            'karma-remap-istanbul'
+            "progress",
+            "coverage",
+            "karma-remap-istanbul"
         ],
         singleRun: true,
+        plugins: [
+            "karma-remap-istanbul",
+            "karma-coverage",
+            "karma-typescript",
+            "karma-webpack",
+            "karma-jasmine",
+            "karma-sourcemap-loader",
+            "karma-chrome-launcher"
+        ],
         files: [
-            'node_modules/lodash/index.js',
-            'node_modules/jquery/dist/jquery.min.js',
-            'node_modules/powerbi-visuals-utils-typeutils/lib/index.js',
-            'node_modules/powerbi-visuals-utils-svgutils/lib/index.js',
-            'node_modules/powerbi-visuals-utils-testutils/lib/index.js',
+            "node_modules/jquery/dist/jquery.min.js",
+            "node_modules/jasmine-jquery/lib/jasmine-jquery.js",
+            srcCssRecursivePath,
             srcRecursivePath,
-            'test/mocks/mockInteractiveBehavior.ts',
             testRecursivePath,
             {
                 pattern: srcOriginalRecursivePath,
@@ -77,56 +84,31 @@ module.exports = (config: Config) => {
             }
         ],
         preprocessors: {
-            "node_modules/lodash/index.js": ["webpack"],
-            "node_modules/powerbi-visuals-utils-testutils/lib/**/*.js": ["webpack"],
-            "node_modules/powerbi-visuals-utils-svgutils/lib/**/*.js": ["webpack"],
-            [testRecursivePath]: ['typescript', "webpack", "sourcemap"],
-            [srcRecursivePath]: ["webpack", 'sourcemap', 'coverage']
+            [testRecursivePath]: ["webpack"],
+            [srcRecursivePath]: ["webpack", "coverage"]
         },
-        webpack: <webpack.Configuration>{
-            target: "web",
-            devtool: "inline-source-map",
-            resolve: {
-                extensions: [".webpack.js", ".web.js", ".js", ".ts", ".tsx"]
-            },
-            externals: [
-                {
-                    sinon: "sinon",
-                    chai: "chai",
-                    jQuery: "jQuery"
-                },
-            ],
-            module: {
-                rules: [
-                    {
-                        test: /\.jsx?$/,
-                    },
-                    {
-                        test: /\.tsx?$/,
-                        loader: "ts-loader",
-                    }
-                ]
-            },
-            output: {
-                filename: "index.build.js",
-                // path: path.resolve(__dirname, "lib")
-            },
-            plugins: [
-            ]
-        },       
+        typescriptPreprocessor: {
+            options: tsconfig.compilerOptions
+        },
         coverageReporter: {
             dir: coverageFolder,
             reporters: [
-                { type: 'html' },
-                { type: 'lcov' }
+                { type: "html" },
+                { type: "lcov" }
             ]
         },
         remapIstanbulReporter: {
             reports: {
-                lcovonly: coverageFolder + '/lcov.info',
-                html: coverageFolder,
-                'text-summary': null
+                lcovonly: coverageFolder + "/lcov.info",
+                html: coverageFolder
             }
+        },
+        mime: {
+            "text/x-typescript": ["ts", "tsx"]
+        },
+        webpack: webpackConfig,
+        webpackMiddleware: {
+            stats: "errors-only"
         }
     });
 };

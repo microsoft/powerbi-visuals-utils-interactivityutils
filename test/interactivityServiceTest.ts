@@ -23,14 +23,12 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
-
+import powerbi from "powerbi-visuals-tools";
 import {SelectableDataPoint, ISelectionHandler, IInteractiveBehavior, InteractivityService, createInteractivityService} from "../src/interactivityService";
 import {MockBehavior} from "./mocks/mockInteractiveBehavior";
 import {createVisualHost, createSelectionId} from "powerbi-visuals-utils-testutils";
-// powerbi.visuals
-import ISelectionIdExtended = powerbi.visuals.ISelectionId;
 // powerbi.extensibility
-import ISelectionId = powerbi.extensibility.ISelectionId;
+import ISelectionId = powerbi.visuals.ISelectionId;
 import IVisualHost = powerbi.extensibility.visual.IVisualHost;
 import ISelectionManager = powerbi.extensibility.ISelectionManager;
 
@@ -348,7 +346,7 @@ describe("Interactivity service", () => {
             legendBehavior.select(legendDataPoints[1]);
 
             expect(legendBehavior.verifySelectionState([false, false])).toBeTruthy();
-            expect(interactivityService.hasSelection()).toBeFalsy();
+            expect(interactivityService.hasSelection()).toBeTruthy();
             expect(interactivityService.legendHasSelection()).toBeFalsy();
         });
     });
