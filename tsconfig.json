@@ -15,10 +15,7 @@
         "outDir": "./lib"
     },
     "files": [
-        "src/filtermanager.ts",
-        "src/interactivityUtils.ts",
-        "src/interactivityService.ts",
-        "src/index.ts",
+        "src/index.ts"
     ],
     "include": [
         "src/index.ts"

@@ -49,7 +49,7 @@ export declare enum SQExprKind {
     NamedQueryRef = 37,
     Member = 38,
     FilteredEval = 39,
-    Conditional = 40,
+    Conditional = 40
 }
 export declare enum QueryComparisonKind {
     Equal = 0,
@@ -60,7 +60,7 @@ export declare enum QueryComparisonKind {
     Contains = 12,
     Is = 13,
     StartsWith = 14,
-    DoesNotContain = 16,
+    DoesNotContain = 16
 }
 export interface AppliedFilter {
     whereItems: {

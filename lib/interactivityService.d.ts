@@ -1,5 +1,3 @@
-/// <reference types="powerbi-visuals-tools" />
-import { Selection } from "d3-selection";
 import { shapesInterfaces } from "powerbi-visuals-utils-svgutils";
 import { AppliedFilter } from "./interfaces";
 import powerbi from "powerbi-visuals-tools";
@@ -24,7 +22,7 @@ export declare function createInteractivityService(hostServices: IVisualHost): I
 /**
 * Creates a clear an svg rect to catch clear clicks.
 */
-export declare function appendClearCatcher(selection: Selection<any, any, any, any>): Selection<any, any, any, any>;
+export declare function appendClearCatcher(selection: d3.Selection<any, any, any, any>): d3.Selection<any, any, any, any>;
 export declare function dataHasSelection(data: SelectableDataPoint[]): boolean;
 export interface IInteractiveBehavior {
     bindEvents(behaviorOptions: any, selectionHandler: ISelectionHandler): void;
@@ -91,7 +89,7 @@ export declare class InteractivityService implements IInteractivityService, ISel
     constructor(hostServices: IVisualHost);
     /** Binds the visual to the interactivityService */
     bind(dataPoints: SelectableDataPoint[], behavior: IInteractiveBehavior, behaviorOptions: any, options?: InteractivityServiceOptions): void;
-    private clearSelectedIds();
+    private clearSelectedIds;
     /**
      * Sets the selected state of all selectable data points to false and invokes the behavior's select command.
      */
@@ -126,17 +124,17 @@ export declare class InteractivityService implements IInteractivityService, ISel
      * Ignores series for now, since we don't support series selection at the moment.
      */
     syncSelectionState(): void;
-    private syncSelectionStateInverted();
-    private renderAll();
+    private syncSelectionStateInverted;
+    private renderAll;
     /** Marks a data point as selected and syncs selection with the host. */
-    private select(dataPoints, multiSelect);
-    private selectSingleDataPoint(dataPoint, shouldDataPointBeSelected);
-    private removeId(toRemove);
-    private sendSelectionToHost();
-    private takeSelectionStateFromDataPoints(dataPoints);
-    private applyToAllSelectableDataPoints(action);
-    private static updateSelectableDataPointsBySelectedIds(selectableDataPoints, selectedIds);
-    private static isDataPointSelected(dataPoint, selectedIds);
-    private removeSelectionIdsWithOnlyMeasures();
-    private removeSelectionIdsExceptOnlyMeasures();
+    private select;
+    private selectSingleDataPoint;
+    private removeId;
+    private sendSelectionToHost;
+    private takeSelectionStateFromDataPoints;
+    private applyToAllSelectableDataPoints;
+    private static updateSelectableDataPointsBySelectedIds;
+    private static isDataPointSelected;
+    private removeSelectionIdsWithOnlyMeasures;
+    private removeSelectionIdsExceptOnlyMeasures;
 }

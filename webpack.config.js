@@ -23,34 +23,38 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
-import { shapesInterfaces } from "powerbi-visuals-utils-svgutils";
-import * as d3 from "d3";
-import { SelectableDataPoint, ISelectionHandler } from "./interactivityService";
 
-import IPoint = shapesInterfaces.IPoint;
+const path = require('path');
+const webpack = require("webpack");
 
-const getEvent = () => require("d3").event;
-
-export function getPositionOfLastInputEvent(): IPoint {
-    return {
-        x: (event as MouseEvent).clientX,
-        y: (event as MouseEvent).clientY
-    };
-}
-
-export function registerStandardSelectionHandler(selection: d3.Selection<any, any, any, any>, selectionHandler: ISelectionHandler): void {
-    selection.on("click", (d: SelectableDataPoint) => handleSelection(d, selectionHandler));
-}
-
-export function registerGroupSelectionHandler(group: d3.Selection<any, any, any, any>, selectionHandler: ISelectionHandler): void {
-    group.on("click", () => {
-        let target: EventTarget = (event as MouseEvent).target,
-            d: SelectableDataPoint = <SelectableDataPoint>d3.select(target as d3.BaseType).datum();
-
-        handleSelection(d, selectionHandler);
-    });
-}
-
-function handleSelection(d: SelectableDataPoint, selectionHandler: ISelectionHandler): void {
-    selectionHandler.handleSelection(d, (getEvent() as MouseEvent).ctrlKey);
-}
+module.exports = {
+    entry: './src/index.ts',
+    devtool: 'source-map',
+    module: {
+        rules: [
+            {
+                test: /\.tsx?$/,
+                use: 'ts-loader',
+                exclude: /node_modules/
+            },
+            {
+                test: /\.json$/,
+                loader: 'json-loader'
+              }
+        ]
+    },
+    externals: {
+        "powerbi-visuals-tools": '{}'
+    },
+    resolve: {
+        extensions: ['.tsx', '.ts', '.js','.css']
+    },
+    output: {
+        path: path.resolve(__dirname, ".tmp/test")
+    },
+    plugins: [
+        new webpack.ProvidePlugin({
+            'powerbi-visuals-tools': null
+          })
+    ]
+};
