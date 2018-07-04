@@ -45,13 +45,13 @@ import BoundingRect = shapesInterfaces.BoundingRect;
 export interface SelectableDataPoint {
     selected: boolean;
     /** Identity for identifying the selectable data point for selection purposes */
-    identity: {};
+    identity: powerbi.visuals.ISelectionId;
     /**
      * A specific identity for when data points exist at a finer granularity than
      * selection is performed.  For example, if your data points should select based
      * only on series even if they exist as category/series intersections.
      */
-    specificIdentity?: {};
+    specificIdentity?: powerbi.visuals.ISelectionId;
 }
 
 /**

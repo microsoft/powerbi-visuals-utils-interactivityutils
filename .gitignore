@@ -3,5 +3,4 @@ node_modules
 *.log
 typings
 /coverage
-lib/*.map
-package-lock.json
+/lib
