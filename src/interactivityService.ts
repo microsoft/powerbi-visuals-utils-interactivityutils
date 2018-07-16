@@ -29,7 +29,7 @@ import { AppliedFilter } from "./interfaces";
 import { FilterManager } from "./filtermanager";
 
 // powerbi.extensibility
-import powerbi from "powerbi-visuals-tools";
+import powerbi from "powerbi-visuals-api";
 import IVisualHost = powerbi.extensibility.visual.IVisualHost;
 import ISelectionManager = powerbi.extensibility.ISelectionManager;
 

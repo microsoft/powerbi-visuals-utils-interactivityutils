@@ -44,7 +44,7 @@ module.exports = {
         ]
     },
     externals: {
-        "powerbi-visuals-tools": '{}'
+        "powerbi-visuals-api": '{}'
     },
     resolve: {
         extensions: ['.tsx', '.ts', '.js','.css']
@@ -54,7 +54,7 @@ module.exports = {
     },
     plugins: [
         new webpack.ProvidePlugin({
-            'powerbi-visuals-tools': null
+            'powerbi-visuals-api': null
           })
     ]
 };

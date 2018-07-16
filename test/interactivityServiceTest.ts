@@ -23,10 +23,10 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
-import powerbi from "powerbi-visuals-tools";
-import {SelectableDataPoint, ISelectionHandler, IInteractiveBehavior, InteractivityService, createInteractivityService} from "../src/interactivityService";
-import {MockBehavior} from "./mocks/mockInteractiveBehavior";
-import {createVisualHost, createSelectionId} from "powerbi-visuals-utils-testutils";
+import powerbi from "powerbi-visuals-api";
+import { SelectableDataPoint,  InteractivityService, createInteractivityService} from "../src/interactivityService";
+import { MockBehavior } from "./mocks/mockInteractiveBehavior";
+import { createVisualHost, createSelectionId} from "powerbi-visuals-utils-testutils";
 // powerbi.extensibility
 import ISelectionId = powerbi.visuals.ISelectionId;
 import IVisualHost = powerbi.extensibility.visual.IVisualHost;

@@ -1,5 +1,5 @@
 
-import { AppliedFilter, QueryComparisonKind, BasicFilterOperators, Expression, SQExprKind } from "./interfaces";
+import { AppliedFilter, QueryComparisonKind, BasicFilterOperators, SQExprKind } from "./interfaces";
 
 import {
     AdvancedFilter,
@@ -13,7 +13,7 @@ import {
 } from "powerbi-models";
 
 // powerbi.visuals
-import powerbi from "powerbi-visuals-tools";
+import powerbi from "powerbi-visuals-api";
 import ISelectionId = powerbi.visuals.ISelectionId;
 
 export class FilterManager {

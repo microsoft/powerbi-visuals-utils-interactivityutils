@@ -1,6 +1,6 @@
 {
   "name": "powerbi-visuals-utils-interactivityutils",
-  "version": "4.0.3",
+  "version": "4.0.4",
   "description": "InteractivityUtils",
   "main": "lib/index",
   "types": "lib/index",
@@ -30,7 +30,6 @@
     "lessc": "lessc src/styles/clearCatcher.less lib/index.css"
   },
   "devDependencies": {
-    "@types/powerbi-visuals-tools": "1.11.0",
     "@types/d3": "5.0.0",
     "@types/jasmine": "2.5.51",
     "@types/jquery": "^3.2.1",
@@ -38,6 +37,7 @@
     "@types/karma": "^1.7.2",
     "@types/webpack": "^3.8.1",
     "@types/lodash": "^4.14.86",
+    "powerbi-visuals-api": "1.13.0",
     "coveralls": "3.0.2",
     "jquery": "^3.2.1",
     "jasmine": "3.1.0",
@@ -52,8 +52,7 @@
     "karma-webpack": "3.0.0",
     "puppeteer": "^1.5.0",
     "less": "2.7.1",
-    "powerbi-visuals-tools": "^1.9.0",
-    "powerbi-visuals-utils-testutils": "2.0.1",
+    "powerbi-visuals-utils-testutils": "2.0.3",
     "ts-loader": "4.4.2",
     "ts-node": "7.0.0",
     "tslint": "5.4.3",
@@ -66,7 +65,7 @@
   "dependencies": {
     "d3": "5.5.0",
     "powerbi-models": "1.0.3",
-    "powerbi-visuals-utils-svgutils": "2.0.0",
-    "powerbi-visuals-utils-typeutils": "2.0.0"
+    "powerbi-visuals-utils-svgutils": "2.0.1",
+    "powerbi-visuals-utils-typeutils": "2.0.1"
   }
 }
