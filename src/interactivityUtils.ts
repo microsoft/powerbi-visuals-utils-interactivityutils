@@ -24,7 +24,9 @@
  *  THE SOFTWARE.
  */
 import { shapesInterfaces } from "powerbi-visuals-utils-svgutils";
-import * as d3 from "d3";
+import {
+    select
+} from "d3-selection";
 import { SelectableDataPoint, ISelectionHandler } from "./interactivityService";
 
 import IPoint = shapesInterfaces.IPoint;
@@ -45,7 +47,7 @@ export function registerStandardSelectionHandler(selection: d3.Selection<any, an
 export function registerGroupSelectionHandler(group: d3.Selection<any, any, any, any>, selectionHandler: ISelectionHandler): void {
     group.on("click", () => {
         let target: EventTarget = (event as MouseEvent).target,
-            d: SelectableDataPoint = <SelectableDataPoint>d3.select(target as d3.BaseType).datum();
+            d: SelectableDataPoint = <SelectableDataPoint>select(target as d3.BaseType).datum();
 
         handleSelection(d, selectionHandler);
     });
