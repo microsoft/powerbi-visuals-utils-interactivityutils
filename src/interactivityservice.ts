@@ -140,6 +140,20 @@ module powerbi.extensibility.utils.interactivity {
         applySelectionFilter(): void;
     }
 
+    // It's a temporary function for compatibility with API 2.1
+    // It probably will be gone after API 2.2 release
+    export function checkDatapointAgainstSelectedIds(datapoint: any, selectedIds: any) {
+        return selectedIds.some(function (value) {
+            const otherSelectionId: any = datapoint.identity;
+            if (value.dataMap && otherSelectionId.dataMap && value.compareMetadata(value.dataMap, otherSelectionId.dataMap))
+                return true;
+            if (!value.dataMap && value.compareMeasures(value.measures, otherSelectionId.measures))
+                return true;
+
+            return false;
+        });
+    }
+
     export class InteractivityService implements IInteractivityService, ISelectionHandler {
         private selectionManager: ISelectionManager;
 
@@ -234,7 +248,7 @@ module powerbi.extensibility.utils.interactivity {
             }
 
             for (let dataPoint of dataPoints) {
-                dataPoint.selected = InteractivityService.isDataPointSelected(dataPoint, this.selectedIds);
+                dataPoint.selected = checkDatapointAgainstSelectedIds(dataPoint, this.selectedIds);
             }
 
             return this.hasSelection();
@@ -381,7 +395,7 @@ module powerbi.extensibility.utils.interactivity {
             }
 
             selectableDataPoints.forEach((dataPoint: SelectableDataPoint) => {
-                const shouldDataPointBeSelected: boolean = !InteractivityService.isDataPointSelected(dataPoint, originalSelectedIds);
+                const shouldDataPointBeSelected: boolean = !checkDatapointAgainstSelectedIds(dataPoint, originalSelectedIds);
 
                 this.selectSingleDataPoint(dataPoint, shouldDataPointBeSelected);
             });
@@ -474,17 +488,13 @@ module powerbi.extensibility.utils.interactivity {
             let foundMatchingId = false;
 
             for (let dataPoint of selectableDataPoints) {
-                dataPoint.selected = InteractivityService.isDataPointSelected(dataPoint, selectedIds);
+                dataPoint.selected = checkDatapointAgainstSelectedIds(dataPoint, selectedIds);
 
                 if (dataPoint.selected)
                     foundMatchingId = true;
             }
 
             return foundMatchingId;
-        }
-
-        private static isDataPointSelected(dataPoint: SelectableDataPoint, selectedIds: ISelectionId[]): boolean {
-            return selectedIds.some((value: ISelectionId) => value.includes(dataPoint.identity as ISelectionId));
         }
 
         private removeSelectionIdsWithOnlyMeasures() {

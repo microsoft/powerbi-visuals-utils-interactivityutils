@@ -49,7 +49,18 @@ module powerbi.extensibility.utils.interactivity.test {
             interactivityService: InteractivityService,
             identities: ISelectionId[],
             selectableDataPoints: SelectableDataPoint[],
-            behavior: MockBehavior;
+            behavior: MockBehavior,
+            incr: number = 0;
+
+        const createSelectionIdWithCompareMeasure = () => {
+            const selId: any = createSelectionId();
+            selId.measures = [incr];
+            incr++;
+            selId.compareMeasures = (current, others) => {
+                return current === others;
+            };
+            return selId;
+        };
 
         beforeEach(() => {
             host = createVisualHost();
@@ -57,12 +68,12 @@ module powerbi.extensibility.utils.interactivity.test {
             interactivityService = createInteractivityService(host) as InteractivityService;
 
             identities = [
-                createSelectionId(),
-                createSelectionId(),
-                createSelectionId(),
-                createSelectionId(),
-                createSelectionId(),
-                createSelectionId()
+                createSelectionIdWithCompareMeasure(),
+                createSelectionIdWithCompareMeasure(),
+                createSelectionIdWithCompareMeasure(),
+                createSelectionIdWithCompareMeasure(),
+                createSelectionIdWithCompareMeasure(),
+                createSelectionIdWithCompareMeasure()
             ];
             selectableDataPoints = <SelectableDataPoint[]>[
                 { selected: false, identity: identities[0] },
@@ -230,7 +241,7 @@ module powerbi.extensibility.utils.interactivity.test {
             it("Single select null identity does not crash", () => {
                 interactivityService.bind(selectableDataPoints, behavior, null);
                 behavior.select({
-                    identity: createSelectionId(),
+                    identity: createSelectionIdWithCompareMeasure(),
                     selected: false,
                 });
                 expect(behavior.verifyCleared()).toBeTruthy();
@@ -278,7 +289,7 @@ module powerbi.extensibility.utils.interactivity.test {
                 let nullIdentity: SelectableDataPoint = {
                     selected: false,
                     identity: null,
-                    specificIdentity: createSelectionId(),
+                    specificIdentity: createSelectionIdWithCompareMeasure(),
                 };
                 interactivityService.handleSelection(nullIdentity, false);
                 expect(interactivityService.hasSelection()).toBe(false);
@@ -287,7 +298,7 @@ module powerbi.extensibility.utils.interactivity.test {
             it("Null specific identity", () => {
                 let nullIdentity: SelectableDataPoint = {
                     selected: false,
-                    identity: createSelectionId(),
+                    identity: createSelectionIdWithCompareMeasure(),
                     specificIdentity: null,
                 };
                 interactivityService.handleSelection(nullIdentity, false);
@@ -331,8 +342,8 @@ module powerbi.extensibility.utils.interactivity.test {
             it("Datapoint selection syncs legend datapoints", () => {
                 // Datapoints
                 let selectableDataPoints = [
-                    { selected: false, identity: createSelectionId() },
-                    { selected: false, identity: createSelectionId() },
+                    { selected: false, identity: createSelectionIdWithCompareMeasure() },
+                    { selected: false, identity: createSelectionIdWithCompareMeasure() },
                 ];
                 behavior = new MockBehavior(selectableDataPoints);
                 interactivityService.bind(selectableDataPoints, behavior, null);
@@ -369,8 +380,8 @@ module powerbi.extensibility.utils.interactivity.test {
 
             it("Invalid selection without selectableDataPoints (only legendDataPoints)", () => {
                 let legendDataPoints = [
-                    { selected: false, identity: createSelectionId() },
-                    { selected: false, identity: createSelectionId() },
+                    { selected: false, identity: createSelectionIdWithCompareMeasure() },
+                    { selected: false, identity: createSelectionIdWithCompareMeasure() },
                 ];
                 let legendBehavior = new MockBehavior(legendDataPoints);
                 interactivityService.bind(legendDataPoints, legendBehavior, null, { isLegend: true });
@@ -381,8 +392,8 @@ module powerbi.extensibility.utils.interactivity.test {
 
                 // New legend datapoints
                 let newLegendDataPoints = [
-                    { selected: false, identity: createSelectionId() },
-                    { selected: false, identity: createSelectionId() },
+                    { selected: false, identity: createSelectionIdWithCompareMeasure() },
+                    { selected: false, identity: createSelectionIdWithCompareMeasure() },
                 ];
                 legendBehavior = new MockBehavior(newLegendDataPoints);
                 interactivityService.bind(newLegendDataPoints, legendBehavior, null, { isLegend: true });

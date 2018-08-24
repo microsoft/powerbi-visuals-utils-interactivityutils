@@ -38,7 +38,7 @@ module powerbi.extensibility.utils.filter {
                                     return powerbi["data"].SQExprBuilder.and(prExp, curExpr);
                                 }, undefined);
 
-                            const identity: DataViewScopeIdentity = powerbi["data"].createDataViewScopeIdentity(sqlExpr);
+                            const identity: any = powerbi["data"].createDataViewScopeIdentity(sqlExpr);
                             return powerbi["visuals"].SelectionId.createWithId(identity);
                         });
 
