@@ -1,3 +1,7 @@
+## 3.2.1
+* REM: function isDataPointSelected from service
+* ADD: exportable function checkDatapointAgainstSelectedIds to provide compatibility with API 2.1
+
 ## 3.2.0
 * UPD: ability to select multiple data points via `handleSelection` method
 

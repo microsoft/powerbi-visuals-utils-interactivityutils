@@ -140,15 +140,34 @@ module powerbi.extensibility.utils.interactivity {
         applySelectionFilter(): void;
     }
 
+    export interface IExtensibilityMeasuredSelecionId extends ExtensibilityISelectionId {
+        dataMap: SelectorsForColumn;
+        measures: string[];
+    }
+
+    export interface IMeasuredSelectionId extends ISelectionId {
+        dataMap: SelectorsForColumn;
+        measures: string[];
+        compareMetadata(currentDataMap: SelectorsForColumn, otherDataMap: SelectorsForColumn): boolean;
+        compareMeasures(currentMeasures: string[], otherMeasures: string[]): boolean;
+    }
+
+    export interface SelectorsForColumn {
+        [queryName: string]: data.DataRepetitionSelector[];
+    }
+
     // It's a temporary function for compatibility with API 2.1
-    // It probably will be gone after API 2.2 release
-    export function checkDatapointAgainstSelectedIds(datapoint: any, selectedIds: any) {
-        return selectedIds.some(function (value) {
-            const otherSelectionId: any = datapoint.identity;
-            if (value.dataMap && otherSelectionId.dataMap && value.compareMetadata(value.dataMap, otherSelectionId.dataMap))
+    // It will probably be removed after API 2.2 release
+    export function checkDatapointAgainstSelectedIds(dataPoint: SelectableDataPoint, selectedIds: ISelectionId[]) {
+        return selectedIds.some((value) => {
+            const measuredValue: IMeasuredSelectionId = value as IMeasuredSelectionId;
+            const otherSelectionId: IExtensibilityMeasuredSelecionId = dataPoint.identity as IExtensibilityMeasuredSelecionId;
+            if (measuredValue.dataMap && otherSelectionId.dataMap && measuredValue.compareMetadata(measuredValue.dataMap, otherSelectionId.dataMap)) {
                 return true;
-            if (!value.dataMap && value.compareMeasures(value.measures, otherSelectionId.measures))
+            }
+            if (!measuredValue.dataMap && measuredValue.compareMeasures(measuredValue.measures, otherSelectionId.measures)) {
                 return true;
+            }
 
             return false;
         });
@@ -165,8 +184,6 @@ module powerbi.extensibility.utils.interactivity {
         // Selection state
         private selectedIds: ISelectionId[] = [];
         private isInvertedSelectionMode: boolean = false;
-        private hasSelectionOverride: boolean;
-        private behavior: any;
 
         public selectableDataPoints: SelectableDataPoint[];
         public selectableLegendDataPoints: SelectableDataPoint[];
@@ -207,26 +224,18 @@ module powerbi.extensibility.utils.interactivity {
                     this.selectableDataPoints = dataPoints;
                     this.renderSelectionInVisual = () => behavior.renderSelection(this.hasSelection());
                 }
-
-                if (options.hasSelectionOverride != null) {
-                    this.hasSelectionOverride = options.hasSelectionOverride;
-                }
-
             }
             else {
                 this.selectableDataPoints = dataPoints;
                 this.renderSelectionInVisual = () => behavior.renderSelection(this.hasSelection());
             }
 
-            // Bind to the behavior
-            this.behavior = behavior;
             behavior.bindEvents(behaviorOptions, this);
             // Sync data points with current selection state
             this.syncSelectionState();
         }
 
         private clearSelectedIds(): void {
-            this.hasSelectionOverride = undefined;
             ArrayExtensions.clear(this.selectedIds);
         }
 
