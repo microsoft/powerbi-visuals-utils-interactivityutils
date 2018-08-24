@@ -1,4 +1,4 @@
-## 3.3.0
+## 4.0.0
 * REM: function restoreSelectionIds from filter manager because it's unsupportable anymore with API 2.1
 * REM: function applySelectionFromFilter from service because it's unsupportable anymore with API 2.1
 * REM: function isDataPointSelected from service because it's incompatible with API 2.1 for a while
