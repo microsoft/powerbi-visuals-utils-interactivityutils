@@ -116,9 +116,6 @@ module powerbi.extensibility.utils.interactivity {
         /** Checks whether the selection mode is inverted or normal */
         isSelectionModeInverted(): boolean;
 
-        /** Apply new selections to change internal state of interactivity service from filter */
-        applySelectionFromFilter(appliedFilter: filter.AppliedFilter): void;
-
         /** Apply new selections to change internal state of interactivity service */
         restoreSelection(selectionIds: ISelectionId[]): void;
     }
@@ -261,13 +258,6 @@ module powerbi.extensibility.utils.interactivity {
             }
 
             return this.hasSelection();
-        }
-
-        /**
-         * Apply new selections to change internal state of interactivity service from filter
-         */
-        public applySelectionFromFilter(appliedFilter: filter.AppliedFilter): void {
-            this.restoreSelection(filter.FilterManager.restoreSelectionIds(appliedFilter));
         }
 
         /**
