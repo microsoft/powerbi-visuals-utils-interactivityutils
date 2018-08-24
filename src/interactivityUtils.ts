@@ -27,7 +27,11 @@ import { shapesInterfaces } from "powerbi-visuals-utils-svgutils";
 import {
     select
 } from "d3-selection";
-import { SelectableDataPoint, ISelectionHandler } from "./interactivityService";
+
+import {
+    SelectableDataPoint,
+    ISelectionHandler
+} from "./interactivityBaseService";
 
 import IPoint = shapesInterfaces.IPoint;
 

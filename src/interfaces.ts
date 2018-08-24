@@ -1,3 +1,10 @@
+export const enum FilterAction {
+    /** Merging filter into existing filters. */
+    merge = 0,
+    /** removing existing filter. */
+    remove = 1,
+}
+
 export interface AppliedFilter {
     whereItems: {
         condition: any
