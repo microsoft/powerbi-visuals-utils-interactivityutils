@@ -160,7 +160,7 @@ module powerbi.extensibility.utils.interactivity {
             const measuredSelectionId: IMeasuredSelectionId = selectionId as IMeasuredSelectionId;
             const otherSelectionId: IExtensibilityMeasuredSelecionId = dataPoint.identity as IExtensibilityMeasuredSelecionId;
 
-            //if the first selectionId is built only from measures then compare measures
+            // if the first selectionId is built only from measures then compare measures
             if (!measuredSelectionId.dataMap && measuredSelectionId.compareMeasures(measuredSelectionId.measures, otherSelectionId.measures)) {
                 return true;
             }
@@ -168,15 +168,15 @@ module powerbi.extensibility.utils.interactivity {
             const selectorOne = measuredSelectionId.getSelector();
             const selectorTwo = otherSelectionId.getSelector();
 
-            //if the first or the second selectionId doesn't have data then return false
+            // if the first or the second selectionId doesn't have data then return false
             if (!(<any>selectorOne).data || !(<any>selectorTwo).data) {
                 return false;
             }
 
-            //at this point both CVSelectionId's got data, we see if the first selectionId data is a subset of the second selectionId data, if not return false
+            // At this point both CVSelectionId's got data, we see if the first selectionId data is a subset of the second selectionId data, if not return false
             for (const dataRepition of (<any>selectorOne).data) {
                 if (!(<any>selectorTwo).data.some(dataI => JSON.stringify(dataI) === JSON.stringify(dataRepition))) {
-                    return false
+                    return false;
                 }
             }
 
