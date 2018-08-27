@@ -140,12 +140,12 @@ module powerbi.extensibility.utils.interactivity {
     export interface IExtensibilityMeasuredSelecionId extends ExtensibilityISelectionId {
         dataMap: SelectorsForColumn;
         measures: string[];
+        getSelector(): data.Selector;
     }
 
     export interface IMeasuredSelectionId extends ISelectionId {
         dataMap: SelectorsForColumn;
         measures: string[];
-        compareMetadata(currentDataMap: SelectorsForColumn, otherDataMap: SelectorsForColumn): boolean;
         compareMeasures(currentMeasures: string[], otherMeasures: string[]): boolean;
     }
 
@@ -156,17 +156,31 @@ module powerbi.extensibility.utils.interactivity {
     // It's a temporary function for compatibility with API 2.1
     // It will probably be removed after API 2.2 release
     export function checkDatapointAgainstSelectedIds(dataPoint: SelectableDataPoint, selectedIds: ISelectionId[]) {
-        return selectedIds.some((value) => {
-            const measuredValue: IMeasuredSelectionId = value as IMeasuredSelectionId;
+        return selectedIds.some((selectionId) => {
+            const measuredSelectionId: IMeasuredSelectionId = selectionId as IMeasuredSelectionId;
             const otherSelectionId: IExtensibilityMeasuredSelecionId = dataPoint.identity as IExtensibilityMeasuredSelecionId;
-            if (measuredValue.dataMap && otherSelectionId.dataMap && measuredValue.compareMetadata(measuredValue.dataMap, otherSelectionId.dataMap)) {
-                return true;
-            }
-            if (!measuredValue.dataMap && measuredValue.compareMeasures(measuredValue.measures, otherSelectionId.measures)) {
+
+            //if the first selectionId is built only from measures then compare measures
+            if (!measuredSelectionId.dataMap && measuredSelectionId.compareMeasures(measuredSelectionId.measures, otherSelectionId.measures)) {
                 return true;
             }
 
-            return false;
+            const selectorOne = measuredSelectionId.getSelector();
+            const selectorTwo = otherSelectionId.getSelector();
+
+            //if the first or the second selectionId doesn't have data then return false
+            if (!(<any>selectorOne).data || !(<any>selectorTwo).data) {
+                return false;
+            }
+
+            //at this point both CVSelectionId's got data, we see if the first selectionId data is a subset of the second selectionId data, if not return false
+            for (const dataRepition of (<any>selectorOne).data) {
+                if (!(<any>selectorTwo).data.some(dataI => JSON.stringify(dataI) === JSON.stringify(dataRepition))) {
+                    return false
+                }
+            }
+
+            return true;
         });
     }
 

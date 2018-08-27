@@ -1,3 +1,6 @@
+## 4.1.1
+* UPD: function checkDatapointAgainstSelectedIds was refactored
+
 ## 4.1.0
 * REM: function restoreSelectionIds from filter manager because it's unsupportable anymore with API 2.1
 * REM: function applySelectionFromFilter from service because it's unsupportable anymore with API 2.1
