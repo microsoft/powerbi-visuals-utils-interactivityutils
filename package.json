@@ -37,7 +37,7 @@
     "@types/karma": "^1.7.2",
     "@types/webpack": "^3.8.1",
     "@types/lodash": "^4.14.86",
-    "powerbi-visuals-api": "1.13.0",
+    "powerbi-visuals-api": "2.1.0",
     "coveralls": "3.0.2",
     "jquery": "^3.2.1",
     "jasmine": "3.1.0",

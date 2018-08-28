@@ -26,12 +26,14 @@
 import { shapesInterfaces } from "powerbi-visuals-utils-svgutils";
 import { arrayExtensions } from "powerbi-visuals-utils-typeutils";
 import { AppliedFilter } from "./interfaces";
-import { FilterManager } from "./filtermanager";
 
 // powerbi.extensibility
 import powerbi from "powerbi-visuals-api";
 import IVisualHost = powerbi.extensibility.visual.IVisualHost;
 import ISelectionManager = powerbi.extensibility.ISelectionManager;
+import DataRepetitionSelector = powerbi.data.DataRepetitionSelector;
+import ExtensibilityISelectionId = powerbi.extensibility.ISelectionId;
+import Selector = powerbi.data.Selector;
 
 // powerbi.visuals
 import ISelectionId = powerbi.visuals.ISelectionId;
@@ -45,7 +47,7 @@ import BoundingRect = shapesInterfaces.BoundingRect;
 export interface SelectableDataPoint {
     selected: boolean;
     /** Identity for identifying the selectable data point for selection purposes */
-    identity: powerbi.visuals.ISelectionId;
+    identity: ExtensibilityISelectionId;
     /**
      * A specific identity for when data points exist at a finer granularity than
      * selection is performed.  For example, if your data points should select based
@@ -120,9 +122,6 @@ export interface IInteractivityService {
     /** Checks whether the selection mode is inverted or normal */
     isSelectionModeInverted(): boolean;
 
-    /** Apply new selections to change internal state of interactivity service from filter */
-    applySelectionFromFilter(appliedFilter: AppliedFilter): void;
-
     /** Apply new selections to change internal state of interactivity service */
     restoreSelection(selectionIds: ISelectionId[]): void;
 }
@@ -144,6 +143,48 @@ export interface ISelectionHandler {
     applySelectionFilter(): void;
 }
 
+export interface IExtensibilityMeasuredSelecionId extends ExtensibilityISelectionId {
+    dataMap: SelectorsForColumn;
+    measures: string[];
+    getSelector(): Selector;
+}
+ export interface IMeasuredSelectionId extends ISelectionId {
+    dataMap: SelectorsForColumn;
+    measures: string[];
+    compareMetadata(currentDataMap: SelectorsForColumn, otherDataMap: SelectorsForColumn): boolean;
+    compareMeasures(currentMeasures: string[], otherMeasures: string[]): boolean;
+}
+ export interface SelectorsForColumn {
+    [queryName: string]: DataRepetitionSelector[];
+}
+ // It's a temporary function for compatibility with API 2.1
+// It will probably be removed after API 2.2 release
+export function checkDatapointAgainstSelectedIds(dataPoint: SelectableDataPoint, selectedIds: ISelectionId[]) {
+    return selectedIds.some((selectionId) => {
+        const measuredSelectionId: IMeasuredSelectionId = selectionId as IMeasuredSelectionId;
+        const otherSelectionId: IExtensibilityMeasuredSelecionId = dataPoint.identity as IExtensibilityMeasuredSelecionId;
+        // if the first selectionId is built only from measures then compare measures
+        if (!measuredSelectionId.dataMap && measuredSelectionId.compareMeasures(measuredSelectionId.measures, otherSelectionId.measures)) {
+            return true;
+        }
+
+        const selectorOne = measuredSelectionId.getSelector();
+        const selectorTwo = otherSelectionId.getSelector();
+            // if the first or the second selectionId doesn't have data then return false
+        if (!(<any>selectorOne).data || !(<any>selectorTwo).data) {
+            return false;
+        }
+            // At this point both CVSelectionId's got data, we see if the first selectionId data is a subset of the second selectionId data, if not return false
+        for (const dataRepition of (<any>selectorOne).data) {
+            if (!(<any>selectorTwo).data.some(dataI => JSON.stringify(dataI) === JSON.stringify(dataRepition))) {
+                return false;
+            }
+        }
+
+        return true;
+    });
+}
+
 export class InteractivityService implements IInteractivityService, ISelectionHandler {
     private selectionManager: ISelectionManager;
 
@@ -155,9 +196,6 @@ export class InteractivityService implements IInteractivityService, ISelectionHa
     // Selection state
     private selectedIds: ISelectionId[] = [];
     private isInvertedSelectionMode: boolean = false;
-    private hasSelectionOverride: boolean;
-    private behavior: any;
-
     public selectableDataPoints: SelectableDataPoint[];
     public selectableLegendDataPoints: SelectableDataPoint[];
     public selectableLabelsDataPoints: SelectableDataPoint[];
@@ -196,26 +234,18 @@ export class InteractivityService implements IInteractivityService, ISelectionHa
                 this.selectableDataPoints = dataPoints;
                 this.renderSelectionInVisual = () => behavior.renderSelection(this.hasSelection());
             }
-
-            if (options.hasSelectionOverride != null) {
-                this.hasSelectionOverride = options.hasSelectionOverride;
-            }
-
         }
         else {
             this.selectableDataPoints = dataPoints;
             this.renderSelectionInVisual = () => behavior.renderSelection(this.hasSelection());
         }
 
-        // Bind to the behavior
-        this.behavior = behavior;
         behavior.bindEvents(behaviorOptions, this);
         // Sync data points with current selection state
         this.syncSelectionState();
     }
 
     private clearSelectedIds(): void {
-        this.hasSelectionOverride = undefined;
         ArrayExtensions.clear(this.selectedIds);
     }
 
@@ -237,17 +267,10 @@ export class InteractivityService implements IInteractivityService, ISelectionHa
         }
 
         for (let dataPoint of dataPoints) {
-            dataPoint.selected = InteractivityService.isDataPointSelected(dataPoint, this.selectedIds);
+            dataPoint.selected = checkDatapointAgainstSelectedIds(dataPoint, this.selectedIds);
         }
 
         return this.hasSelection();
-    }
-
-    /**
-     * Apply new selections to change internal state of interactivity service from filter
-     */
-    public applySelectionFromFilter(appliedFilter: AppliedFilter): void {
-        this.restoreSelection(FilterManager.restoreSelectionIds(appliedFilter));
     }
 
     /**
@@ -382,7 +405,7 @@ export class InteractivityService implements IInteractivityService, ISelectionHa
         }
 
         selectableDataPoints.forEach((dataPoint: SelectableDataPoint) => {
-            const shouldDataPointBeSelected: boolean = !InteractivityService.isDataPointSelected(dataPoint, originalSelectedIds);
+            const shouldDataPointBeSelected: boolean = !checkDatapointAgainstSelectedIds(dataPoint, originalSelectedIds);
 
             this.selectSingleDataPoint(dataPoint, shouldDataPointBeSelected);
         });
@@ -475,17 +498,13 @@ export class InteractivityService implements IInteractivityService, ISelectionHa
         let foundMatchingId = false;
 
         for (let dataPoint of selectableDataPoints) {
-            dataPoint.selected = InteractivityService.isDataPointSelected(dataPoint, selectedIds);
+            dataPoint.selected = checkDatapointAgainstSelectedIds(dataPoint, selectedIds);
 
             if (dataPoint.selected)
                 foundMatchingId = true;
         }
 
         return foundMatchingId;
-    }
-
-    private static isDataPointSelected(dataPoint: SelectableDataPoint, selectedIds: ISelectionId[]): boolean {
-        return selectedIds.some((value: ISelectionId) => value.includes(dataPoint.identity as ISelectionId));
     }
 
     private removeSelectionIdsWithOnlyMeasures() {
