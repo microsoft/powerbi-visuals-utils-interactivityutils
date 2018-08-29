@@ -26,7 +26,7 @@
 import powerbi from "powerbi-visuals-api";
 import { SelectableDataPoint,  InteractivityService, createInteractivityService} from "../src/interactivityService";
 import { MockBehavior } from "./mocks/mockInteractiveBehavior";
-import { createVisualHost, createSelectionId} from "powerbi-visuals-utils-testutils";
+import { createVisualHost, createSelectionId } from "powerbi-visuals-utils-testutils";
 // powerbi.extensibility
 import ISelectionId = powerbi.visuals.ISelectionId;
 import IVisualHost = powerbi.extensibility.visual.IVisualHost;
@@ -37,7 +37,18 @@ describe("Interactivity service", () => {
         interactivityService: InteractivityService,
         identities: ISelectionId[],
         selectableDataPoints: SelectableDataPoint[],
-        behavior: MockBehavior;
+        behavior: MockBehavior,
+        incr: number = 0;
+
+    const createSelectionIdWithCompareMeasure = () => {
+        const selId: any = createSelectionId();
+        selId.measures = [incr];
+        incr++;
+        selId.compareMeasures = (current, others) => {
+            return current === others;
+        };
+        return selId;
+    };
 
     beforeEach(() => {
         host = createVisualHost();
@@ -45,12 +56,12 @@ describe("Interactivity service", () => {
         interactivityService = createInteractivityService(host) as InteractivityService;
 
         identities = [
-            createSelectionId(),
-            createSelectionId(),
-            createSelectionId(),
-            createSelectionId(),
-            createSelectionId(),
-            createSelectionId()
+            createSelectionIdWithCompareMeasure(),
+            createSelectionIdWithCompareMeasure(),
+            createSelectionIdWithCompareMeasure(),
+            createSelectionIdWithCompareMeasure(),
+            createSelectionIdWithCompareMeasure(),
+            createSelectionIdWithCompareMeasure()
         ];
         selectableDataPoints = <SelectableDataPoint[]>[
             { selected: false, identity: identities[0] },
@@ -181,7 +192,7 @@ describe("Interactivity service", () => {
         it("Single select null identity does not crash", () => {
             interactivityService.bind(selectableDataPoints, behavior, null);
             behavior.select({
-                identity: createSelectionId(),
+                identity: createSelectionIdWithCompareMeasure(),
                 selected: false,
             });
             expect(behavior.verifyCleared()).toBeTruthy();
@@ -229,7 +240,7 @@ describe("Interactivity service", () => {
             let nullIdentity: SelectableDataPoint = {
                 selected: false,
                 identity: null,
-                specificIdentity: createSelectionId(),
+                specificIdentity: createSelectionIdWithCompareMeasure(),
             };
             interactivityService.handleSelection(nullIdentity, false);
             expect(interactivityService.hasSelection()).toBe(false);
@@ -238,7 +249,7 @@ describe("Interactivity service", () => {
         it("Null specific identity", () => {
             let nullIdentity: SelectableDataPoint = {
                 selected: false,
-                identity: createSelectionId(),
+                identity: createSelectionIdWithCompareMeasure(),
                 specificIdentity: null,
             };
             interactivityService.handleSelection(nullIdentity, false);
@@ -282,8 +293,8 @@ describe("Interactivity service", () => {
         it("Datapoint selection syncs legend datapoints", () => {
             // Datapoints
             let selectableDataPoints = [
-                { selected: false, identity: createSelectionId() },
-                { selected: false, identity: createSelectionId() },
+                { selected: false, identity: createSelectionIdWithCompareMeasure() },
+                { selected: false, identity: createSelectionIdWithCompareMeasure() },
             ];
             behavior = new MockBehavior(selectableDataPoints);
             interactivityService.bind(selectableDataPoints, behavior, null);
@@ -320,8 +331,8 @@ describe("Interactivity service", () => {
 
         it("Invalid selection without selectableDataPoints (only legendDataPoints)", () => {
             let legendDataPoints = [
-                { selected: false, identity: createSelectionId() },
-                { selected: false, identity: createSelectionId() },
+                { selected: false, identity: createSelectionIdWithCompareMeasure() },
+                { selected: false, identity: createSelectionIdWithCompareMeasure() },
             ];
             let legendBehavior = new MockBehavior(legendDataPoints);
             interactivityService.bind(legendDataPoints, legendBehavior, null, { isLegend: true });
@@ -332,8 +343,8 @@ describe("Interactivity service", () => {
 
             // New legend datapoints
             let newLegendDataPoints = [
-                { selected: false, identity: createSelectionId() },
-                { selected: false, identity: createSelectionId() },
+                { selected: false, identity: createSelectionIdWithCompareMeasure() },
+                { selected: false, identity: createSelectionIdWithCompareMeasure() },
             ];
             legendBehavior = new MockBehavior(newLegendDataPoints);
             interactivityService.bind(newLegendDataPoints, legendBehavior, null, { isLegend: true });
