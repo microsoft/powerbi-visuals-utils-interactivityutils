@@ -35,20 +35,26 @@ module powerbi.extensibility.utils.interactivity.test {
     import IVisualHost = powerbi.extensibility.visual.IVisualHost;
 
     // powerbi.extensibility.utils.interactivity
-    import InteractivityService = powerbi.extensibility.utils.interactivity.InteractivityService;
-    import FilterManager = powerbi.extensibility.utils.filter.FilterManager;
-    import SelectableDataPoint = powerbi.extensibility.utils.interactivity.SelectableDataPoint;
-    import createInteractivityService = powerbi.extensibility.utils.interactivity.createInteractivityService;
+    import InteractivitySelectionService = powerbi.extensibility.utils.interactivity.InteractivitySelectionService;
+    import SelectionDataPoint = powerbi.extensibility.utils.interactivity.SelectionDataPoint;
+    import createInteractivitySelectionService = powerbi.extensibility.utils.interactivity.createInteractivitySelectionService;
+    import IBehaviorOptions = powerbi.extensibility.utils.interactivity.IBehaviorOptions;
     import MockBehavior = powerbi.extensibility.utils.interactivity.test.mocks.MockBehavior;
 
     import createVisualHost = powerbi.extensibility.utils.test.mocks.createVisualHost;
     import createSelectionId = powerbi.extensibility.utils.test.mocks.createSelectionId;
 
+    interface ChicletSlicerBehaviorOptions extends IBehaviorOptions<SelectionDataPoint> {
+        some: string;
+        collection: string;
+        random: string;
+    }
+
     describe("Interactivity service", () => {
         let host: IVisualHost,
-            interactivityService: InteractivityService,
+            interactivityService: InteractivitySelectionService,
             identities: ISelectionId[],
-            selectableDataPoints: SelectableDataPoint[],
+            selectableDataPoints: SelectionDataPoint[],
             behavior: MockBehavior,
             incr: number = 0;
 
@@ -65,7 +71,7 @@ module powerbi.extensibility.utils.interactivity.test {
         beforeEach(() => {
             host = createVisualHost();
 
-            interactivityService = createInteractivityService(host) as InteractivityService;
+            interactivityService = createInteractivitySelectionService(host) as InteractivitySelectionService;
 
             identities = [
                 createSelectionIdWithCompareMeasure(),
@@ -75,7 +81,7 @@ module powerbi.extensibility.utils.interactivity.test {
                 createSelectionIdWithCompareMeasure(),
                 createSelectionIdWithCompareMeasure()
             ];
-            selectableDataPoints = <SelectableDataPoint[]>[
+            selectableDataPoints = <SelectionDataPoint[]>[
                 { selected: false, identity: identities[0] },
                 { selected: false, identity: identities[1] },
                 { selected: false, identity: identities[2] },
@@ -87,33 +93,12 @@ module powerbi.extensibility.utils.interactivity.test {
             behavior = new MockBehavior(selectableDataPoints);
         });
 
-        describe("applySelectionFilter", () => {
-            it("shouldn't throw any exceptions if the selectionManager is undefined", () => {
-                interactivityService["selectionManager"] = null;
-
-                expect(() => {
-                    interactivityService.applySelectionFilter();
-                }).not.toThrow();
-            });
-
-            it("the selectionManager.applySelectionFilter should be called", () => {
-                (interactivityService["selectionManager"] as ISelectionManager).applySelectionFilter = () => { };
-
-                spyOn(interactivityService["selectionManager"], "applySelectionFilter");
-
-                interactivityService.applySelectionFilter();
-
-                expect((interactivityService["selectionManager"] as ISelectionManager).applySelectionFilter)
-                    .toHaveBeenCalled();
-            });
-        });
-
         describe("Binding", () => {
 
             it("Basic binding", () => {
                 spyOn(behavior, "bindEvents");
                 spyOn(behavior, "renderSelection");
-                interactivityService.bind(selectableDataPoints, behavior, null);
+                interactivityService.bind({ dataPoints: selectableDataPoints, behavior: behavior });
                 expect(behavior.bindEvents).toHaveBeenCalled();
                 expect(behavior.verifyCleared()).toBeTruthy();
                 expect(behavior.renderSelection).not.toHaveBeenCalled();
@@ -122,12 +107,14 @@ module powerbi.extensibility.utils.interactivity.test {
 
             it("Binding passes behaviorOptions", () => {
                 spyOn(behavior, "bindEvents");
-                let arbitraryBehaviorOptions = {
+                const arbitraryBehaviorOptions: ChicletSlicerBehaviorOptions = {
+                    dataPoints: selectableDataPoints,
+                    behavior: behavior,
                     some: "random",
                     collection: "of",
                     random: "stuff",
                 };
-                interactivityService.bind(selectableDataPoints, behavior, arbitraryBehaviorOptions);
+                interactivityService.bind(arbitraryBehaviorOptions);
                 expect(behavior.bindEvents).toHaveBeenCalledWith(arbitraryBehaviorOptions, interactivityService);
             });
         });
@@ -136,7 +123,7 @@ module powerbi.extensibility.utils.interactivity.test {
 
             it("Basic selection", () => {
                 spyOn(behavior, "renderSelection");
-                interactivityService.bind(selectableDataPoints, behavior, null);
+                interactivityService.bind({ dataPoints: selectableDataPoints, behavior: behavior });
                 behavior.selectIndex(0, false);
                 expect(behavior.verifySingleSelectedAt(0)).toBeTruthy();
                 expect(behavior.renderSelection).toHaveBeenCalledWith(true);
@@ -144,15 +131,15 @@ module powerbi.extensibility.utils.interactivity.test {
             });
 
             it("Apply selection", () => {
-                let newDataPoints = selectableDataPoints.map((selectableDataPoint: SelectableDataPoint) => {
+                let newDataPoints = selectableDataPoints.map((selectableDataPoint: SelectionDataPoint) => {
                     return {
                         selected: false,
                         identity: selectableDataPoint.identity
-                    } as SelectableDataPoint;
+                    } as SelectionDataPoint;
                 });
 
                 spyOn(behavior, "renderSelection");
-                interactivityService.bind(selectableDataPoints, behavior, null);
+                interactivityService.bind({ dataPoints: selectableDataPoints, behavior: behavior });
                 behavior.selectIndex(0, false);
                 expect(behavior.verifySingleSelectedAt(0)).toBeTruthy();
                 expect(behavior.renderSelection).toHaveBeenCalledWith(true);
@@ -167,7 +154,7 @@ module powerbi.extensibility.utils.interactivity.test {
 
             it("Clear selection through event", () => {
                 spyOn(behavior, "renderSelection");
-                interactivityService.bind(selectableDataPoints, behavior, null);
+                interactivityService.bind({ dataPoints: selectableDataPoints, behavior: behavior });
                 behavior.selectIndex(0, false);
                 behavior.clear();
                 expect(behavior.verifyCleared()).toBeTruthy();
@@ -177,7 +164,7 @@ module powerbi.extensibility.utils.interactivity.test {
 
             it("Clear selection through service", () => {
                 spyOn(behavior, "renderSelection");
-                interactivityService.bind(selectableDataPoints, behavior, null);
+                interactivityService.bind({ dataPoints: selectableDataPoints, behavior: behavior });
                 behavior.selectIndex(0, false);
                 interactivityService.clearSelection();
                 expect(behavior.verifyCleared()).toBeTruthy();
@@ -186,7 +173,7 @@ module powerbi.extensibility.utils.interactivity.test {
             });
 
             it("Multiple single selects", () => {
-                interactivityService.bind(selectableDataPoints, behavior, null);
+                interactivityService.bind({ dataPoints: selectableDataPoints, behavior: behavior });
                 for (let i = 0, ilen = selectableDataPoints.length; i < ilen; i++) {
                     behavior.selectIndex(i, false);
                     expect(behavior.verifySingleSelectedAt(i)).toBeTruthy();
@@ -195,7 +182,7 @@ module powerbi.extensibility.utils.interactivity.test {
 
             describe("Multiple selects", () => {
                 it("should select all of data points if multiSelect is false", () => {
-                    interactivityService.bind(selectableDataPoints, behavior, null);
+                    interactivityService.bind({ dataPoints: selectableDataPoints, behavior: behavior });
                     interactivityService.handleSelection(selectableDataPoints, false);
 
                     for (let dataPointIndex = 0; dataPointIndex < selectableDataPoints.length; dataPointIndex++) {
@@ -204,12 +191,12 @@ module powerbi.extensibility.utils.interactivity.test {
                 });
 
                 it("should select all of data point if multiSelect is true and dataPoints are applied by small groups", () => {
-                    interactivityService.bind(selectableDataPoints, behavior, null);
+                    interactivityService.bind({ dataPoints: selectableDataPoints, behavior: behavior });
 
                     const amountOfDataPoints: number = selectableDataPoints.length;
 
-                    const firstGroup: SelectableDataPoint[] = selectableDataPoints.slice(0, amountOfDataPoints / 2);
-                    const secondGroup: SelectableDataPoint[] = selectableDataPoints.slice(amountOfDataPoints / 2, amountOfDataPoints);
+                    const firstGroup: SelectionDataPoint[] = selectableDataPoints.slice(0, amountOfDataPoints / 2);
+                    const secondGroup: SelectionDataPoint[] = selectableDataPoints.slice(amountOfDataPoints / 2, amountOfDataPoints);
 
                     interactivityService.handleSelection(firstGroup, true);
                     interactivityService.handleSelection(secondGroup, true);
@@ -221,7 +208,7 @@ module powerbi.extensibility.utils.interactivity.test {
             });
 
             it("should select nothing if dataPoints are empty", () => {
-                interactivityService.bind(selectableDataPoints, behavior, null);
+                interactivityService.bind({ dataPoints: selectableDataPoints, behavior: behavior });
 
                 interactivityService.handleSelection(null, null);
 
@@ -231,7 +218,7 @@ module powerbi.extensibility.utils.interactivity.test {
             });
 
             it("Single select clears", () => {
-                interactivityService.bind(selectableDataPoints, behavior, null);
+                interactivityService.bind({ dataPoints: selectableDataPoints, behavior: behavior });
                 behavior.selectIndex(1, false);
                 expect(behavior.verifySingleSelectedAt(1)).toBeTruthy();
                 behavior.selectIndex(1, false);
@@ -239,7 +226,7 @@ module powerbi.extensibility.utils.interactivity.test {
             });
 
             it("Single select null identity does not crash", () => {
-                interactivityService.bind(selectableDataPoints, behavior, null);
+                interactivityService.bind({ dataPoints: selectableDataPoints, behavior: behavior });
                 behavior.select({
                     identity: createSelectionIdWithCompareMeasure(),
                     selected: false,
@@ -248,7 +235,7 @@ module powerbi.extensibility.utils.interactivity.test {
             });
 
             it("Basic multiselect", () => {
-                interactivityService.bind(selectableDataPoints, behavior, null);
+                interactivityService.bind({ dataPoints: selectableDataPoints, behavior: behavior });
                 behavior.selectIndex(1, true);
                 expect(behavior.verifySelectionState([false, true, false, false, false, false, false])).toBeTruthy();
                 behavior.selectIndex(2, true);
@@ -258,7 +245,7 @@ module powerbi.extensibility.utils.interactivity.test {
             });
 
             it("Multiselect clears", () => {
-                interactivityService.bind(selectableDataPoints, behavior, null);
+                interactivityService.bind({ dataPoints: selectableDataPoints, behavior: behavior });
                 behavior.selectIndex(1, true);
                 expect(behavior.verifySelectionState([false, true, false, false, false, false, false])).toBeTruthy();
                 behavior.selectIndex(2, true);
@@ -272,7 +259,7 @@ module powerbi.extensibility.utils.interactivity.test {
             });
 
             it("Single and multiselect", () => {
-                interactivityService.bind(selectableDataPoints, behavior, null);
+                interactivityService.bind({ dataPoints: selectableDataPoints, behavior: behavior });
                 behavior.selectIndex(1, false);
                 expect(behavior.verifySingleSelectedAt(1)).toBeTruthy();
                 behavior.selectIndex(2, true);
@@ -286,7 +273,7 @@ module powerbi.extensibility.utils.interactivity.test {
             });
 
             it("Null identity", () => {
-                let nullIdentity: SelectableDataPoint = {
+                let nullIdentity: SelectionDataPoint = {
                     selected: false,
                     identity: null,
                     specificIdentity: createSelectionIdWithCompareMeasure(),
@@ -296,7 +283,7 @@ module powerbi.extensibility.utils.interactivity.test {
             });
 
             it("Null specific identity", () => {
-                let nullIdentity: SelectableDataPoint = {
+                let nullIdentity: SelectionDataPoint = {
                     selected: false,
                     identity: createSelectionIdWithCompareMeasure(),
                     specificIdentity: null,
@@ -306,7 +293,7 @@ module powerbi.extensibility.utils.interactivity.test {
             });
 
             it("Null for identity and specific identity", () => {
-                let nullIdentity: SelectableDataPoint = {
+                let nullIdentity: SelectionDataPoint = {
                     selected: false,
                     identity: null,
                     specificIdentity: null,
@@ -324,8 +311,8 @@ module powerbi.extensibility.utils.interactivity.test {
                     { selected: false, identity: selectableDataPoints[1].identity },
                 ];
                 let legendBehavior = new MockBehavior(legendDataPoints);
-                interactivityService.bind(selectableDataPoints, behavior, null);
-                interactivityService.bind(legendDataPoints, legendBehavior, null, { isLegend: true });
+                interactivityService.bind({ dataPoints: selectableDataPoints, behavior: behavior });
+                interactivityService.bind({ dataPoints: legendDataPoints, behavior: legendBehavior, interactivityServiceOptions: { isLegend: true } });
 
                 legendBehavior.selectIndex(0);
                 expect(legendBehavior.verifySingleSelectedAt(0)).toBeTruthy();
@@ -346,7 +333,7 @@ module powerbi.extensibility.utils.interactivity.test {
                     { selected: false, identity: createSelectionIdWithCompareMeasure() },
                 ];
                 behavior = new MockBehavior(selectableDataPoints);
-                interactivityService.bind(selectableDataPoints, behavior, null);
+                interactivityService.bind({ dataPoints: selectableDataPoints, behavior: behavior });
 
                 // Legend datapoints
                 let legendDataPoints = [
@@ -354,7 +341,7 @@ module powerbi.extensibility.utils.interactivity.test {
                     { selected: false, identity: selectableDataPoints[1].identity },
                 ];
                 let legendBehavior = new MockBehavior(legendDataPoints);
-                interactivityService.bind(legendDataPoints, legendBehavior, null, { isLegend: true });
+                interactivityService.bind({ dataPoints: legendDataPoints, behavior: legendBehavior, interactivityServiceOptions: { isLegend: true } });
 
                 // Trigger selection on datapoints
                 behavior.selectIndex(1);
@@ -384,7 +371,7 @@ module powerbi.extensibility.utils.interactivity.test {
                     { selected: false, identity: createSelectionIdWithCompareMeasure() },
                 ];
                 let legendBehavior = new MockBehavior(legendDataPoints);
-                interactivityService.bind(legendDataPoints, legendBehavior, null, { isLegend: true });
+                interactivityService.bind({ dataPoints: legendDataPoints, behavior: legendBehavior, interactivityServiceOptions: { isLegend: true } });
 
                 // Select first legend item
                 legendBehavior.selectIndex(0);
@@ -396,7 +383,7 @@ module powerbi.extensibility.utils.interactivity.test {
                     { selected: false, identity: createSelectionIdWithCompareMeasure() },
                 ];
                 legendBehavior = new MockBehavior(newLegendDataPoints);
-                interactivityService.bind(newLegendDataPoints, legendBehavior, null, { isLegend: true });
+                interactivityService.bind({ dataPoints: newLegendDataPoints, behavior: legendBehavior, interactivityServiceOptions: { isLegend: true } });
 
                 // Select a new legend item
                 legendBehavior.selectIndex(0);
@@ -419,8 +406,8 @@ module powerbi.extensibility.utils.interactivity.test {
                     { selected: false, identity: selectableDataPoints[1].identity },
                 ];
                 let labelBehavior = new MockBehavior(labelsDataPoints);
-                interactivityService.bind(selectableDataPoints, behavior, null);
-                interactivityService.bind(labelsDataPoints, labelBehavior, null, { isLabels: true });
+                interactivityService.bind({ dataPoints: selectableDataPoints, behavior: behavior });
+                interactivityService.bind({ dataPoints: labelsDataPoints, behavior: labelBehavior, interactivityServiceOptions: { isLabels: true } });
 
                 labelBehavior.selectIndex(0);
                 labelBehavior.verifySingleSelectedAt(0);
@@ -432,237 +419,6 @@ module powerbi.extensibility.utils.interactivity.test {
                 behavior.verifySingleSelectedAt(1);
                 labelBehavior.verifyCleared();
                 expect(interactivityService.hasSelection()).toBeTruthy();
-            });
-        });
-    });
-
-    describe("FilterManager", () => {
-
-        describe("basic filter", () => {
-            // In [1000, 2000] basic filter sample
-            let filterIn10002000: string =
-                `{"fromValue":{"items":{"a":{"entity":"Annual Revenue"}}},` +
-                `"whereItems":[{"condition":{"_kind":10,"args":[{"_kind":2,"source":{"_kind":0,"entity":"Annual Revenue","variable":"a"},"ref":"Year"}],` +
-                `"values":[[{"_kind":17,"type":{"underlyingType":260,"category":null},"value":1000,"typeEncodedValue":"1000L"}],` +
-                `[{"_kind":17,"type":{"underlyingType":260,"category":null},"value":2000,"typeEncodedValue":"2000L"}]]}}]}`;
-
-            let filterNotIn10002000: string =
-                `{"fromValue":{"items":{"a":{"entity":"Annual Revenue"}}},` +
-                `"whereItems":[{"condition":{"_kind":16,"arg":{"_kind":10,"args":[{"_kind":2,"source":{"_kind":0,"entity":"Annual Revenue","variable":"a"},"ref":"Year"}],` +
-                `"values":[[{"_kind":17,"type":{"underlyingType":260,"category":null},"value":1000,"typeEncodedValue":"1000L"}],` +
-                `[{"_kind":17,"type":{"underlyingType":260,"category":null},"value":2000,"typeEncodedValue":"2000L"}]]}}}]}`;
-
-            it("restore 'In' condition filter", (done) => {
-                let filter = JSON.parse(filterIn10002000);
-                let restoredFilter = FilterManager.restoreFilter(filter) as IBasicFilter;
-
-                expect(restoredFilter.operator).toBe("In");
-                expect(restoredFilter.values.length).toBe(2);
-                expect(restoredFilter.filterType).toBe(1 /* FilterType.Basic*/);
-                expect(restoredFilter.values[0][0].value).toBe(1000);
-                expect(restoredFilter.values[1][0].value).toBe(2000);
-                done();
-            });
-
-            it("restore 'NotIn' condition filter", (done) => {
-                let filter = JSON.parse(filterNotIn10002000);
-                let restoredFilter = FilterManager.restoreFilter(filter) as IBasicFilter;
-
-                expect(restoredFilter.operator).toBe("NotIn");
-                expect(restoredFilter.values.length).toBe(2);
-                expect(restoredFilter.filterType).toBe(1 /* FilterType.Basic*/);
-                expect(restoredFilter.values[0][0].value).toBe(1000);
-                expect(restoredFilter.values[1][0].value).toBe(2000);
-                done();
-            });
-        });
-
-        describe("restore advanced filter with one condition", () => {
-            let filterContaints1000 =
-                `{"fromValue":{"items":{"a":{"entity":"Annual Revenue"}}},` +
-                `"whereItems":[{"condition":{"_kind":12,"left":{"_kind":2,"source":{"_kind":0,"entity":"Annual Revenue","variable":"a"},"ref":"Year"},` +
-                `"right":{"_kind":17,"type":{"underlyingType":259,"category":null},"value":1000,"typeEncodedValue":"1000D"}}}]}`;
-
-            let filterDoesNotContain1000: string =
-                `{"fromValue":{"items":{"a":{"entity":"Annual Revenue"}}},` +
-                `"whereItems":[{"condition":{"_kind":16,"arg":{"_kind":12,"left":{"_kind":2,"source":{"_kind":0,"entity":"Annual Revenue","variable":"a"},"ref":"Year"},` +
-                `"right":{"_kind":17,"type":{"underlyingType":259,"category":null},"value":1000,"typeEncodedValue":"1000D"}}}}]}`;
-
-            let filterDoesNotStartWith1000: string =
-                `{"fromValue":{"items":{"a":{"entity":"Annual Revenue"}}},` +
-                `"whereItems":[{"condition":{"_kind":16,"arg":{"_kind":14,"left":{"_kind":2,"source":{"_kind":0,"entity":"Annual Revenue","variable":"a"},"ref":"Year"},` +
-                `"right":{"_kind":17,"type":{"underlyingType":259,"category":null},"value":1000,"typeEncodedValue":"1000D"}}}}]}`;
-
-            let filterGreaterThan1000: string =
-                `{"fromValue":{"items":{"a":{"entity":"Annual Revenue"}}},` +
-                `"whereItems":[{"condition":{"_kind":13,"comparison":1,"left":{"_kind":2,"source":{"_kind":0,"entity":"Annual Revenue","variable":"a"},"ref":"Year"},` +
-                `"right":{"_kind":17,"type":{"underlyingType":259,"category":null},"value":1000,"typeEncodedValue":"1000D"}}}]}`;
-
-            let filterGreaterThanOrEqual1000: string =
-                `{"fromValue":{"items":{"a":{"entity":"Annual Revenue"}}},` +
-                `"whereItems":[{"condition":{"_kind":13,"comparison":2,"left":{"_kind":2,"source":{"_kind":0,"entity":"Annual Revenue","variable":"a"},"ref":"Year"},` +
-                `"right":{"_kind":17,"type":{"underlyingType":259,"category":null},"value":1000,"typeEncodedValue":"1000D"}}}]}`;
-
-            let filterIs1000: string =
-                `{"fromValue":{"items":{"a":{"entity":"Annual Revenue"}}},` +
-                `"whereItems":[{"condition":{"_kind":13,"comparison":0,"left":{"_kind":2,"source":{"_kind":0,"entity":"Annual Revenue","variable":"a"},"ref":"Year"},` +
-                `"right":{"_kind":17,"type":{"underlyingType":259,"category":null},"value":1000,"typeEncodedValue":"1000D"}}}]}`;
-
-            let filterIsBlank1000: string =
-                `{"fromValue":{"items":{"a":{"entity":"Annual Revenue"}}},` +
-                `"whereItems":[{"condition":{"_kind":13,"comparison":0,"left":{"_kind":2,"source":{"_kind":0,"entity":"Annual Revenue","variable":"a"},"ref":"Year"},` +
-                `"right":{"_kind":17,"type":{"underlyingType":0,"category":null},"value":null,"typeEncodedValue":"null"}}}]}`;
-
-            let filterIsNot1000: string =
-                `{"fromValue":{"items":{"a":{"entity":"Annual Revenue"}}},` +
-                `"whereItems":[{"condition":{"_kind":16,"arg":{"_kind":13,"comparison":0,"left":{"_kind":2,"source":{"_kind":0,"entity":"Annual Revenue","variable":"a"},` +
-                `"ref":"Year"},"right":{"_kind":17,"type":{"underlyingType":259,"category":null},"value":1000,"typeEncodedValue":"1000D"}}}}]}`;
-
-            let filterIsNotBlank1000: string =
-                `{"fromValue":{"items":{"a":{"entity":"Annual Revenue"}}},` +
-                `"whereItems":[{"condition":{"_kind":16,"arg":{"_kind":13,"comparison":0,"left":{"_kind":2,"source":{"_kind":0,"entity":"Annual Revenue","variable":"a"},` +
-                `"ref":"Year"},"right":{"_kind":17,"type":{"underlyingType":0,"category":null},"value":null,"typeEncodedValue":"null"}}}}]}`;
-
-            let filterLessThan1000: string =
-                `{"fromValue":{"items":{"a":{"entity":"Annual Revenue"}}},` +
-                `"whereItems":[{"condition":{"_kind":13,"comparison":3,"left":{"_kind":2,"source":{"_kind":0,"entity":"Annual Revenue","variable":"a"},"ref":"Year"},` +
-                `"right":{"_kind":17,"type":{"underlyingType":259,"category":null},"value":1000,"typeEncodedValue":"1000D"}}}]}`;
-
-            let filterLessThanOrEqual1000: string =
-                `{"fromValue":{"items":{"a":{"entity":"Annual Revenue"}}},` +
-                `"whereItems":[{"condition":{"_kind":13,"comparison":4,"left":{"_kind":2,"source":{"_kind":0,"entity":"Annual Revenue","variable":"a"},"ref":"Year"},` +
-                `"right":{"_kind":17,"type":{"underlyingType":259,"category":null},"value":1000,"typeEncodedValue":"1000D"}}}]}`;
-
-            it("restore 'Contains' operator filter", (done) => {
-                let filter = JSON.parse(filterContaints1000);
-                let restoredFilter = FilterManager.restoreFilter(filter) as IAdvancedFilter;
-
-                expect(restoredFilter.logicalOperator).toBe("And");
-                expect(restoredFilter.conditions.length).toBe(1);
-                expect(restoredFilter.filterType).toBe(0 /* FilterType.Advanced*/);
-                expect(restoredFilter.conditions[0].operator).toBe("Contains");
-                expect(restoredFilter.conditions[0].value).toBe(1000);
-                done();
-            });
-
-            it("restore 'DoesNotContain' operator filter", (done) => {
-                let filter = JSON.parse(filterDoesNotContain1000);
-                let restoredFilter = FilterManager.restoreFilter(filter) as IAdvancedFilter;
-
-                expect(restoredFilter.logicalOperator).toBe("And");
-                expect(restoredFilter.conditions.length).toBe(1);
-                expect(restoredFilter.filterType).toBe(0 /* FilterType.Advanced*/);
-                expect(restoredFilter.conditions[0].operator).toBe("DoesNotContain");
-                expect(restoredFilter.conditions[0].value).toBe(1000);
-                done();
-            });
-
-            it("restore 'DoesNotStartWith' operator filter", (done) => {
-                let filter = JSON.parse(filterDoesNotStartWith1000);
-                let restoredFilter = FilterManager.restoreFilter(filter) as IAdvancedFilter;
-
-                expect(restoredFilter.logicalOperator).toBe("And");
-                expect(restoredFilter.conditions.length).toBe(1);
-                expect(restoredFilter.filterType).toBe(0 /* FilterType.Advanced*/);
-                expect(restoredFilter.conditions[0].operator).toBe("DoesNotStartWith");
-                expect(restoredFilter.conditions[0].value).toBe(1000);
-                done();
-            });
-
-            it("restore 'GreaterThan' operator filter", (done) => {
-                let filter = JSON.parse(filterGreaterThan1000);
-                let restoredFilter = FilterManager.restoreFilter(filter) as IAdvancedFilter;
-
-                expect(restoredFilter.logicalOperator).toBe("And");
-                expect(restoredFilter.conditions.length).toBe(1);
-                expect(restoredFilter.filterType).toBe(0 /* FilterType.Advanced*/);
-                expect(restoredFilter.conditions[0].operator).toBe("GreaterThan");
-                expect(restoredFilter.conditions[0].value).toBe(1000);
-                done();
-            });
-
-            it("restore 'GreaterThanOrEqual' operator filter", (done) => {
-                let filter = JSON.parse(filterGreaterThanOrEqual1000);
-                let restoredFilter = FilterManager.restoreFilter(filter) as IAdvancedFilter;
-
-                expect(restoredFilter.logicalOperator).toBe("And");
-                expect(restoredFilter.conditions.length).toBe(1);
-                expect(restoredFilter.filterType).toBe(0 /* FilterType.Advanced*/);
-                expect(restoredFilter.conditions[0].operator).toBe("GreaterThanOrEqual");
-                expect(restoredFilter.conditions[0].value).toBe(1000);
-                done();
-            });
-
-            it("restore 'Is' operator filter", (done) => {
-                let filter = JSON.parse(filterIs1000);
-                let restoredFilter = FilterManager.restoreFilter(filter) as IAdvancedFilter;
-
-                expect(restoredFilter.logicalOperator).toBe("And");
-                expect(restoredFilter.conditions.length).toBe(1);
-                expect(restoredFilter.filterType).toBe(0 /* FilterType.Advanced*/);
-                expect(restoredFilter.conditions[0].operator).toBe("Is");
-                expect(restoredFilter.conditions[0].value).toBe(1000);
-                done();
-            });
-
-            it("restore 'IsNot' operator filter", (done) => {
-                let filter = JSON.parse(filterIsNot1000);
-                let restoredFilter = FilterManager.restoreFilter(filter) as IAdvancedFilter;
-
-                expect(restoredFilter.logicalOperator).toBe("And");
-                expect(restoredFilter.conditions.length).toBe(1);
-                expect(restoredFilter.filterType).toBe(0 /* FilterType.Advanced*/);
-                expect(restoredFilter.conditions[0].operator).toBe("IsNot");
-                expect(restoredFilter.conditions[0].value).toBe(1000);
-                done();
-            });
-
-            it("restore 'IsBlank' operator filter", (done) => {
-                let filter = JSON.parse(filterIsBlank1000);
-                let restoredFilter = FilterManager.restoreFilter(filter) as IAdvancedFilter;
-
-                expect(restoredFilter.logicalOperator).toBe("And");
-                expect(restoredFilter.conditions.length).toBe(1);
-                expect(restoredFilter.filterType).toBe(0 /* FilterType.Advanced*/);
-                expect(restoredFilter.conditions[0].operator).toBe("Is");
-                expect(restoredFilter.conditions[0].value).toBeNull();
-                done();
-            });
-
-            it("restore 'IsNotBlank' operator filter", (done) => {
-                let filter = JSON.parse(filterIsNotBlank1000);
-                let restoredFilter = FilterManager.restoreFilter(filter) as IAdvancedFilter;
-
-                expect(restoredFilter.logicalOperator).toBe("And");
-                expect(restoredFilter.conditions.length).toBe(1);
-                expect(restoredFilter.filterType).toBe(0 /* FilterType.Advanced*/);
-                expect(restoredFilter.conditions[0].operator).toBe("IsNotBlank");
-                expect(restoredFilter.conditions[0].value).toBeNull();
-                done();
-            });
-
-            it("restore 'LessThan' operator filter", (done) => {
-                let filter = JSON.parse(filterLessThan1000);
-                let restoredFilter = FilterManager.restoreFilter(filter) as IAdvancedFilter;
-
-                expect(restoredFilter.logicalOperator).toBe("And");
-                expect(restoredFilter.conditions.length).toBe(1);
-                expect(restoredFilter.filterType).toBe(0 /* FilterType.Advanced*/);
-                expect(restoredFilter.conditions[0].operator).toBe("LessThan");
-                expect(restoredFilter.conditions[0].value).toBe(1000);
-                done();
-            });
-
-            it("restore 'LessThanOrEqual' operator filter", (done) => {
-                let filter = JSON.parse(filterLessThanOrEqual1000);
-                let restoredFilter = FilterManager.restoreFilter(filter) as IAdvancedFilter;
-
-                expect(restoredFilter.logicalOperator).toBe("And");
-                expect(restoredFilter.conditions.length).toBe(1);
-                expect(restoredFilter.filterType).toBe(0 /* FilterType.Advanced*/);
-                expect(restoredFilter.conditions[0].operator).toBe("LessThanOrEqual");
-                expect(restoredFilter.conditions[0].value).toBe(1000);
-                done();
             });
         });
     });

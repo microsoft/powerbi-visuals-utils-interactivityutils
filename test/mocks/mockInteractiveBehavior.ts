@@ -28,16 +28,16 @@
 
 module powerbi.extensibility.utils.interactivity.test.mocks {
     // powerbi.extensibility.utils.interactivity
-    import SelectableDataPoint = powerbi.extensibility.utils.interactivity.SelectableDataPoint;
+    import SelectionDataPoint = powerbi.extensibility.utils.interactivity.SelectionDataPoint;
     import IInteractiveBehavior = powerbi.extensibility.utils.interactivity.IInteractiveBehavior;
     import ISelectionHandler = powerbi.extensibility.utils.interactivity.ISelectionHandler;
 
     export class MockBehavior implements IInteractiveBehavior {
-        private selectableDataPoints: SelectableDataPoint[];
+        private selectionDataPoint: SelectionDataPoint[];
         private selectionHandler: ISelectionHandler;
 
-        constructor(selectableDataPoints: SelectableDataPoint[]) {
-            this.selectableDataPoints = selectableDataPoints;
+        constructor(selectionDataPoint: SelectionDataPoint[]) {
+            this.selectionDataPoint = selectionDataPoint;
         }
 
         public bindEvents(options: any, selectionHandler: ISelectionHandler): void {
@@ -50,10 +50,10 @@ module powerbi.extensibility.utils.interactivity.test.mocks {
         public renderSelection(hasSelection: boolean): void { }
 
         public selectIndex(index: number, multiSelect?: boolean): void {
-            this.selectionHandler.handleSelection(this.selectableDataPoints[index], !!multiSelect);
+            this.selectionHandler.handleSelection(this.selectionDataPoint[index], !!multiSelect);
         }
 
-        public select(dataPoints: SelectableDataPoint | SelectableDataPoint[], multiSelect?: boolean): void {
+        public select(dataPoints: SelectionDataPoint | SelectionDataPoint[], multiSelect?: boolean): void {
             this.selectionHandler.handleSelection(dataPoints, !!multiSelect);
         }
 
@@ -62,14 +62,14 @@ module powerbi.extensibility.utils.interactivity.test.mocks {
         }
 
         public selectIndexAndPersist(index: number, multiSelect?: boolean): void {
-            this.selectionHandler.handleSelection(this.selectableDataPoints[index], !!multiSelect);
+            this.selectionHandler.handleSelection(this.selectionDataPoint[index], !!multiSelect);
         }
 
         public verifyCleared(): boolean {
-            let selectableDataPoints = this.selectableDataPoints;
+            let selectionDataPoint = this.selectionDataPoint;
 
-            for (let i = 0, ilen = selectableDataPoints.length; i < ilen; i++) {
-                if (selectableDataPoints[i].selected)
+            for (let i = 0, ilen = selectionDataPoint.length; i < ilen; i++) {
+                if (selectionDataPoint[i].selected)
                     return false;
             }
 
@@ -77,24 +77,24 @@ module powerbi.extensibility.utils.interactivity.test.mocks {
         }
 
         public verifySingleSelectedAt(index: number): boolean {
-            return this.selectableDataPoints[index].selected;
+            return this.selectionDataPoint[index].selected;
         }
 
         public verifySelectionState(selectionState: boolean[]): boolean {
-            let selectableDataPoints = this.selectableDataPoints;
+            let selectionDataPoint = this.selectionDataPoint;
 
-            for (let i = 0, ilen = selectableDataPoints.length; i < ilen; i++) {
-                if (selectableDataPoints[i].selected !== selectionState[i])
+            for (let i = 0, ilen = selectionDataPoint.length; i < ilen; i++) {
+                if (selectionDataPoint[i].selected !== selectionState[i])
                     return false;
             }
             return true;
         }
 
         public selections(): boolean[] {
-            let selectableDataPoints = this.selectableDataPoints,
+            let selectionDataPoint = this.selectionDataPoint,
                 selections: boolean[] = [];
 
-            for (let dataPoint of selectableDataPoints) {
+            for (let dataPoint of selectionDataPoint) {
                 selections.push(!!dataPoint.selected);
             }
 
