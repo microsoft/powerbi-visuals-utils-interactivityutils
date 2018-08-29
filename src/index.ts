@@ -1,5 +1,12 @@
-import * as interactivityService from "./interactivityService";
+import * as interactivityBaseService from "./interactivityBaseService";
+import * as interactivityFilterService from "./interactivityFilterService";
+import * as interactivitySelectionService from "./interactivitySelectionService";
 import * as interactivityUtils from "./interactivityUtils";
-import * as filtermanager from "./filtermanager";
-import * as interfaces from "./interfaces";
-export { interactivityService, interactivityUtils, filtermanager, interfaces };
+import * as interactivityInterfaces from "./interfaces";
+export {
+    interactivityBaseService,
+    interactivityFilterService,
+    interactivitySelectionService,
+    interactivityUtils,
+    interactivityInterfaces
+};
