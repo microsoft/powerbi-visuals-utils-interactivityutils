@@ -1,3 +1,6 @@
+## 5.1.0
+* Update packages to fix vulnerabilities
+
 ## 3.0.1
 * Moved to webpack 3, commonjs style.
 
