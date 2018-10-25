@@ -1,3 +1,6 @@
+## 4.2.0 
+* Update packages to fix vulnerabilities
+
 ## 4.1.1
 * UPD: function checkDatapointAgainstSelectedIds was refactored
 
