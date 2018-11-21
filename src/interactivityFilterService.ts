@@ -27,7 +27,10 @@
 import powerbi from "powerbi-visuals-api";
 import {
     IBasicFilter,
-    IFilterColumnTarget
+    IFilterColumnTarget,
+    IFilter,
+    FilterType,
+    BasicFilter
  } from "powerbi-models";
 
 import IVisualHost = powerbi.extensibility.visual.IVisualHost;
@@ -88,11 +91,14 @@ export class InteractivityFilterService
         const jsonFilters = options.jsonFilters;
         ArrayExtensions.clear(this.selectedCategories);
         if (jsonFilters && jsonFilters.length > 0) {
-            jsonFilters.forEach((filter: IBasicFilter) => {
-                if (filter.values && filter.values.length > 0) {
-                    filter.values.forEach((value: powerbi.PrimitiveValue) => {
-                        this.selectedCategories.push(value);
-                    });
+            jsonFilters.forEach((filter: IFilter) => {
+                if (filter.filterType === FilterType.Basic) {
+                    let basicFilter = filter as IBasicFilter;
+                    if (basicFilter.values && basicFilter.values.length > 0) {
+                        basicFilter.values.forEach((value: powerbi.PrimitiveValue) => {
+                            this.selectedCategories.push(value);
+                        });
+                    }
                 }
             });
         }
@@ -186,11 +192,11 @@ export class InteractivityFilterService
     }
 
     protected sendSelectionToHost(): void {
-        const filter: IBasicFilter = new window["powerbi-models"].BasicFilter(
+        const filter: IBasicFilter = new BasicFilter(
             this.filterColumnTarget,
             "In",
             this.selectedCategories as any[]
-        );
+        ).toJSON();
 
         if (this.selectedCategories && this.selectedCategories.length) {
             this.hostServices.applyJsonFilter(
