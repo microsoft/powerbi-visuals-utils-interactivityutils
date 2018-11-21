@@ -1,6 +1,6 @@
 {
   "name": "powerbi-visuals-utils-interactivityutils",
-  "version": "4.2.0",
+  "version": "4.3.0",
   "description": "InteractivityUtils",
   "main": "lib/index.js",
   "repository": {

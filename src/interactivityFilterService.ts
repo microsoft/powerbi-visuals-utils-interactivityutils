@@ -36,7 +36,7 @@ module powerbi.extensibility.utils.interactivity {
     export interface IFilterBehaviorOptions extends IBehaviorOptions<FilterDataPoint> {
         dataView: DataView;
         category: DataViewCategoryColumn;
-        jsonFilters: IBasicFilter[];
+        jsonFilters: IFilter[];
     }
 
     export function extractFilterColumnTarget(categoryColumn: DataViewCategoryColumn): IFilterColumnTarget {
