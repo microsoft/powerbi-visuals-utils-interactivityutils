@@ -24,8 +24,37 @@
  *  THE SOFTWARE.
  */
 
-/// <reference path="../lib/index.d.ts" />
-/// <reference path="../node_modules/powerbi-models/dist/models-noexports.d.ts" />
-/// <reference path="../node_modules/powerbi-visuals-tools/templates/visuals/.api/v1.6.0/PowerBI-visuals.d.ts" />
-/// <reference path="../node_modules/powerbi-visuals-utils-testutils/lib/index.d.ts" />
-/// <reference path="mocks/mockInteractiveBehavior.ts" />
+const path = require('path');
+const webpack = require("webpack");
+
+module.exports = {
+    entry: './src/index.ts',
+    devtool: 'source-map',
+    module: {
+        rules: [
+            {
+                test: /\.tsx?$/,
+                use: 'ts-loader',
+                exclude: /node_modules/
+            },
+            {
+                test: /\.json$/,
+                loader: 'json-loader'
+              }
+        ]
+    },
+    externals: {
+        "powerbi-visuals-api": '{}'
+    },
+    resolve: {
+        extensions: ['.tsx', '.ts', '.js','.css']
+    },
+    output: {
+        path: path.resolve(__dirname, ".tmp/test")
+    },
+    plugins: [
+        new webpack.ProvidePlugin({
+            'powerbi-visuals-api': null
+          })
+    ]
+};
