@@ -1,42 +1,51 @@
 /*
- *  Power BI Visualizations
- *
- *  Copyright (c) Microsoft Corporation
- *  All rights reserved.
- *  MIT License
- *
- *  Permission is hereby granted, free of charge, to any person obtaining a copy
- *  of this software and associated documentation files (the ""Software""), to deal
- *  in the Software without restriction, including without limitation the rights
- *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- *  copies of the Software, and to permit persons to whom the Software is
- *  furnished to do so, subject to the following conditions:
- *
- *  The above copyright notice and this permission notice shall be included in
- *  all copies or substantial portions of the Software.
- *
- *  THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- *  THE SOFTWARE.
- */
+*  Power BI Visualizations
+*
+*  Copyright (c) Microsoft Corporation
+*  All rights reserved.
+*  MIT License
+*
+*  Permission is hereby granted, free of charge, to any person obtaining a copy
+*  of this software and associated documentation files (the ""Software""), to deal
+*  in the Software without restriction, including without limitation the rights
+*  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+*  copies of the Software, and to permit persons to whom the Software is
+*  furnished to do so, subject to the following conditions:
+*
+*  The above copyright notice and this permission notice shall be included in
+*  all copies or substantial portions of the Software.
+*
+*  THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+*  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+*  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+*  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+*  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+*  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+*  THE SOFTWARE.
+*/
+
 import powerbi from "powerbi-visuals-api";
-import { SelectableDataPoint,  InteractivityService, createInteractivityService} from "../src/interactivityService";
 import { MockBehavior } from "./mocks/mockInteractiveBehavior";
 import { createVisualHost, createSelectionId } from "powerbi-visuals-utils-testutils";
 // powerbi.extensibility
 import ISelectionId = powerbi.visuals.ISelectionId;
 import IVisualHost = powerbi.extensibility.visual.IVisualHost;
-import ISelectionManager = powerbi.extensibility.ISelectionManager;
+
+import { SelectionDataPoint, InteractivitySelectionService } from "../src/interactivitySelectionService";
+import { IBehaviorOptions } from "../src/interactivityBaseService";
+import { createInteractivitySelectionService } from "../src/interactivitySelectionService";
+
+interface ChicletSlicerBehaviorOptions extends IBehaviorOptions<SelectionDataPoint> {
+    some: string;
+    collection: string;
+    random: string;
+}
 
 describe("Interactivity service", () => {
     let host: IVisualHost,
-        interactivityService: InteractivityService,
+        interactivityService: InteractivitySelectionService,
         identities: ISelectionId[],
-        selectableDataPoints: SelectableDataPoint[],
+        selectableDataPoints: SelectionDataPoint[],
         behavior: MockBehavior,
         incr: number = 0;
 
@@ -53,7 +62,7 @@ describe("Interactivity service", () => {
     beforeEach(() => {
         host = createVisualHost();
 
-        interactivityService = createInteractivityService(host) as InteractivityService;
+        interactivityService = createInteractivitySelectionService(host) as InteractivitySelectionService;
 
         identities = [
             createSelectionIdWithCompareMeasure(),
@@ -63,7 +72,7 @@ describe("Interactivity service", () => {
             createSelectionIdWithCompareMeasure(),
             createSelectionIdWithCompareMeasure()
         ];
-        selectableDataPoints = <SelectableDataPoint[]>[
+        selectableDataPoints = <SelectionDataPoint[]>[
             { selected: false, identity: identities[0] },
             { selected: false, identity: identities[1] },
             { selected: false, identity: identities[2] },
@@ -75,33 +84,12 @@ describe("Interactivity service", () => {
         behavior = new MockBehavior(selectableDataPoints);
     });
 
-    describe("applySelectionFilter", () => {
-        it("shouldn't throw any exceptions if the selectionManager is undefined", () => {
-            interactivityService["selectionManager"] = null;
-
-            expect(() => {
-                interactivityService.applySelectionFilter();
-            }).not.toThrow();
-        });
-
-        it("the selectionManager.applySelectionFilter should be called", () => {
-            (interactivityService["selectionManager"] as ISelectionManager).applySelectionFilter = () => { };
-
-            spyOn(interactivityService["selectionManager"], "applySelectionFilter");
-
-            interactivityService.applySelectionFilter();
-
-            expect((interactivityService["selectionManager"] as ISelectionManager).applySelectionFilter)
-                .toHaveBeenCalled();
-        });
-    });
-
     describe("Binding", () => {
 
         it("Basic binding", () => {
             spyOn(behavior, "bindEvents");
             spyOn(behavior, "renderSelection");
-            interactivityService.bind(selectableDataPoints, behavior, null);
+            interactivityService.bind({ dataPoints: selectableDataPoints, behavior: behavior });
             expect(behavior.bindEvents).toHaveBeenCalled();
             expect(behavior.verifyCleared()).toBeTruthy();
             expect(behavior.renderSelection).not.toHaveBeenCalled();
@@ -110,12 +98,14 @@ describe("Interactivity service", () => {
 
         it("Binding passes behaviorOptions", () => {
             spyOn(behavior, "bindEvents");
-            let arbitraryBehaviorOptions = {
+            const arbitraryBehaviorOptions: ChicletSlicerBehaviorOptions = {
+                dataPoints: selectableDataPoints,
+                behavior: behavior,
                 some: "random",
                 collection: "of",
                 random: "stuff",
             };
-            interactivityService.bind(selectableDataPoints, behavior, arbitraryBehaviorOptions);
+            interactivityService.bind(arbitraryBehaviorOptions);
             expect(behavior.bindEvents).toHaveBeenCalledWith(arbitraryBehaviorOptions, interactivityService);
         });
     });
@@ -124,7 +114,7 @@ describe("Interactivity service", () => {
 
         it("Basic selection", () => {
             spyOn(behavior, "renderSelection");
-            interactivityService.bind(selectableDataPoints, behavior, null);
+            interactivityService.bind({ dataPoints: selectableDataPoints, behavior: behavior });
             behavior.selectIndex(0, false);
             expect(behavior.verifySingleSelectedAt(0)).toBeTruthy();
             expect(behavior.renderSelection).toHaveBeenCalledWith(true);
@@ -132,15 +122,15 @@ describe("Interactivity service", () => {
         });
 
         it("Apply selection", () => {
-            let newDataPoints = selectableDataPoints.map((selectableDataPoint: SelectableDataPoint) => {
+            let newDataPoints = selectableDataPoints.map((selectableDataPoint: SelectionDataPoint) => {
                 return {
                     selected: false,
                     identity: selectableDataPoint.identity
-                } as SelectableDataPoint;
+                } as SelectionDataPoint;
             });
 
             spyOn(behavior, "renderSelection");
-            interactivityService.bind(selectableDataPoints, behavior, null);
+            interactivityService.bind({ dataPoints: selectableDataPoints, behavior: behavior });
             behavior.selectIndex(0, false);
             expect(behavior.verifySingleSelectedAt(0)).toBeTruthy();
             expect(behavior.renderSelection).toHaveBeenCalledWith(true);
@@ -155,7 +145,7 @@ describe("Interactivity service", () => {
 
         it("Clear selection through event", () => {
             spyOn(behavior, "renderSelection");
-            interactivityService.bind(selectableDataPoints, behavior, null);
+            interactivityService.bind({ dataPoints: selectableDataPoints, behavior: behavior });
             behavior.selectIndex(0, false);
             behavior.clear();
             expect(behavior.verifyCleared()).toBeTruthy();
@@ -165,7 +155,7 @@ describe("Interactivity service", () => {
 
         it("Clear selection through service", () => {
             spyOn(behavior, "renderSelection");
-            interactivityService.bind(selectableDataPoints, behavior, null);
+            interactivityService.bind({ dataPoints: selectableDataPoints, behavior: behavior });
             behavior.selectIndex(0, false);
             interactivityService.clearSelection();
             expect(behavior.verifyCleared()).toBeTruthy();
@@ -174,15 +164,52 @@ describe("Interactivity service", () => {
         });
 
         it("Multiple single selects", () => {
-            interactivityService.bind(selectableDataPoints, behavior, null);
+            interactivityService.bind({ dataPoints: selectableDataPoints, behavior: behavior });
             for (let i = 0, ilen = selectableDataPoints.length; i < ilen; i++) {
                 behavior.selectIndex(i, false);
                 expect(behavior.verifySingleSelectedAt(i)).toBeTruthy();
             }
         });
 
+        describe("Multiple selects", () => {
+            it("should select all of data points if multiSelect is false", () => {
+                interactivityService.bind({ dataPoints: selectableDataPoints, behavior: behavior });
+                interactivityService.handleSelection(selectableDataPoints, false);
+
+                for (let dataPointIndex = 0; dataPointIndex < selectableDataPoints.length; dataPointIndex++) {
+                    expect(behavior.verifySingleSelectedAt(dataPointIndex)).toBeTruthy();
+                }
+            });
+
+            it("should select all of data point if multiSelect is true and dataPoints are applied by small groups", () => {
+                interactivityService.bind({ dataPoints: selectableDataPoints, behavior: behavior });
+
+                const amountOfDataPoints: number = selectableDataPoints.length;
+
+                const firstGroup: SelectionDataPoint[] = selectableDataPoints.slice(0, amountOfDataPoints / 2);
+                const secondGroup: SelectionDataPoint[] = selectableDataPoints.slice(amountOfDataPoints / 2, amountOfDataPoints);
+
+                interactivityService.handleSelection(firstGroup, true);
+                interactivityService.handleSelection(secondGroup, true);
+
+                for (let dataPointIndex = 0; dataPointIndex < selectableDataPoints.length; dataPointIndex++) {
+                    expect(behavior.verifySingleSelectedAt(dataPointIndex)).toBeTruthy();
+                }
+            });
+        });
+
+        it("should select nothing if dataPoints are empty", () => {
+            interactivityService.bind({ dataPoints: selectableDataPoints, behavior: behavior });
+
+            interactivityService.handleSelection(null, null);
+
+            for (let dataPointIndex = 0; dataPointIndex < selectableDataPoints.length; dataPointIndex++) {
+                expect(behavior.verifySingleSelectedAt(dataPointIndex)).toBeFalsy();
+            }
+        });
+
         it("Single select clears", () => {
-            interactivityService.bind(selectableDataPoints, behavior, null);
+            interactivityService.bind({ dataPoints: selectableDataPoints, behavior: behavior });
             behavior.selectIndex(1, false);
             expect(behavior.verifySingleSelectedAt(1)).toBeTruthy();
             behavior.selectIndex(1, false);
@@ -190,7 +217,7 @@ describe("Interactivity service", () => {
         });
 
         it("Single select null identity does not crash", () => {
-            interactivityService.bind(selectableDataPoints, behavior, null);
+            interactivityService.bind({ dataPoints: selectableDataPoints, behavior: behavior });
             behavior.select({
                 identity: createSelectionIdWithCompareMeasure(),
                 selected: false,
@@ -199,7 +226,7 @@ describe("Interactivity service", () => {
         });
 
         it("Basic multiselect", () => {
-            interactivityService.bind(selectableDataPoints, behavior, null);
+            interactivityService.bind({ dataPoints: selectableDataPoints, behavior: behavior });
             behavior.selectIndex(1, true);
             expect(behavior.verifySelectionState([false, true, false, false, false, false, false])).toBeTruthy();
             behavior.selectIndex(2, true);
@@ -209,7 +236,7 @@ describe("Interactivity service", () => {
         });
 
         it("Multiselect clears", () => {
-            interactivityService.bind(selectableDataPoints, behavior, null);
+            interactivityService.bind({ dataPoints: selectableDataPoints, behavior: behavior });
             behavior.selectIndex(1, true);
             expect(behavior.verifySelectionState([false, true, false, false, false, false, false])).toBeTruthy();
             behavior.selectIndex(2, true);
@@ -223,7 +250,7 @@ describe("Interactivity service", () => {
         });
 
         it("Single and multiselect", () => {
-            interactivityService.bind(selectableDataPoints, behavior, null);
+            interactivityService.bind({ dataPoints: selectableDataPoints, behavior: behavior });
             behavior.selectIndex(1, false);
             expect(behavior.verifySingleSelectedAt(1)).toBeTruthy();
             behavior.selectIndex(2, true);
@@ -237,7 +264,7 @@ describe("Interactivity service", () => {
         });
 
         it("Null identity", () => {
-            let nullIdentity: SelectableDataPoint = {
+            let nullIdentity: SelectionDataPoint = {
                 selected: false,
                 identity: null,
                 specificIdentity: createSelectionIdWithCompareMeasure(),
@@ -247,7 +274,7 @@ describe("Interactivity service", () => {
         });
 
         it("Null specific identity", () => {
-            let nullIdentity: SelectableDataPoint = {
+            let nullIdentity: SelectionDataPoint = {
                 selected: false,
                 identity: createSelectionIdWithCompareMeasure(),
                 specificIdentity: null,
@@ -257,7 +284,7 @@ describe("Interactivity service", () => {
         });
 
         it("Null for identity and specific identity", () => {
-            let nullIdentity: SelectableDataPoint = {
+            let nullIdentity: SelectionDataPoint = {
                 selected: false,
                 identity: null,
                 specificIdentity: null,
@@ -275,8 +302,8 @@ describe("Interactivity service", () => {
                 { selected: false, identity: selectableDataPoints[1].identity },
             ];
             let legendBehavior = new MockBehavior(legendDataPoints);
-            interactivityService.bind(selectableDataPoints, behavior, null);
-            interactivityService.bind(legendDataPoints, legendBehavior, null, { isLegend: true });
+            interactivityService.bind({ dataPoints: selectableDataPoints, behavior: behavior });
+            interactivityService.bind({ dataPoints: legendDataPoints, behavior: legendBehavior, interactivityServiceOptions: { isLegend: true } });
 
             legendBehavior.selectIndex(0);
             expect(legendBehavior.verifySingleSelectedAt(0)).toBeTruthy();
@@ -297,7 +324,7 @@ describe("Interactivity service", () => {
                 { selected: false, identity: createSelectionIdWithCompareMeasure() },
             ];
             behavior = new MockBehavior(selectableDataPoints);
-            interactivityService.bind(selectableDataPoints, behavior, null);
+            interactivityService.bind({ dataPoints: selectableDataPoints, behavior: behavior });
 
             // Legend datapoints
             let legendDataPoints = [
@@ -305,7 +332,7 @@ describe("Interactivity service", () => {
                 { selected: false, identity: selectableDataPoints[1].identity },
             ];
             let legendBehavior = new MockBehavior(legendDataPoints);
-            interactivityService.bind(legendDataPoints, legendBehavior, null, { isLegend: true });
+            interactivityService.bind({ dataPoints: legendDataPoints, behavior: legendBehavior, interactivityServiceOptions: { isLegend: true } });
 
             // Trigger selection on datapoints
             behavior.selectIndex(1);
@@ -335,7 +362,7 @@ describe("Interactivity service", () => {
                 { selected: false, identity: createSelectionIdWithCompareMeasure() },
             ];
             let legendBehavior = new MockBehavior(legendDataPoints);
-            interactivityService.bind(legendDataPoints, legendBehavior, null, { isLegend: true });
+            interactivityService.bind({ dataPoints: legendDataPoints, behavior: legendBehavior, interactivityServiceOptions: { isLegend: true } });
 
             // Select first legend item
             legendBehavior.selectIndex(0);
@@ -347,7 +374,7 @@ describe("Interactivity service", () => {
                 { selected: false, identity: createSelectionIdWithCompareMeasure() },
             ];
             legendBehavior = new MockBehavior(newLegendDataPoints);
-            interactivityService.bind(newLegendDataPoints, legendBehavior, null, { isLegend: true });
+            interactivityService.bind({ dataPoints: newLegendDataPoints, behavior: legendBehavior, interactivityServiceOptions: { isLegend: true } });
 
             // Select a new legend item
             legendBehavior.selectIndex(0);
@@ -370,8 +397,8 @@ describe("Interactivity service", () => {
                 { selected: false, identity: selectableDataPoints[1].identity },
             ];
             let labelBehavior = new MockBehavior(labelsDataPoints);
-            interactivityService.bind(selectableDataPoints, behavior, null);
-            interactivityService.bind(labelsDataPoints, labelBehavior, null, { isLabels: true });
+            interactivityService.bind({ dataPoints: selectableDataPoints, behavior: behavior });
+            interactivityService.bind({ dataPoints: labelsDataPoints, behavior: labelBehavior, interactivityServiceOptions: { isLabels: true } });
 
             labelBehavior.selectIndex(0);
             labelBehavior.verifySingleSelectedAt(0);
