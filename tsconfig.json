@@ -12,9 +12,9 @@
         "node_modules/powerbi-visuals-tools/templates/visuals/.api/v2.1.0/PowerBI-visuals.d.ts",
         "node_modules/powerbi-visuals-utils-typeutils/lib/index.d.ts",
         "node_modules/powerbi-visuals-utils-svgutils/lib/index.d.ts",
-        "src/interfaces.ts",
-        "src/filtermanager.ts",
-        "src/interactivityservice.ts",
+        "src/interactivityBaseService.ts",
+        "src/interactivityFilterService.ts",
+        "src/interactivitySelectionService.ts",
         "src/interactivityUtils.ts"
     ]
 }

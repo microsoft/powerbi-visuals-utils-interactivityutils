@@ -1,3 +1,10 @@
+## 4.3.0
+* REM: filterManager.ts
+* REM: interactivityservice.ts
+* ADD: interactivityBaseService.ts that contains basic and abstract methods for selection and filtering
+* ADD: interactivitySelectionService.ts that extends interactivityBaseService.ts to support selection as before but some old methods were removed
+* ADD: interactivityFilterService.ts that extends interactivityBaseService.ts to support JSON filtering from last APIs
+
 ## 4.2.0 
 * Update packages to fix vulnerabilities
 
