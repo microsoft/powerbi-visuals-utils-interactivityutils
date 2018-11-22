@@ -1,5 +1,6 @@
 {
   "name": "powerbi-visuals-utils-interactivityutils",
+  "sideEffects": false,
   "version": "5.2.0",
   "description": "InteractivityUtils",
   "main": "lib/index",
