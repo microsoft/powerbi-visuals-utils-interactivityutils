@@ -19,6 +19,12 @@ To install the package you should run the following command in the directory wit
 npm install powerbi-visuals-utils-interactivityutils --save
 ```
 
+From version 3.0 or later you also need to install ```powerbi-models``` to resolve dependencies.
+
+```bash
+npm install powerbi-models --save
+```
+
 This command installs the package and adds a package as a dependency to your ```package.json```
 
 ## Including declarations to the build flow
@@ -26,6 +32,7 @@ The package contains ```d.ts``` declarations file, it's necessary for TypeScript
 * ```node_modules/powerbi-visuals-utils-typeutils/lib/index.d.ts```
 * ```node_modules/powerbi-visuals-utils-svgutils/lib/index.d.ts```
 * ```node_modules/powerbi-visuals-utils-interactivityutils/lib/index.d.ts```
+* ```node_modules/powerbi-models/dist/models-noexports.d.ts```
 
 As a result you will have the following file structure:
 ```json
@@ -34,7 +41,8 @@ As a result you will have the following file structure:
   "files": [
     "node_modules/powerbi-visuals-utils-typeutils/lib/index.d.ts",
     "node_modules/powerbi-visuals-utils-svgutils/lib/index.d.ts",
-    "node_modules/powerbi-visuals-utils-interactivityutils/lib/index.d.ts"
+    "node_modules/powerbi-visuals-utils-interactivityutils/lib/index.d.ts",
+    "node_modules/powerbi-models/dist/models-noexports.d.ts"
   ]
 }
 ```
