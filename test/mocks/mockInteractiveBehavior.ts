@@ -28,15 +28,15 @@
 
 module powerbi.extensibility.utils.interactivity.test.mocks {
     // powerbi.extensibility.utils.interactivity
-    import SelectionDataPoint = powerbi.extensibility.utils.interactivity.SelectionDataPoint;
+    import SelectableDataPoint = powerbi.extensibility.utils.interactivity.SelectableDataPoint;
     import IInteractiveBehavior = powerbi.extensibility.utils.interactivity.IInteractiveBehavior;
     import ISelectionHandler = powerbi.extensibility.utils.interactivity.ISelectionHandler;
 
     export class MockBehavior implements IInteractiveBehavior {
-        private selectionDataPoint: SelectionDataPoint[];
+        private selectionDataPoint: SelectableDataPoint[];
         private selectionHandler: ISelectionHandler;
 
-        constructor(selectionDataPoint: SelectionDataPoint[]) {
+        constructor(selectionDataPoint: SelectableDataPoint[]) {
             this.selectionDataPoint = selectionDataPoint;
         }
 
@@ -53,7 +53,7 @@ module powerbi.extensibility.utils.interactivity.test.mocks {
             this.selectionHandler.handleSelection(this.selectionDataPoint[index], !!multiSelect);
         }
 
-        public select(dataPoints: SelectionDataPoint | SelectionDataPoint[], multiSelect?: boolean): void {
+        public select(dataPoints: SelectableDataPoint | SelectableDataPoint[], multiSelect?: boolean): void {
             this.selectionHandler.handleSelection(dataPoints, !!multiSelect);
         }
 

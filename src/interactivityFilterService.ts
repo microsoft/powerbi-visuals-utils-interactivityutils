@@ -29,7 +29,7 @@ module powerbi.extensibility.utils.interactivity {
     // powerbi.extensibility.utils.type
     import ArrayExtensions = powerbi.extensibility.utils.type.ArrayExtensions;
 
-    export interface FilterDataPoint extends SelectableDataPoint {
+    export interface FilterDataPoint extends BaseDataPoint {
         category: PrimitiveValue;
     }
 

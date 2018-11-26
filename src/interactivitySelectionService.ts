@@ -34,7 +34,7 @@ module powerbi.extensibility.utils.interactivity {
     // powerbi.visuals
     import ISelectionId = powerbi.visuals.ISelectionId;
 
-    export interface SelectionDataPoint extends SelectableDataPoint {
+    export interface SelectableDataPoint extends BaseDataPoint {
         /** Identity for identifying the selectable data point for selection purposes */
         identity: ExtensibilityISelectionId;
         /**
@@ -45,7 +45,7 @@ module powerbi.extensibility.utils.interactivity {
         specificIdentity?: ExtensibilityISelectionId;
     }
 
-    export class InteractivitySelectionService extends InteractivityBaseService<SelectionDataPoint, IBehaviorOptions<SelectionDataPoint>> implements IInteractivityService<SelectionDataPoint>, ISelectionHandler  {
+    export class InteractivitySelectionService extends InteractivityBaseService<SelectableDataPoint, IBehaviorOptions<SelectableDataPoint>> implements IInteractivityService<SelectableDataPoint>, ISelectionHandler  {
         private selectionManager: ISelectionManager;
         private selectedIds: ISelectionId[] = [];
 
@@ -68,7 +68,7 @@ module powerbi.extensibility.utils.interactivity {
             super.clearSelection();
         }
 
-        public applySelectionStateToData(dataPoints: SelectionDataPoint[], hasHighlights?: boolean): boolean {
+        public applySelectionStateToData(dataPoints: SelectableDataPoint[], hasHighlights?: boolean): boolean {
             if (hasHighlights && this.hasSelection()) {
                 let selectionIds: ISelectionId[] = (this.selectionManager.getSelectionIds() || []) as ISelectionId[];
 
@@ -137,15 +137,15 @@ module powerbi.extensibility.utils.interactivity {
         }
 
         /** Marks a data point as selected and syncs selection with the host. */
-        protected select(dataPoints: SelectionDataPoint | SelectionDataPoint[], multiSelect: boolean): void {
-            const selectableDataPoints: SelectionDataPoint[] = [].concat(dataPoints);
+        protected select(dataPoints: SelectableDataPoint | SelectableDataPoint[], multiSelect: boolean): void {
+            const selectableDataPoints: SelectableDataPoint[] = [].concat(dataPoints);
             const originalSelectedIds = [...this.selectedIds];
 
             if (!multiSelect || !selectableDataPoints.length) {
                 ArrayExtensions.clear(this.selectedIds);
             }
 
-            selectableDataPoints.forEach((dataPoint: SelectionDataPoint) => {
+            selectableDataPoints.forEach((dataPoint: SelectableDataPoint) => {
                 const shouldDataPointBeSelected: boolean = !this.isDataPointSelected(dataPoint, originalSelectedIds);
                 this.selectSingleDataPoint(dataPoint, shouldDataPointBeSelected);
             });
@@ -153,7 +153,7 @@ module powerbi.extensibility.utils.interactivity {
             this.syncSelectionState();
         }
 
-        protected takeSelectionStateFromDataPoints(dataPoints: SelectionDataPoint[]): void {
+        protected takeSelectionStateFromDataPoints(dataPoints: SelectableDataPoint[]): void {
             let selectedIds: ISelectionId[] = this.selectedIds;
 
             // Replace the existing selectedIds rather than merging.
@@ -202,7 +202,7 @@ module powerbi.extensibility.utils.interactivity {
             }
         }
 
-        private selectSingleDataPoint(dataPoint: SelectionDataPoint, shouldDataPointBeSelected: boolean): void {
+        private selectSingleDataPoint(dataPoint: SelectableDataPoint, shouldDataPointBeSelected: boolean): void {
             if (!dataPoint || !dataPoint.identity) {
                 return;
             }
@@ -236,7 +236,7 @@ module powerbi.extensibility.utils.interactivity {
             }
         }
 
-        private updateSelectableDataPointsBySelectedIds(selectableDataPoints: SelectionDataPoint[], selectedIds: ISelectionId[]): boolean {
+        private updateSelectableDataPointsBySelectedIds(selectableDataPoints: SelectableDataPoint[], selectedIds: ISelectionId[]): boolean {
             let foundMatchingId = false;
 
             for (let dataPoint of selectableDataPoints) {
@@ -249,7 +249,7 @@ module powerbi.extensibility.utils.interactivity {
             return foundMatchingId;
         }
 
-        private isDataPointSelected(dataPoint: SelectionDataPoint, selectedIds: ISelectionId[]): boolean {
+        private isDataPointSelected(dataPoint: SelectableDataPoint, selectedIds: ISelectionId[]): boolean {
             return selectedIds.some((value: ISelectionId) => value.includes(dataPoint.identity as ISelectionId));
         }
 
@@ -266,7 +266,7 @@ module powerbi.extensibility.utils.interactivity {
     /**
      * Factory method to create an IInteractivityService instance.
      */
-    export function createInteractivitySelectionService(hostServices: IVisualHost): IInteractivityService<SelectionDataPoint> {
+    export function createInteractivitySelectionService(hostServices: IVisualHost): IInteractivityService<SelectableDataPoint> {
         return new InteractivitySelectionService(hostServices);
     }
 

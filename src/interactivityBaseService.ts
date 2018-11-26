@@ -28,7 +28,7 @@ module powerbi.extensibility.utils.interactivity {
     // powerbi.extensibility.utils.svg
     import BoundingRect = powerbi.extensibility.utils.svg.shapes.BoundingRect;
 
-    export interface SelectableDataPoint {
+    export interface BaseDataPoint {
         selected: boolean;
     }
 
@@ -42,7 +42,7 @@ module powerbi.extensibility.utils.interactivity {
             .attr({ width: "100%", height: "100%" });
     }
 
-    export function dataHasSelection(data: SelectableDataPoint[]): boolean {
+    export function dataHasSelection(data: BaseDataPoint[]): boolean {
         for (let i = 0, ilen = data.length; i < ilen; i++) {
             if (data[i].selected) {
                 return true;
@@ -52,7 +52,7 @@ module powerbi.extensibility.utils.interactivity {
     }
 
     export interface IInteractiveBehavior {
-        bindEvents(behaviorOptions: IBehaviorOptions<SelectableDataPoint>, selectionHandler: ISelectionHandler): void;
+        bindEvents(behaviorOptions: IBehaviorOptions<BaseDataPoint>, selectionHandler: ISelectionHandler): void;
         renderSelection(hasSelection: boolean): void;
     }
 
@@ -68,7 +68,7 @@ module powerbi.extensibility.utils.interactivity {
     /**
      * Responsible for managing interactivity between the hosting visual and its peers
      */
-    export interface IInteractivityService<SelectableDataPointType extends SelectableDataPoint> {
+    export interface IInteractivityService<SelectableDataPointType extends BaseDataPoint> {
         /** Binds the visual to the interactivityService */
         bind(options: IBehaviorOptions<SelectableDataPointType>): void;
 
@@ -94,20 +94,20 @@ module powerbi.extensibility.utils.interactivity {
          * identity is undefined, the selection state is cleared. In this case, if specificIdentity
          * exists, it will still be sent to the host.
          */
-        handleSelection(dataPoints: SelectableDataPoint | SelectableDataPoint[], multiSelect: boolean): void;
+        handleSelection(dataPoints: BaseDataPoint | BaseDataPoint[], multiSelect: boolean): void;
 
         /** Handles a selection clear, clearing all selection state */
         handleClearSelection(): void;
     }
 
-    export interface IBehaviorOptions<SelectableDataPointType extends SelectableDataPoint> {
+    export interface IBehaviorOptions<SelectableDataPointType extends BaseDataPoint> {
         behavior: IInteractiveBehavior;
         dataPoints: SelectableDataPointType[];
         interactivityServiceOptions?: InteractivityServiceOptions;
     }
 
     export abstract class InteractivityBaseService
-        <SelectableDataPointType extends SelectableDataPoint,
+        <SelectableDataPointType extends BaseDataPoint,
         IBehaviorOptionsType extends IBehaviorOptions<SelectableDataPointType>>
         implements IInteractivityService<SelectableDataPointType>, ISelectionHandler {
 

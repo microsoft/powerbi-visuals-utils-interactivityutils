@@ -36,7 +36,7 @@ module powerbi.extensibility.utils.interactivity.test {
 
     // powerbi.extensibility.utils.interactivity
     import InteractivitySelectionService = powerbi.extensibility.utils.interactivity.InteractivitySelectionService;
-    import SelectionDataPoint = powerbi.extensibility.utils.interactivity.SelectionDataPoint;
+    import SelectableDataPoint = powerbi.extensibility.utils.interactivity.SelectableDataPoint;
     import createInteractivitySelectionService = powerbi.extensibility.utils.interactivity.createInteractivitySelectionService;
     import IBehaviorOptions = powerbi.extensibility.utils.interactivity.IBehaviorOptions;
     import MockBehavior = powerbi.extensibility.utils.interactivity.test.mocks.MockBehavior;
@@ -44,7 +44,7 @@ module powerbi.extensibility.utils.interactivity.test {
     import createVisualHost = powerbi.extensibility.utils.test.mocks.createVisualHost;
     import createSelectionId = powerbi.extensibility.utils.test.mocks.createSelectionId;
 
-    interface ChicletSlicerBehaviorOptions extends IBehaviorOptions<SelectionDataPoint> {
+    interface ChicletSlicerBehaviorOptions extends IBehaviorOptions<SelectableDataPoint> {
         some: string;
         collection: string;
         random: string;
@@ -54,7 +54,7 @@ module powerbi.extensibility.utils.interactivity.test {
         let host: IVisualHost,
             interactivityService: InteractivitySelectionService,
             identities: ISelectionId[],
-            selectableDataPoints: SelectionDataPoint[],
+            selectableDataPoints: SelectableDataPoint[],
             behavior: MockBehavior,
             incr: number = 0;
 
@@ -81,7 +81,7 @@ module powerbi.extensibility.utils.interactivity.test {
                 createSelectionIdWithCompareMeasure(),
                 createSelectionIdWithCompareMeasure()
             ];
-            selectableDataPoints = <SelectionDataPoint[]>[
+            selectableDataPoints = <SelectableDataPoint[]>[
                 { selected: false, identity: identities[0] },
                 { selected: false, identity: identities[1] },
                 { selected: false, identity: identities[2] },
@@ -131,11 +131,11 @@ module powerbi.extensibility.utils.interactivity.test {
             });
 
             it("Apply selection", () => {
-                let newDataPoints = selectableDataPoints.map((selectableDataPoint: SelectionDataPoint) => {
+                let newDataPoints = selectableDataPoints.map((selectableDataPoint: SelectableDataPoint) => {
                     return {
                         selected: false,
                         identity: selectableDataPoint.identity
-                    } as SelectionDataPoint;
+                    } as SelectableDataPoint;
                 });
 
                 spyOn(behavior, "renderSelection");
@@ -195,8 +195,8 @@ module powerbi.extensibility.utils.interactivity.test {
 
                     const amountOfDataPoints: number = selectableDataPoints.length;
 
-                    const firstGroup: SelectionDataPoint[] = selectableDataPoints.slice(0, amountOfDataPoints / 2);
-                    const secondGroup: SelectionDataPoint[] = selectableDataPoints.slice(amountOfDataPoints / 2, amountOfDataPoints);
+                    const firstGroup: SelectableDataPoint[] = selectableDataPoints.slice(0, amountOfDataPoints / 2);
+                    const secondGroup: SelectableDataPoint[] = selectableDataPoints.slice(amountOfDataPoints / 2, amountOfDataPoints);
 
                     interactivityService.handleSelection(firstGroup, true);
                     interactivityService.handleSelection(secondGroup, true);
@@ -273,7 +273,7 @@ module powerbi.extensibility.utils.interactivity.test {
             });
 
             it("Null identity", () => {
-                let nullIdentity: SelectionDataPoint = {
+                let nullIdentity: SelectableDataPoint = {
                     selected: false,
                     identity: null,
                     specificIdentity: createSelectionIdWithCompareMeasure(),
@@ -283,7 +283,7 @@ module powerbi.extensibility.utils.interactivity.test {
             });
 
             it("Null specific identity", () => {
-                let nullIdentity: SelectionDataPoint = {
+                let nullIdentity: SelectableDataPoint = {
                     selected: false,
                     identity: createSelectionIdWithCompareMeasure(),
                     specificIdentity: null,
@@ -293,7 +293,7 @@ module powerbi.extensibility.utils.interactivity.test {
             });
 
             it("Null for identity and specific identity", () => {
-                let nullIdentity: SelectionDataPoint = {
+                let nullIdentity: SelectableDataPoint = {
                     selected: false,
                     identity: null,
                     specificIdentity: null,

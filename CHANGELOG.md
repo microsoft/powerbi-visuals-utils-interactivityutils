@@ -1,3 +1,7 @@
+## 4.4.0
+* Rename SelectableDataPoint to BaseDataPoint.
+* Rename SelectionDataPoint to SelectableDataPoint 
+
 ## 4.3.0
 * REM: filterManager.ts
 * REM: interactivityservice.ts
