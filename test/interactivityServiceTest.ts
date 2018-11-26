@@ -31,11 +31,11 @@ import { createVisualHost, createSelectionId } from "powerbi-visuals-utils-testu
 import ISelectionId = powerbi.visuals.ISelectionId;
 import IVisualHost = powerbi.extensibility.visual.IVisualHost;
 
-import { SelectionDataPoint, InteractivitySelectionService } from "../src/interactivitySelectionService";
+import { SelectableDataPoint, InteractivitySelectionService } from "../src/interactivitySelectionService";
 import { IBehaviorOptions } from "../src/interactivityBaseService";
 import { createInteractivitySelectionService } from "../src/interactivitySelectionService";
 
-interface ChicletSlicerBehaviorOptions extends IBehaviorOptions<SelectionDataPoint> {
+interface ChicletSlicerBehaviorOptions extends IBehaviorOptions<SelectableDataPoint> {
     some: string;
     collection: string;
     random: string;
@@ -45,7 +45,7 @@ describe("Interactivity service", () => {
     let host: IVisualHost,
         interactivityService: InteractivitySelectionService,
         identities: ISelectionId[],
-        selectableDataPoints: SelectionDataPoint[],
+        selectableDataPoints: SelectableDataPoint[],
         behavior: MockBehavior,
         incr: number = 0;
 
@@ -72,7 +72,7 @@ describe("Interactivity service", () => {
             createSelectionIdWithCompareMeasure(),
             createSelectionIdWithCompareMeasure()
         ];
-        selectableDataPoints = <SelectionDataPoint[]>[
+        selectableDataPoints = <SelectableDataPoint[]>[
             { selected: false, identity: identities[0] },
             { selected: false, identity: identities[1] },
             { selected: false, identity: identities[2] },
@@ -122,11 +122,11 @@ describe("Interactivity service", () => {
         });
 
         it("Apply selection", () => {
-            let newDataPoints = selectableDataPoints.map((selectableDataPoint: SelectionDataPoint) => {
+            let newDataPoints = selectableDataPoints.map((selectableDataPoint: SelectableDataPoint) => {
                 return {
                     selected: false,
                     identity: selectableDataPoint.identity
-                } as SelectionDataPoint;
+                } as SelectableDataPoint;
             });
 
             spyOn(behavior, "renderSelection");
@@ -186,8 +186,8 @@ describe("Interactivity service", () => {
 
                 const amountOfDataPoints: number = selectableDataPoints.length;
 
-                const firstGroup: SelectionDataPoint[] = selectableDataPoints.slice(0, amountOfDataPoints / 2);
-                const secondGroup: SelectionDataPoint[] = selectableDataPoints.slice(amountOfDataPoints / 2, amountOfDataPoints);
+                const firstGroup: SelectableDataPoint[] = selectableDataPoints.slice(0, amountOfDataPoints / 2);
+                const secondGroup: SelectableDataPoint[] = selectableDataPoints.slice(amountOfDataPoints / 2, amountOfDataPoints);
 
                 interactivityService.handleSelection(firstGroup, true);
                 interactivityService.handleSelection(secondGroup, true);
@@ -264,7 +264,7 @@ describe("Interactivity service", () => {
         });
 
         it("Null identity", () => {
-            let nullIdentity: SelectionDataPoint = {
+            let nullIdentity: SelectableDataPoint = {
                 selected: false,
                 identity: null,
                 specificIdentity: createSelectionIdWithCompareMeasure(),
@@ -274,7 +274,7 @@ describe("Interactivity service", () => {
         });
 
         it("Null specific identity", () => {
-            let nullIdentity: SelectionDataPoint = {
+            let nullIdentity: SelectableDataPoint = {
                 selected: false,
                 identity: createSelectionIdWithCompareMeasure(),
                 specificIdentity: null,
@@ -284,7 +284,7 @@ describe("Interactivity service", () => {
         });
 
         it("Null for identity and specific identity", () => {
-            let nullIdentity: SelectionDataPoint = {
+            let nullIdentity: SelectableDataPoint = {
                 selected: false,
                 identity: null,
                 specificIdentity: null,

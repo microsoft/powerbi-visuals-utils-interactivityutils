@@ -29,7 +29,7 @@ import {
     select
 } from "d3-selection";
 import { ISelectionHandler } from "./interactivityBaseService";
-import { SelectionDataPoint } from "./interactivitySelectionService";
+import { SelectableDataPoint } from "./interactivitySelectionService";
 
 import IPoint = shapesInterfaces.IPoint;
 
@@ -43,18 +43,18 @@ export function getPositionOfLastInputEvent(): IPoint {
 }
 
 export function registerStandardSelectionHandler(selection: d3.Selection<any, any, any, any>, selectionHandler: ISelectionHandler): void {
-    selection.on("click", (d: SelectionDataPoint) => handleSelection(d, selectionHandler));
+    selection.on("click", (d: SelectableDataPoint) => handleSelection(d, selectionHandler));
 }
 
 export function registerGroupSelectionHandler(group: d3.Selection<any, any, any, any>, selectionHandler: ISelectionHandler): void {
     group.on("click", () => {
         let target: EventTarget = (event as MouseEvent).target,
-            d: SelectionDataPoint = <SelectionDataPoint>select(target as d3.BaseType).datum();
+            d: SelectableDataPoint = <SelectableDataPoint>select(target as d3.BaseType).datum();
 
         handleSelection(d, selectionHandler);
     });
 }
 
-function handleSelection(d: SelectionDataPoint, selectionHandler: ISelectionHandler): void {
+function handleSelection(d: SelectableDataPoint, selectionHandler: ISelectionHandler): void {
     selectionHandler.handleSelection(d, (getEvent() as MouseEvent).ctrlKey);
 }
