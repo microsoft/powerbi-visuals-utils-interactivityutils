@@ -1,3 +1,7 @@
+## 4.4.0 / 5.4.0 (webpack)
+* Rename SelectableDataPoint to BaseDataPoint.
+* Rename SelectionDataPoint to SelectableDataPoint 
+
 ## 4.3.0 / 5.2.0 (webpack)
 * REM: filterManager.ts
 * REM: interactivityservice.ts

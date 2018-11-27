@@ -40,14 +40,14 @@ import ArrayExtensions = arrayExtensions.ArrayExtensions;
 
 import {
     IBehaviorOptions,
-    SelectableDataPoint,
+    BaseDataPoint,
     InteractivityBaseService,
     IInteractivityService,
     ISelectionHandler,
     FilterAction
 } from "./interactivityBaseService";
 
-export interface FilterDataPoint extends SelectableDataPoint {
+export interface FilterDataPoint extends BaseDataPoint {
     category: powerbi.PrimitiveValue;
 }
 

@@ -24,7 +24,7 @@
 *  THE SOFTWARE.
 */
 
-export interface SelectableDataPoint {
+export interface BaseDataPoint {
     selected: boolean;
 }
 
@@ -44,7 +44,7 @@ export function appendClearCatcher(selection: d3.Selection<any, any, any, any>):
         .attr("height", "100%");
 }
 
-export function dataHasSelection(data: SelectableDataPoint[]): boolean {
+export function dataHasSelection(data: BaseDataPoint[]): boolean {
     for (let i = 0, ilen = data.length; i < ilen; i++) {
         if (data[i].selected) {
             return true;
@@ -54,7 +54,7 @@ export function dataHasSelection(data: SelectableDataPoint[]): boolean {
 }
 
 export interface IInteractiveBehavior {
-    bindEvents(behaviorOptions: IBehaviorOptions<SelectableDataPoint>, selectionHandler: ISelectionHandler): void;
+    bindEvents(behaviorOptions: IBehaviorOptions<BaseDataPoint>, selectionHandler: ISelectionHandler): void;
     renderSelection(hasSelection: boolean): void;
 }
 
@@ -70,7 +70,7 @@ export interface InteractivityServiceOptions {
 /**
  * Responsible for managing interactivity between the hosting visual and its peers
  */
-export interface IInteractivityService<SelectableDataPointType extends SelectableDataPoint> {
+export interface IInteractivityService<SelectableDataPointType extends BaseDataPoint> {
     /** Binds the visual to the interactivityService */
     bind(options: IBehaviorOptions<SelectableDataPointType>): void;
 
@@ -96,20 +96,20 @@ export interface ISelectionHandler {
      * identity is undefined, the selection state is cleared. In this case, if specificIdentity
      * exists, it will still be sent to the host.
      */
-    handleSelection(dataPoints: SelectableDataPoint | SelectableDataPoint[], multiSelect: boolean): void;
+    handleSelection(dataPoints: BaseDataPoint | BaseDataPoint[], multiSelect: boolean): void;
 
     /** Handles a selection clear, clearing all selection state */
     handleClearSelection(): void;
 }
 
-export interface IBehaviorOptions<SelectableDataPointType extends SelectableDataPoint> {
+export interface IBehaviorOptions<SelectableDataPointType extends BaseDataPoint> {
     behavior: IInteractiveBehavior;
     dataPoints: SelectableDataPointType[];
     interactivityServiceOptions?: InteractivityServiceOptions;
 }
 
 export abstract class InteractivityBaseService
-    <SelectableDataPointType extends SelectableDataPoint,
+    <SelectableDataPointType extends BaseDataPoint,
     IBehaviorOptionsType extends IBehaviorOptions<SelectableDataPointType>>
     implements IInteractivityService<SelectableDataPointType>, ISelectionHandler {
 

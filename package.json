@@ -1,7 +1,7 @@
 {
   "name": "powerbi-visuals-utils-interactivityutils",
   "sideEffects": false,
-  "version": "5.2.0",
+  "version": "5.4.0",
   "description": "InteractivityUtils",
   "main": "lib/index",
   "types": "lib/index",
@@ -52,7 +52,7 @@
     "karma-typescript-preprocessor": "0.4.0",
     "karma-webpack": "3.0.5",
     "less": "3.8.1",
-    "powerbi-visuals-api": "2.1.0",
+    "powerbi-visuals-api": "^2.2.2",
     "powerbi-visuals-utils-testutils": "^2.1.4",
     "puppeteer": "1.9.0",
     "ts-loader": "5.2.2",

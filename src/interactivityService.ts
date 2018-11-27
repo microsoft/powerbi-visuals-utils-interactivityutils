@@ -25,7 +25,6 @@
  */
 import { shapesInterfaces } from "powerbi-visuals-utils-svgutils";
 import { arrayExtensions } from "powerbi-visuals-utils-typeutils";
-import { AppliedFilter } from "./interfaces";
 
 // powerbi.extensibility
 import powerbi from "powerbi-visuals-api";
@@ -71,7 +70,7 @@ export function appendClearCatcher(selection: d3.Selection<any, any, any, any>):
         .append("rect")
         .classed("clearCatcher", true)
         .attr("width", "100%")
-        .attr("height", "100%");
+        .attr("height", "100%" );
 }
 
 export function dataHasSelection(data: SelectableDataPoint[]): boolean {
@@ -148,39 +147,33 @@ export interface IExtensibilityMeasuredSelecionId extends ExtensibilityISelectio
     measures: string[];
     getSelector(): Selector;
 }
-export interface IMeasuredSelectionId extends ISelectionId {
+ export interface IMeasuredSelectionId extends ISelectionId {
     dataMap: SelectorsForColumn;
     measures: string[];
     compareMetadata(currentDataMap: SelectorsForColumn, otherDataMap: SelectorsForColumn): boolean;
     compareMeasures(currentMeasures: string[], otherMeasures: string[]): boolean;
 }
-export interface SelectorsForColumn {
+ export interface SelectorsForColumn {
     [queryName: string]: DataRepetitionSelector[];
 }
-
-/**
- * It's a temporary function for compatibility with API 2.1
- */
+ // It's a temporary function for compatibility with API 2.1
+// It will probably be removed after API 2.2 release
 export function checkDatapointAgainstSelectedIds(dataPoint: SelectableDataPoint, selectedIds: ISelectionId[]) {
     return selectedIds.some((selectionId) => {
         const measuredSelectionId: IMeasuredSelectionId = selectionId as IMeasuredSelectionId;
         const otherSelectionId: IExtensibilityMeasuredSelecionId = dataPoint.identity as IExtensibilityMeasuredSelecionId;
-
         // if the first selectionId is built only from measures then compare measures
-        if (!measuredSelectionId.dataMap
-            && measuredSelectionId.compareMeasures // It does not exist in noiframe mode.
-            && measuredSelectionId.compareMeasures(measuredSelectionId.measures, otherSelectionId.measures)
-        ) {
+        if (!measuredSelectionId.dataMap && measuredSelectionId.compareMeasures(measuredSelectionId.measures, otherSelectionId.measures)) {
             return true;
         }
 
         const selectorOne = measuredSelectionId.getSelector();
         const selectorTwo = otherSelectionId.getSelector();
-        // if the first or the second selectionId doesn't have data then return false
+            // if the first or the second selectionId doesn't have data then return false
         if (!(<any>selectorOne).data || !(<any>selectorTwo).data) {
             return false;
         }
-        // At this point both CVSelectionId's got data, we see if the first selectionId data is a subset of the second selectionId data, if not return false
+            // At this point both CVSelectionId's got data, we see if the first selectionId data is a subset of the second selectionId data, if not return false
         for (const dataRepition of (<any>selectorOne).data) {
             if (!(<any>selectorTwo).data.some(dataI => JSON.stringify(dataI) === JSON.stringify(dataRepition))) {
                 return false;

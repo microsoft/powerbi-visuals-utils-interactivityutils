@@ -37,13 +37,13 @@ import ISelectionId = powerbi.visuals.ISelectionId;
 
 import {
     IBehaviorOptions,
-    SelectableDataPoint,
+    BaseDataPoint,
     InteractivityBaseService,
     IInteractivityService,
     ISelectionHandler
 } from "./interactivityBaseService";
 
-export interface SelectionDataPoint extends SelectableDataPoint {
+export interface SelectableDataPoint extends BaseDataPoint {
     /** Identity for identifying the selectable data point for selection purposes */
     identity: ExtensibilityISelectionId;
     /**
@@ -54,7 +54,7 @@ export interface SelectionDataPoint extends SelectableDataPoint {
     specificIdentity?: ExtensibilityISelectionId;
 }
 
-export class InteractivitySelectionService extends InteractivityBaseService<SelectionDataPoint, IBehaviorOptions<SelectionDataPoint>> implements IInteractivityService<SelectionDataPoint>, ISelectionHandler  {
+export class InteractivitySelectionService extends InteractivityBaseService<SelectableDataPoint, IBehaviorOptions<SelectableDataPoint>> implements IInteractivityService<SelectableDataPoint>, ISelectionHandler  {
     private selectionManager: ISelectionManager;
     private selectedIds: ISelectionId[] = [];
 
@@ -77,7 +77,7 @@ export class InteractivitySelectionService extends InteractivityBaseService<Sele
         super.clearSelection();
     }
 
-    public applySelectionStateToData(dataPoints: SelectionDataPoint[], hasHighlights?: boolean): boolean {
+    public applySelectionStateToData(dataPoints: SelectableDataPoint[], hasHighlights?: boolean): boolean {
         if (hasHighlights && this.hasSelection()) {
             let selectionIds: ISelectionId[] = (this.selectionManager.getSelectionIds() || []) as ISelectionId[];
 
@@ -146,15 +146,15 @@ export class InteractivitySelectionService extends InteractivityBaseService<Sele
     }
 
     /** Marks a data point as selected and syncs selection with the host. */
-    protected select(dataPoints: SelectionDataPoint | SelectionDataPoint[], multiSelect: boolean): void {
-        const selectableDataPoints: SelectionDataPoint[] = [].concat(dataPoints);
+    protected select(dataPoints: SelectableDataPoint | SelectableDataPoint[], multiSelect: boolean): void {
+        const selectableDataPoints: SelectableDataPoint[] = [].concat(dataPoints);
         const originalSelectedIds = [...this.selectedIds];
 
         if (!multiSelect || !selectableDataPoints.length) {
             ArrayExtensions.clear(this.selectedIds);
         }
 
-        selectableDataPoints.forEach((dataPoint: SelectionDataPoint) => {
+        selectableDataPoints.forEach((dataPoint: SelectableDataPoint) => {
             const shouldDataPointBeSelected: boolean = !this.isDataPointSelected(dataPoint, originalSelectedIds);
             this.selectSingleDataPoint(dataPoint, shouldDataPointBeSelected);
         });
@@ -162,7 +162,7 @@ export class InteractivitySelectionService extends InteractivityBaseService<Sele
         this.syncSelectionState();
     }
 
-    protected takeSelectionStateFromDataPoints(dataPoints: SelectionDataPoint[]): void {
+    protected takeSelectionStateFromDataPoints(dataPoints: SelectableDataPoint[]): void {
         let selectedIds: ISelectionId[] = this.selectedIds;
 
         // Replace the existing selectedIds rather than merging.
@@ -211,7 +211,7 @@ export class InteractivitySelectionService extends InteractivityBaseService<Sele
         }
     }
 
-    private selectSingleDataPoint(dataPoint: SelectionDataPoint, shouldDataPointBeSelected: boolean): void {
+    private selectSingleDataPoint(dataPoint: SelectableDataPoint, shouldDataPointBeSelected: boolean): void {
         if (!dataPoint || !dataPoint.identity) {
             return;
         }
@@ -245,7 +245,7 @@ export class InteractivitySelectionService extends InteractivityBaseService<Sele
         }
     }
 
-    private updateSelectableDataPointsBySelectedIds(selectableDataPoints: SelectionDataPoint[], selectedIds: ISelectionId[]): boolean {
+    private updateSelectableDataPointsBySelectedIds(selectableDataPoints: SelectableDataPoint[], selectedIds: ISelectionId[]): boolean {
         let foundMatchingId = false;
 
         for (let dataPoint of selectableDataPoints) {
@@ -258,7 +258,7 @@ export class InteractivitySelectionService extends InteractivityBaseService<Sele
         return foundMatchingId;
     }
 
-    private isDataPointSelected(dataPoint: SelectionDataPoint, selectedIds: ISelectionId[]): boolean {
+    private isDataPointSelected(dataPoint: SelectableDataPoint, selectedIds: ISelectionId[]): boolean {
         return selectedIds.some((value: ISelectionId) => value.includes(dataPoint.identity as ISelectionId));
     }
 
@@ -275,6 +275,6 @@ export class InteractivitySelectionService extends InteractivityBaseService<Sele
 /**
  * Factory method to create an IInteractivityService instance.
  */
-export function createInteractivitySelectionService(hostServices: IVisualHost): IInteractivityService<SelectionDataPoint> {
+export function createInteractivitySelectionService(hostServices: IVisualHost): IInteractivityService<SelectableDataPoint> {
     return new InteractivitySelectionService(hostServices);
 }
