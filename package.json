@@ -1,10 +1,12 @@
 {
   "name": "powerbi-visuals-utils-interactivityutils",
-  "sideEffects": false,
-  "version": "5.4.0",
+  "version": "5.4.1",
   "description": "InteractivityUtils",
-  "main": "lib/index",
-  "types": "lib/index",
+  "main": "lib/index.js",
+  "module": "lib/index.js",
+  "jsnext:main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "sideEffects": false,
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Microsoft/powerbi-visuals-utils-interactivityutils.git"
@@ -53,7 +55,7 @@
     "karma-webpack": "3.0.5",
     "less": "3.8.1",
     "powerbi-visuals-api": "^2.2.2",
-    "powerbi-visuals-utils-testutils": "^2.1.4",
+    "powerbi-visuals-utils-testutils": "^2.1.6",
     "puppeteer": "1.9.0",
     "ts-loader": "5.2.2",
     "ts-node": "7.0.1",
@@ -66,7 +68,7 @@
   "dependencies": {
     "d3": "5.5.0",
     "powerbi-models": "1.0.12",
-    "powerbi-visuals-utils-svgutils": "^2.1.0",
-    "powerbi-visuals-utils-typeutils": "^2.1.0"
+    "powerbi-visuals-utils-svgutils": "^2.1.1",
+    "powerbi-visuals-utils-typeutils": "^2.1.1"
   }
 }
