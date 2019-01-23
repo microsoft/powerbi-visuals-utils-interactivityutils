@@ -307,7 +307,9 @@ export class InteractivityService implements IInteractivityService, ISelectionHa
             return;
         }
 
-        this.selectionManager.applySelectionFilter();
+        if (typeof (<any>this.selectionManager).applySelectionFilter !== "undefined") {
+            (<any>this.selectionManager).applySelectionFilter();
+        }
     }
 
     public handleSelection(dataPoints: SelectableDataPoint | SelectableDataPoint[], multiSelect: boolean): void {

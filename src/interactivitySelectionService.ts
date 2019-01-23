@@ -56,15 +56,15 @@ export interface SelectableDataPoint extends BaseDataPoint {
 
 export class InteractivitySelectionService extends InteractivityBaseService<SelectableDataPoint, IBehaviorOptions<SelectableDataPoint>> implements IInteractivityService<SelectableDataPoint>, ISelectionHandler  {
     private selectionManager: ISelectionManager;
-    private selectedIds: ISelectionId[] = [];
 
     constructor(hostServices: IVisualHost) {
         super();
         this.selectionManager = hostServices.createSelectionManager();
 
         if (this.selectionManager.registerOnSelectCallback) {
+            // when selecton was updated on Power BI side need to display actual selection state on the visual
             this.selectionManager.registerOnSelectCallback(() => {
-                this.restoreSelection([...this.selectionManager.getSelectionIds() as ISelectionId[]]);
+                this.restoreSelection();
             });
         }
     }
@@ -73,20 +73,18 @@ export class InteractivitySelectionService extends InteractivityBaseService<Sele
      * Sets the selected state of all selectable data points to false and invokes the behavior's select command.
      */
     public clearSelection(): void {
-        ArrayExtensions.clear(this.selectedIds);
+        this.selectionManager.clear();
         super.clearSelection();
     }
 
     public applySelectionStateToData(dataPoints: SelectableDataPoint[], hasHighlights?: boolean): boolean {
         if (hasHighlights && this.hasSelection()) {
-            let selectionIds: ISelectionId[] = (this.selectionManager.getSelectionIds() || []) as ISelectionId[];
-
-            ArrayExtensions.clear(this.selectedIds);
-            ArrayExtensions.clear(selectionIds);
+            this.selectionManager.clear();
         }
 
+        const selectedIds: ISelectionId[] = this.selectionManager.getSelectionIds() as ISelectionId[];
         for (let dataPoint of dataPoints) {
-            dataPoint.selected = this.isDataPointSelected(dataPoint, this.selectedIds);
+            dataPoint.selected = this.isDataPointSelected(dataPoint, selectedIds);
         }
 
         return this.hasSelection();
@@ -95,10 +93,11 @@ export class InteractivitySelectionService extends InteractivityBaseService<Sele
     /**
      * Apply new selections to change internal state of interactivity service
      */
-    public restoreSelection(selectionIds: ISelectionId[]) {
-        this.clearSelection();
-        this.selectedIds = selectionIds;
+    public restoreSelection() {
+        // syncSelectionState gets actual selectedIds
+        // from selection manager and updates selectable datapoints state to correspond state
         this.syncSelectionState();
+        // render new state of selection
         this.renderAll();
     }
 
@@ -106,7 +105,7 @@ export class InteractivitySelectionService extends InteractivityBaseService<Sele
      * Checks whether there is at least one item selected.
      */
     public hasSelection(): boolean {
-        return this.selectedIds.length > 0;
+        return this.selectionManager.getSelectionIds().length > 0;
     }
 
     /**
@@ -128,17 +127,22 @@ export class InteractivitySelectionService extends InteractivityBaseService<Sele
             return;
         }
 
+        // get current state of selections from selection manager
+        const selectedIds: ISelectionId[] = this.selectionManager.getSelectionIds() as ISelectionId[];
         if (this.selectableDataPoints) {
-            this.updateSelectableDataPointsBySelectedIds(this.selectableDataPoints, this.selectedIds);
+            // update datapoints (set selection state for datapoint, update `selected` property of datapoint)
+            this.updateSelectableDataPointsBySelectedIds(this.selectableDataPoints, selectedIds);
         }
 
         if (this.selectableLegendDataPoints) {
-            this.updateSelectableDataPointsBySelectedIds(this.selectableLegendDataPoints, this.selectedIds);
+            // update datapoints for legend datapoint (set selection state for datapoint, update `selected` property of datapoint)
+            this.updateSelectableDataPointsBySelectedIds(this.selectableLegendDataPoints, selectedIds);
         }
 
         if (this.selectableLabelsDataPoints) {
+            // update datapoints for label datapoints
             for (let labelsDataPoint of this.selectableLabelsDataPoints) {
-                labelsDataPoint.selected = this.selectedIds.some((value: ISelectionId) => {
+                labelsDataPoint.selected = selectedIds.some((value: ISelectionId) => {
                     return value.includes(labelsDataPoint.identity as ISelectionId);
                 });
             }
@@ -148,22 +152,42 @@ export class InteractivitySelectionService extends InteractivityBaseService<Sele
     /** Marks a data point as selected and syncs selection with the host. */
     protected select(dataPoints: SelectableDataPoint | SelectableDataPoint[], multiSelect: boolean): void {
         const selectableDataPoints: SelectableDataPoint[] = [].concat(dataPoints);
-        const originalSelectedIds = [...this.selectedIds];
+        const originalSelectedIds = [...this.selectionManager.getSelectionIds() as ISelectionId[]];
 
         if (!multiSelect || !selectableDataPoints.length) {
-            ArrayExtensions.clear(this.selectedIds);
+            // if multiselect isn't active need to reset curent selections
+            // or clear selection by passing empty array of selection in dataPoints parameter
+            this.selectionManager.clear();
         }
 
+        // array of selection of selected datapoints
+        const selectionIdsToSelect: ISelectionId[] = [];
+
         selectableDataPoints.forEach((dataPoint: SelectableDataPoint) => {
+            if (!dataPoint || !dataPoint.identity) {
+                return;
+            }
             const shouldDataPointBeSelected: boolean = !this.isDataPointSelected(dataPoint, originalSelectedIds);
-            this.selectSingleDataPoint(dataPoint, shouldDataPointBeSelected);
+            // update state of datapoint, set as selected and acumulate selectionId in temp array
+            if (shouldDataPointBeSelected) {
+                dataPoint.selected = true;
+                selectionIdsToSelect.push(dataPoint.identity as ISelectionId);
+            } else {
+                // set selection as false if datapoint isn't selected
+                dataPoint.selected = false;
+                if (multiSelect) {
+                    selectionIdsToSelect.push(dataPoint.identity as ISelectionId);
+                }
+            }
         });
+        // if multiselect isn't active selection manager resets current state of selection and applies new selections
+        this.selectionManager.select(selectionIdsToSelect, multiSelect);
 
         this.syncSelectionState();
     }
 
     protected takeSelectionStateFromDataPoints(dataPoints: SelectableDataPoint[]): void {
-        let selectedIds: ISelectionId[] = this.selectedIds;
+        const selectedIds: ISelectionId[] = this.selectionManager.getSelectionIds() as ISelectionId[];
 
         // Replace the existing selectedIds rather than merging.
         ArrayExtensions.clear(selectedIds);
@@ -176,19 +200,12 @@ export class InteractivitySelectionService extends InteractivityBaseService<Sele
     }
 
     protected sendSelectionToHost(): void {
-        if (!this.selectionManager) {
-            return;
-        }
-
-        if (this.selectedIds && this.selectedIds.length) {
-            this.selectionManager.select([...this.selectedIds]);
-        } else {
-            this.selectionManager.clear();
-        }
+        // don't need to send to host something, selectionManager responsible for that
+        return;
     }
 
     private syncSelectionStateInverted(): void {
-        let selectedIds = this.selectedIds;
+        let selectedIds = this.selectionManager.getSelectionIds();
         let selectableDataPoints = this.selectableDataPoints;
         if (!selectableDataPoints) {
             return;
@@ -211,40 +228,6 @@ export class InteractivitySelectionService extends InteractivityBaseService<Sele
         }
     }
 
-    private selectSingleDataPoint(dataPoint: SelectableDataPoint, shouldDataPointBeSelected: boolean): void {
-        if (!dataPoint || !dataPoint.identity) {
-            return;
-        }
-
-        const identity: ISelectionId = dataPoint.identity as ISelectionId;
-
-        if (shouldDataPointBeSelected) {
-            dataPoint.selected = true;
-            this.selectedIds.push(identity);
-            if (identity.hasIdentity()) {
-                this.removeSelectionIdsWithOnlyMeasures();
-            }
-            else {
-                this.removeSelectionIdsExceptOnlyMeasures();
-            }
-        }
-        else {
-            dataPoint.selected = false;
-            this.removeId(identity);
-        }
-    }
-
-    private removeId(toRemove: ISelectionId): void {
-        let selectedIds = this.selectedIds;
-        for (let i = selectedIds.length - 1; i > -1; i--) {
-            let currentId = selectedIds[i];
-
-            if (toRemove.includes(currentId)) {
-                selectedIds.splice(i, 1);
-            }
-        }
-    }
-
     private updateSelectableDataPointsBySelectedIds(selectableDataPoints: SelectableDataPoint[], selectedIds: ISelectionId[]): boolean {
         let foundMatchingId = false;
 
@@ -261,15 +244,6 @@ export class InteractivitySelectionService extends InteractivityBaseService<Sele
     private isDataPointSelected(dataPoint: SelectableDataPoint, selectedIds: ISelectionId[]): boolean {
         return selectedIds.some((value: ISelectionId) => value.includes(dataPoint.identity as ISelectionId));
     }
-
-    private removeSelectionIdsWithOnlyMeasures() {
-        this.selectedIds = this.selectedIds.filter((identity) => identity.hasIdentity());
-    }
-
-    private removeSelectionIdsExceptOnlyMeasures() {
-        this.selectedIds = this.selectedIds.filter((identity) => !identity.hasIdentity());
-    }
-
 }
 
 /**

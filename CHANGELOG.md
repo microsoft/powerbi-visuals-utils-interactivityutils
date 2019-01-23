@@ -1,3 +1,8 @@
+## 5.4.1 (webpack)
+* Add jsnext:main
+* Remove internal selectedIds
+* Update testutils, typeutils and svgutils 
+
 ## 4.4.0 / 5.4.0 (webpack)
 * Rename SelectableDataPoint to BaseDataPoint.
 * Rename SelectionDataPoint to SelectableDataPoint 
