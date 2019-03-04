@@ -1,10 +1,12 @@
 {
   "name": "powerbi-visuals-utils-interactivityutils",
-  "sideEffects": false,
-  "version": "5.4.0",
+  "version": "5.4.1",
   "description": "InteractivityUtils",
-  "main": "lib/index",
-  "types": "lib/index",
+  "main": "lib/index.js",
+  "module": "lib/index.js",
+  "jsnext:main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "sideEffects": false,
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Microsoft/powerbi-visuals-utils-interactivityutils.git"
@@ -26,7 +28,7 @@
     "build": "tsc",
     "postbuild": "npm run lessc",
     "test": "karma start",
-    "pretest": "npm run build:map && npm run lint",
+    "pretest": "npm run lint",
     "lint": "tslint -r \"node_modules/tslint-microsoft-contrib\"  \"+(src|test)/**/*.ts\"",
     "lessc": "lessc src/styles/clearCatcher.less lib/index.css"
   },
@@ -39,12 +41,14 @@
     "@types/lodash": "^4.14.86",
     "@types/webpack": "^3.8.1",
     "coveralls": "3.0.2",
+    "istanbul-instrumenter-loader": "3.0.1",
     "jasmine": "3.2.0",
     "jasmine-jquery": "2.1.1",
     "jquery": "^3.2.1",
-    "karma": "3.1.1",
+    "karma": "4.0.0",
     "karma-chrome-launcher": "2.2.0",
     "karma-coverage": "1.1.2",
+    "karma-coverage-istanbul-reporter": "^2.0.4",
     "karma-jasmine": "1.1.2",
     "karma-remap-istanbul": "0.6.0",
     "karma-sourcemap-loader": "0.3.7",
@@ -52,8 +56,8 @@
     "karma-typescript-preprocessor": "0.4.0",
     "karma-webpack": "3.0.5",
     "less": "3.8.1",
-    "powerbi-visuals-api": "^2.2.2",
-    "powerbi-visuals-utils-testutils": "^2.1.4",
+    "powerbi-visuals-api": "~2.3.1",
+    "powerbi-visuals-utils-testutils": "^2.1.7",
     "puppeteer": "1.9.0",
     "ts-loader": "5.2.2",
     "ts-node": "7.0.1",
@@ -66,7 +70,7 @@
   "dependencies": {
     "d3": "5.5.0",
     "powerbi-models": "1.0.12",
-    "powerbi-visuals-utils-svgutils": "^2.1.0",
-    "powerbi-visuals-utils-typeutils": "^2.1.0"
+    "powerbi-visuals-utils-svgutils": "^2.1.1",
+    "powerbi-visuals-utils-typeutils": "^2.1.1"
   }
 }
