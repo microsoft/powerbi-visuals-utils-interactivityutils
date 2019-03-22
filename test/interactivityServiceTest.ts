@@ -32,8 +32,11 @@ import ISelectionId = powerbi.visuals.ISelectionId;
 import IVisualHost = powerbi.extensibility.visual.IVisualHost;
 
 import { SelectableDataPoint, InteractivitySelectionService } from "../src/interactivitySelectionService";
+import { extractFilterColumnTarget } from "../src/interactivityFilterService";
 import { IBehaviorOptions } from "../src/interactivityBaseService";
 import { createInteractivitySelectionService } from "../src/interactivitySelectionService";
+
+import { IFilterColumnTarget } from "powerbi-models";
 
 interface ChicletSlicerBehaviorOptions extends IBehaviorOptions<SelectableDataPoint> {
     some: string;
@@ -107,6 +110,51 @@ describe("Interactivity service", () => {
             };
             interactivityService.bind(arbitraryBehaviorOptions);
             expect(behavior.bindEvents).toHaveBeenCalledWith(arbitraryBehaviorOptions, interactivityService);
+        });
+    });
+
+    describe("Helpers", () => {
+        it("Extract Filter Column Target", () => {
+            let regularCategoryColumn: any = {
+                source: {
+                    displayName: "",
+                    expr: {
+                        source: {
+                            entity: "TableName"
+                        },
+                        ref: "ColumnName"
+                    }
+                },
+                values: []
+            };
+            let filetColumnTarget: IFilterColumnTarget = extractFilterColumnTarget(regularCategoryColumn);
+            expect(filetColumnTarget.table).toBe("TableName");
+            expect(filetColumnTarget.column).toBe("ColumnName");
+
+            delete regularCategoryColumn.source.expr.source.entity;
+            filetColumnTarget = extractFilterColumnTarget(regularCategoryColumn);
+            expect(filetColumnTarget.table).toBeNull();
+            expect(filetColumnTarget.column).toBe("ColumnName");
+
+            delete regularCategoryColumn.source.expr.source;
+            filetColumnTarget = extractFilterColumnTarget(regularCategoryColumn);
+            expect(filetColumnTarget.table).toBeNull();
+            expect(filetColumnTarget.column).toBe("ColumnName");
+
+            delete regularCategoryColumn.source.expr.ref;
+            filetColumnTarget = extractFilterColumnTarget(regularCategoryColumn);
+            expect(filetColumnTarget.table).toBeNull();
+            expect(filetColumnTarget.column).toBeNull();
+
+            delete regularCategoryColumn.source.expr;
+            filetColumnTarget = extractFilterColumnTarget(regularCategoryColumn);
+            expect(filetColumnTarget.table).toBeNull();
+            expect(filetColumnTarget.column).toBeNull();
+
+            delete regularCategoryColumn.source;
+            filetColumnTarget = extractFilterColumnTarget(regularCategoryColumn);
+            expect(filetColumnTarget.table).toBeNull();
+            expect(filetColumnTarget.column).toBeNull();
         });
     });
 

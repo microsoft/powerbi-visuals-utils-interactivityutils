@@ -1,3 +1,6 @@
+## 5.4.2 (webpack)
+* extractFilterColumnTarget method was corrected to extract table and column name from correct properties
+
 ## 5.4.1 (webpack)
 * Add jsnext:main
 * Remove internal selectedIds

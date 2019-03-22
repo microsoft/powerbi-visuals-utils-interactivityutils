@@ -31,7 +31,7 @@ import {
     IFilter,
     FilterType,
     BasicFilter
- } from "powerbi-models";
+} from "powerbi-models";
 
 import IVisualHost = powerbi.extensibility.visual.IVisualHost;
 // powerbi.extensibility.utils.type
@@ -58,9 +58,15 @@ export interface IFilterBehaviorOptions extends IBehaviorOptions<FilterDataPoint
 }
 
 export function extractFilterColumnTarget(categoryColumn: powerbi.DataViewCategoryColumn): IFilterColumnTarget {
-    const categoryExpr: any = categoryColumn.source && categoryColumn.source.expr ? categoryColumn.source.expr as any : null;
-    const filterTargetTable: string = categoryExpr && categoryExpr.source && categoryExpr.source.entity ? categoryExpr.source.entity : categoryColumn.source.queryName.substr(0, categoryColumn.source.queryName.indexOf("."));
-    const filterTargetColumn: string = categoryExpr && categoryExpr.arg && categoryExpr.arg.arg && categoryExpr.arg.arg.property ? categoryExpr.arg.arg.property : categoryColumn.source.displayName;
+    const categoryExpr: any = categoryColumn.source && categoryColumn.source.expr
+        ? categoryColumn.source.expr as any
+        : null;
+    const filterTargetTable: string = categoryExpr && categoryExpr.source && categoryExpr.source.entity
+        ? categoryExpr.source.entity
+        : null;
+    const filterTargetColumn: string = categoryExpr && categoryExpr.ref
+        ? categoryExpr.ref
+        : null;
 
     return {
         table: filterTargetTable,
