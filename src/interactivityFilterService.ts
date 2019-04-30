@@ -24,12 +24,12 @@
  *  THE SOFTWARE.
  */
 
-module powerbi.extensibility.utils.interactivity {
+namespace powerbi.extensibility.utils.interactivity {
     import IVisualHost = powerbi.extensibility.visual.IVisualHost;
     // powerbi.extensibility.utils.type
     import ArrayExtensions = powerbi.extensibility.utils.type.ArrayExtensions;
 
-    export interface FilterDataPoint extends SelectableDataPoint {
+    export interface FilterDataPoint extends BaseDataPoint  {
         category: PrimitiveValue;
     }
 
@@ -182,14 +182,14 @@ module powerbi.extensibility.utils.interactivity {
                     filter,
                     this.filterObjectProperty.objectName,
                     this.filterObjectProperty.propertyName,
-                    FilterAction.merge
+                    FilterAction.merge,
                 );
             } else {
                 this.hostServices.applyJsonFilter(
                     filter,
                     this.filterObjectProperty.objectName,
                     this.filterObjectProperty.propertyName,
-                    FilterAction.remove
+                    FilterAction.remove,
                 );
             }
         }
