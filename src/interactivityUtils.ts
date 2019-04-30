@@ -36,19 +36,19 @@ module powerbi.extensibility.utils.interactivity {
         }
 
         export function registerStandardSelectionHandler(selection: d3.Selection<any>, selectionHandler: ISelectionHandler): void {
-            selection.on("click", (d: SelectableDataPoint) => handleSelection(d, selectionHandler));
+            selection.on("click", (d: BaseDataPoint ) => handleSelection(d, selectionHandler));
         }
 
         export function registerGroupSelectionHandler(group: d3.Selection<any>, selectionHandler: ISelectionHandler): void {
             group.on("click", () => {
                 let target = (d3.event as MouseEvent).target,
-                    d: SelectableDataPoint = d3.select(target).datum();
+                    d: BaseDataPoint  = d3.select(target).datum();
 
                 handleSelection(d, selectionHandler);
             });
         }
 
-        function handleSelection(d: SelectableDataPoint, selectionHandler: ISelectionHandler): void {
+        function handleSelection(d: BaseDataPoint , selectionHandler: ISelectionHandler): void {
             selectionHandler.handleSelection(d, (d3.event as MouseEvent).ctrlKey);
         }
     }

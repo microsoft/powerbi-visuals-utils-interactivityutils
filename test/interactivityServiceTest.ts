@@ -36,7 +36,7 @@ module powerbi.extensibility.utils.interactivity.test {
 
     // powerbi.extensibility.utils.interactivity
     import InteractivitySelectionService = powerbi.extensibility.utils.interactivity.InteractivitySelectionService;
-    import SelectionDataPoint = powerbi.extensibility.utils.interactivity.SelectionDataPoint;
+    import SelectionDataPoint = powerbi.extensibility.utils.interactivity.SelectableDataPoint;
     import createInteractivitySelectionService = powerbi.extensibility.utils.interactivity.createInteractivitySelectionService;
     import IBehaviorOptions = powerbi.extensibility.utils.interactivity.IBehaviorOptions;
     import MockBehavior = powerbi.extensibility.utils.interactivity.test.mocks.MockBehavior;
@@ -44,7 +44,7 @@ module powerbi.extensibility.utils.interactivity.test {
     import createVisualHost = powerbi.extensibility.utils.test.mocks.createVisualHost;
     import createSelectionId = powerbi.extensibility.utils.test.mocks.createSelectionId;
 
-    interface ChicletSlicerBehaviorOptions extends IBehaviorOptions<SelectionDataPoint> {
+    interface ChicletSlicerBehaviorOptions extends IBehaviorOptions<SelectableDataPoint> {
         some: string;
         collection: string;
         random: string;

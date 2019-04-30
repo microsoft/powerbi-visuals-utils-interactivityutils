@@ -1,3 +1,7 @@
+## 4.4.0
+* API 2.5.0 Support. 
+* Remove internal selectionIDs
+
 ## 4.3.0
 * REM: filterManager.ts
 * REM: interactivityservice.ts
