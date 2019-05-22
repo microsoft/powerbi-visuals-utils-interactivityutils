@@ -320,13 +320,13 @@ export class InteractivityService implements IInteractivityService, ISelectionHa
         }
 
         this.select(dataPoints, multiSelect);
-        this.sendSelectionToHost();
+        this.sendSelectionToHost(multiSelect);
         this.renderAll();
     }
 
     public handleClearSelection(): void {
         this.clearSelection();
-        this.sendSelectionToHost();
+        this.sendSelectionToHost(false);
     }
 
     /**
@@ -447,13 +447,13 @@ export class InteractivityService implements IInteractivityService, ISelectionHa
         }
     }
 
-    private sendSelectionToHost() {
+    private sendSelectionToHost(multiSelect: boolean) {
         if (!this.selectionManager) {
             return;
         }
 
         if (this.selectedIds && this.selectedIds.length) {
-            this.selectionManager.select([...this.selectedIds]);
+            this.selectionManager.select([...this.selectedIds], multiSelect);
         } else {
             this.selectionManager.clear();
         }
