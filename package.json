@@ -1,6 +1,6 @@
 {
   "name": "powerbi-visuals-utils-interactivityutils",
-  "version": "5.4.3",
+  "version": "5.5.0",
   "description": "InteractivityUtils",
   "main": "lib/index.js",
   "module": "lib/index.js",
@@ -56,8 +56,8 @@
     "karma-typescript-preprocessor": "0.4.0",
     "karma-webpack": "3.0.5",
     "less": "3.8.1",
-    "powerbi-visuals-api": "~2.3.1",
-    "powerbi-visuals-utils-testutils": "^2.1.7",
+    "powerbi-visuals-api": "2.6.0",
+    "powerbi-visuals-utils-testutils": "2.2.0",
     "puppeteer": "^1.16.0",
     "ts-loader": "5.2.2",
     "ts-node": "7.0.1",
@@ -70,7 +70,7 @@
   "dependencies": {
     "d3": "5.5.0",
     "powerbi-models": "1.0.12",
-    "powerbi-visuals-utils-svgutils": "^2.1.1",
-    "powerbi-visuals-utils-typeutils": "^2.1.1"
+    "powerbi-visuals-utils-svgutils": "2.2.0",
+    "powerbi-visuals-utils-typeutils": "2.2.0"
   }
 }

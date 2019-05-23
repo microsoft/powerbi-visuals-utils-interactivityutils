@@ -1,5 +1,6 @@
-## 5.4.3 (webpack)
-* Cross visuals multiselect support
+## 5.5.0 (webpack)
+* Update packages to fix vulnerabilities
+* Update powerbi-visual-api to 2.6
 
 ## 5.4.2 (webpack)
 * extractFilterColumnTarget method was corrected to extract table and column name from correct properties
