@@ -1,15 +1,27 @@
-## 4.4.0
-* API 2.5.0 Support. 
-* Remove internal selectionIDs
+## 5.5.0 (webpack)
+* Update packages to fix vulnerabilities
+* Update powerbi-visual-api to 2.6
 
-## 4.3.0
+## 5.4.2 (webpack)
+* extractFilterColumnTarget method was corrected to extract table and column name from correct properties
+
+## 5.4.1 (webpack)
+* Add jsnext:main
+* Remove internal selectedIds
+* Update testutils, typeutils and svgutils 
+
+## 4.4.0 / 5.4.0 (webpack)
+* Rename SelectableDataPoint to BaseDataPoint.
+* Rename SelectionDataPoint to SelectableDataPoint 
+
+## 4.3.0 / 5.2.0 (webpack)
 * REM: filterManager.ts
 * REM: interactivityservice.ts
 * ADD: interactivityBaseService.ts that contains basic and abstract methods for selection and filtering
 * ADD: interactivitySelectionService.ts that extends interactivityBaseService.ts to support selection as before but some old methods were removed
 * ADD: interactivityFilterService.ts that extends interactivityBaseService.ts to support JSON filtering from last APIs
 
-## 4.2.0 
+## 4.2.0 / 5.2.0 (webpack)
 * Update packages to fix vulnerabilities
 
 ## 4.1.1
@@ -24,7 +36,7 @@
 ## 3.2.0
 * UPD: ability to select multiple data points via `handleSelection` method
 
-## 3.1.0
+## 3.1.0 (webpack)
 * ADD: ability to support Power BI bookmarks
 
 ## 3.0.1
