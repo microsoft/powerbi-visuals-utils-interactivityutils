@@ -156,6 +156,54 @@ describe("Interactivity service", () => {
             expect(filetColumnTarget.table).toBeNull();
             expect(filetColumnTarget.column).toBeNull();
         });
+
+        it("Extract Filter Column Target for hierarchical data", () => {
+            let regularCategoryColumn: any = {
+                "roles": {
+                    "Fields": true
+                },
+                "type": {
+                    "text": true
+                },
+                "displayName": "Organization Level 02",
+                "queryName": "Organization.Organizations.Organization Level 02",
+                "expr": {
+                    "arg": {
+                        "arg": {
+                            "entity": "Organization",
+                            "variable": "o",
+                            "kind": 0
+                        },
+                        "hierarchy": "Organizations",
+                        "kind": 6
+                    },
+                    "level": "Organization Level 02",
+                    "kind": 7
+                },
+                "index": 1,
+                "identityExprs": [
+                    {
+                        "source": {
+                            "entity": "Organization",
+                            "kind": 0
+                        },
+                        "ref": "Organization Level 01.Key0",
+                        "kind": 2
+                    },
+                    {
+                        "source": {
+                            "entity": "Organization",
+                            "kind": 0
+                        },
+                        "ref": "Organization Level 02.Key0",
+                        "kind": 2
+                    }
+                ]
+            };
+            let filetColumnTarget: IFilterColumnTarget = extractFilterColumnTarget(regularCategoryColumn);
+            expect(filetColumnTarget.table).toBe("Organization");
+            expect(filetColumnTarget.column).toBe("Organization Level 02");
+        });
     });
 
     describe("Selection", () => {

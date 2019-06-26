@@ -47,6 +47,10 @@ import {
     FilterAction
 } from "./interactivityBaseService";
 
+import {
+    SQExprKind
+} from "./interfaces";
+
 export interface FilterDataPoint extends BaseDataPoint {
     category: powerbi.PrimitiveValue;
 }
@@ -57,22 +61,35 @@ export interface IFilterBehaviorOptions extends IBehaviorOptions<FilterDataPoint
     jsonFilters: powerbi.IFilter[];
 }
 
-export function extractFilterColumnTarget(categoryColumn: powerbi.DataViewCategoryColumn): IFilterColumnTarget {
-    const categoryExpr: any = categoryColumn.source && categoryColumn.source.expr
-        ? categoryColumn.source.expr as any
+export function extractFilterColumnTarget(categoryColumn: powerbi.DataViewCategoryColumn | powerbi.DataViewCategoryColumn | powerbi.DataViewMetadataColumn): IFilterColumnTarget {
+    const categoryColumnMeta = categoryColumn as powerbi.DataViewCategoryColumn;
+    const categoryExpr: any = categoryColumnMeta.source && categoryColumnMeta.source.expr
+        ? categoryColumnMeta.source.expr as any
         : null;
-    const filterTargetTable: string = categoryExpr && categoryExpr.source && categoryExpr.source.entity
+    let filterTargetTable: string = categoryExpr && categoryExpr.source && categoryExpr.source.entity
         ? categoryExpr.source.entity
         : null;
-    const filterTargetColumn: string = categoryExpr && categoryExpr.ref
+        let filterTargetColumn: string = categoryExpr && categoryExpr.ref
         ? categoryExpr.ref
         : null;
+
+    if (categoryColumn && (categoryColumn as powerbi.DataViewMetadataColumn).expr) {
+        const columnMeta = (categoryColumn as powerbi.DataViewMetadataColumn);
+        const expr: any = columnMeta.expr as any;
+        if (expr.kind === SQExprKind.HierarchyLevel) {
+            filterTargetColumn = expr.level;
+            if (columnMeta.identityExprs.length) {
+                filterTargetTable = (columnMeta.identityExprs[columnMeta.identityExprs.length - 1] as any).source.entity;
+            } else {
+                filterTargetTable = (columnMeta.identityExprs as any).source.entity;
+            }
+        }
+    }
 
     return {
         table: filterTargetTable,
         column: filterTargetColumn
     };
-
 }
 
 export class InteractivityFilterService
