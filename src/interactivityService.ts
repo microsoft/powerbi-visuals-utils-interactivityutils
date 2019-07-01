@@ -30,7 +30,7 @@ import { arrayExtensions } from "powerbi-visuals-utils-typeutils";
 import powerbi from "powerbi-visuals-api";
 import IVisualHost = powerbi.extensibility.visual.IVisualHost;
 import ISelectionManager = powerbi.extensibility.ISelectionManager;
-import DataRepetitionSelector = powerbi.data.DataRepetitionSelector;
+import CustomVisualOpaqueIdentity = powerbi.visuals.CustomVisualOpaqueIdentity;
 import ExtensibilityISelectionId = powerbi.extensibility.ISelectionId;
 import Selector = powerbi.data.Selector;
 
@@ -154,7 +154,7 @@ export interface IExtensibilityMeasuredSelecionId extends ExtensibilityISelectio
     compareMeasures(currentMeasures: string[], otherMeasures: string[]): boolean;
 }
  export interface SelectorsForColumn {
-    [queryName: string]: DataRepetitionSelector[];
+    [queryName: string]: CustomVisualOpaqueIdentity[];
 }
  // It's a temporary function for compatibility with API 2.1
 // It will probably be removed after API 2.2 release

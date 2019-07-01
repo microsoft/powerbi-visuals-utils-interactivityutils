@@ -1,3 +1,6 @@
+## 5.5.1 (webpack)
+* extractFilterColumnTarget method was corrected to extract table and column name from correct properties for hierarchical data
+
 ## 5.5.0 (webpack)
 * Update packages to fix vulnerabilities
 * Update powerbi-visual-api to 2.6
