@@ -1,3 +1,6 @@
+## 5.5.2 (webpack)
+* extractFilterColumnTarget method was corrected to extract table and column name from correct properties for *non* hierarchical data
+
 ## 5.5.1 (webpack)
 * extractFilterColumnTarget method was corrected to extract table and column name from correct properties for hierarchical data
 

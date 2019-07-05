@@ -83,6 +83,9 @@ export function extractFilterColumnTarget(categoryColumn: powerbi.DataViewCatego
             } else {
                 filterTargetTable = (columnMeta.identityExprs as any).source.entity;
             }
+        } else if (expr.kind === SQExprKind.ColumnRef) {
+            filterTargetTable = expr.source.entity;
+            filterTargetColumn = expr.ref;
         }
     }
 

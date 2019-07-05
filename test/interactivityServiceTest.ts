@@ -157,7 +157,7 @@ describe("Interactivity service", () => {
             expect(filetColumnTarget.column).toBeNull();
         });
 
-        it("Extract Filter Column Target for hierarchical data", () => {
+        it("Extract Filter Column Target for hierarchical data (dataViewMappings: table, source: Multidimensional)", () => {
             let regularCategoryColumn: any = {
                 "roles": {
                     "Fields": true
@@ -203,6 +203,124 @@ describe("Interactivity service", () => {
             let filetColumnTarget: IFilterColumnTarget = extractFilterColumnTarget(regularCategoryColumn);
             expect(filetColumnTarget.table).toBe("Organization");
             expect(filetColumnTarget.column).toBe("Organization Level 02");
+        });
+
+        it("Extract Filter Column Target for hierarchical data (dataViewMappings: table, source: import mode)", () => {
+            let regularCategoryColumn: any = {
+                roles: {
+                    Fields: true
+                },
+                type: {
+                    text: true
+                },
+                displayName: "Country Name",
+                queryName: "Sales.Channel Partner Hierarchy.Country",
+                expr: {
+                    arg: {
+                        arg: {
+                            entity: "Sales",
+                            variable: "f",
+                            kind: 0
+                        },
+                        hierarchy: "Channel Partner Hierarchy",
+                        kind: 6
+                    },
+                    level: "Country",
+                    kind: 7
+                },
+                index: 1,
+                identityExprs: [
+                    {
+                        source: {
+                            entity: "Sales",
+                            kind: 0
+                        },
+                        ref: "Country",
+                        kind: 2
+                    }
+                ]
+            };
+            let filetColumnTarget: IFilterColumnTarget = extractFilterColumnTarget(regularCategoryColumn);
+            expect(filetColumnTarget.table).toBe("Sales");
+            expect(filetColumnTarget.column).toBe("Country");
+        });
+
+        it("Extract Filter Column Target for datetime column with 'auto date/time' set to on (dataViewMappings: table, source: import mode)", () => {
+            let regularCategoryColumn: any = {
+                roles: {
+                    Fields: true
+                },
+                type: {
+                    text: true
+                },
+                displayName: "Year",
+                queryName: "Sales.Date.Variation.Date Hierarchy.Year",
+                expr: {
+                    arg: {
+                        arg: {
+                            arg: {
+                                entity: "Sales",
+                                variable: "f",
+                                kind: 0
+                            },
+                            name: "Variation",
+                            property: "Date",
+                            kind: 5
+                        },
+                        hierarchy: "Date Hierarchy",
+                        kind: 6
+                    },
+                    level: "Year",
+                    kind: 7
+                },
+                index: 0,
+                identityExprs: [
+                    {
+                        source: {
+                            entity: "LocalDateTable_bcfa94c1-7c12-4317-9a5f-204f8a9724ca",
+                            kind: 0
+                        },
+                        ref: "Year",
+                        kind: 2
+                    }
+                ]
+            };
+            let filetColumnTarget: IFilterColumnTarget = extractFilterColumnTarget(regularCategoryColumn);
+            expect(filetColumnTarget.table).toBe("LocalDateTable_bcfa94c1-7c12-4317-9a5f-204f8a9724ca");
+            expect(filetColumnTarget.column).toBe("Year");
+        });
+
+        it("Extract Filter Column Target for single column (dataViewMappings: table, source: import mode)", () => {
+            let regularCategoryColumn: any = {
+                roles: {
+                    Fields: true
+                },
+                type: {
+                    text: true
+                },
+                displayName: "Organization Level 01",
+                queryName: "Organization.Organization Level 01",
+                expr: {
+                    source: {
+                        entity: "Organization"
+                    },
+                    ref: "Organization Level 01",
+                    kind: 2
+                },
+                index: 1,
+                identityExprs: [
+                    {
+                        source: {
+                            entity: "Organization"
+                        },
+                        ref: "Organization Level 01",
+                        kind: 2
+                    }
+                ]
+            };
+            let filetColumnTarget: IFilterColumnTarget = extractFilterColumnTarget(regularCategoryColumn);
+            expect(filetColumnTarget.table).toBe("Organization");
+            expect(filetColumnTarget.column).toBe("Organization Level 01");
         });
     });
 
