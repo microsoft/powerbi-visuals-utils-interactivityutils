@@ -61,31 +61,39 @@ export interface IFilterBehaviorOptions extends IBehaviorOptions<FilterDataPoint
     jsonFilters: powerbi.IFilter[];
 }
 
-export function extractFilterColumnTarget(categoryColumn: powerbi.DataViewCategoryColumn | powerbi.DataViewCategoryColumn | powerbi.DataViewMetadataColumn): IFilterColumnTarget {
-    const categoryColumnMeta = categoryColumn as powerbi.DataViewCategoryColumn;
-    const categoryExpr: any = categoryColumnMeta.source && categoryColumnMeta.source.expr
-        ? categoryColumnMeta.source.expr as any
-        : null;
-    let filterTargetTable: string = categoryExpr && categoryExpr.source && categoryExpr.source.entity
-        ? categoryExpr.source.entity
-        : null;
-        let filterTargetColumn: string = categoryExpr && categoryExpr.ref
-        ? categoryExpr.ref
+export function extractFilterColumnTarget(categoryColumn: powerbi.DataViewCategoryColumn | powerbi.DataViewMetadataColumn): IFilterColumnTarget {
+    // take an expression from source or column metadata
+    let expr: any = categoryColumn && (<any>categoryColumn).source && (<any>categoryColumn).source.expr
+        ? (<any>categoryColumn).source.expr as any
+        : (<any>categoryColumn).expr as any;
+
+    // take table name from source.entity if column definition is simple
+    let filterTargetTable: string = expr && expr.source && expr.source.entity
+        ? expr.source.entity
         : null;
 
-    if (categoryColumn && (categoryColumn as powerbi.DataViewMetadataColumn).expr) {
-        const columnMeta = (categoryColumn as powerbi.DataViewMetadataColumn);
-        const expr: any = columnMeta.expr as any;
-        if (expr.kind === SQExprKind.HierarchyLevel) {
-            filterTargetColumn = expr.level;
-            if (columnMeta.identityExprs.length) {
-                filterTargetTable = (columnMeta.identityExprs[columnMeta.identityExprs.length - 1] as any).source.entity;
-            } else {
-                filterTargetTable = (columnMeta.identityExprs as any).source.entity;
+    // take expr.ref as column name if column definition is simple
+    let filterTargetColumn: string = expr && expr.ref
+        ? expr.ref
+        : null;
+
+    // special cases
+    // when data structure is hierarchical
+    if (expr && expr.kind === SQExprKind.HierarchyLevel && (<any>categoryColumn).identityExprs) {
+        filterTargetColumn = expr.level;
+
+        // Only if we have hierarchical structure with virtual table, take table name from identityExprs
+        // Power BI creates hierarchy for date type of data (Year, Quater, Month, Days)
+        // For it, Power BI creates a virtual table and gives it generated name as... 'LocalDateTable_bcfa94c1-7c12-4317-9a5f-204f8a9724ca'
+        // Visuals have to use a virtual table name as a target of JSON to filter date hierarchy properly
+        if (expr.arg && expr.arg.kind === SQExprKind.Hierarchy && expr.arg && expr.arg.arg &&
+            expr.arg.arg.kind === SQExprKind.PropertyVariationSource) {
+            if ((<any>categoryColumn).identityExprs && (<any>categoryColumn).identityExprs.length) {
+                filterTargetTable = ((<any>categoryColumn).identityExprs[(<any>categoryColumn).identityExprs.length - 1] as any).source.entity;
             }
-        } else if (expr.kind === SQExprKind.ColumnRef) {
-            filterTargetTable = expr.source.entity;
-            filterTargetColumn = expr.ref;
+        } else {
+            // otherwise take column name from expr
+            filterTargetTable = expr.arg && expr.arg.arg && expr.arg.arg.entity;
         }
     }
 
