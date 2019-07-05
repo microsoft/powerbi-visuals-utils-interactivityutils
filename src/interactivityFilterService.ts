@@ -62,28 +62,31 @@ export interface IFilterBehaviorOptions extends IBehaviorOptions<FilterDataPoint
 }
 
 export function extractFilterColumnTarget(categoryColumn: powerbi.DataViewCategoryColumn | powerbi.DataViewMetadataColumn): IFilterColumnTarget {
-    // take expression from source or column metadata
+    // take an expression from source or column metadata
     let expr: any = categoryColumn && (<any>categoryColumn).source && (<any>categoryColumn).source.expr
         ? (<any>categoryColumn).source.expr as any
         : (<any>categoryColumn).expr as any;
 
-    // take table name from source.entity if there is simple column definition
+    // take table name from source.entity if column definition is simple
     let filterTargetTable: string = expr && expr.source && expr.source.entity
         ? expr.source.entity
         : null;
 
-    // take expr.ref as column name
+    // take expr.ref as column name if column definition is simple
     let filterTargetColumn: string = expr && expr.ref
         ? expr.ref
         : null;
 
     // special cases
-    // data can has hierarchy of columns built by user or built by Power BI (example for Date)
+    // when data structure is hierarchical
     if (expr && expr.kind === SQExprKind.HierarchyLevel && (<any>categoryColumn).identityExprs) {
         filterTargetColumn = expr.level;
 
-        // take table name from identityExprs if only if when we have date hirarcy with with virtual table
-        if (expr.arg && expr.arg.kind === SQExprKind.Hierarchy && expr.arg &&
+        // Only if we have hierarchical structure with virtual table, take table name from identityExprs
+        // Power BI creates hierarchy for date type of data (Year, Quater, Month, Days)
+        // For it, Power BI creates a virtual table and gives it generated name as... 'LocalDateTable_bcfa94c1-7c12-4317-9a5f-204f8a9724ca'
+        // Visuals have to use a virtual table name as a target of JSON to filter date hierarchy properly
+        if (expr.arg && expr.arg.kind === SQExprKind.Hierarchy && expr.arg && expr.arg.arg &&
             expr.arg.arg.kind === SQExprKind.PropertyVariationSource) {
             if ((<any>categoryColumn).identityExprs && (<any>categoryColumn).identityExprs.length) {
                 filterTargetTable = ((<any>categoryColumn).identityExprs[(<any>categoryColumn).identityExprs.length - 1] as any).source.entity;
