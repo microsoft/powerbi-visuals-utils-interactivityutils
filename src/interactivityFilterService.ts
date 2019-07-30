@@ -80,20 +80,19 @@ export function extractFilterColumnTarget(categoryColumn: powerbi.DataViewCatego
     // special cases
     // when data structure is hierarchical
     if (expr && expr.kind === SQExprKind.HierarchyLevel && (<any>categoryColumn).identityExprs) {
-        filterTargetColumn = expr.level;
+        const identityExprs = (<any>categoryColumn).identityExprs;
 
         // Only if we have hierarchical structure with virtual table, take table name from identityExprs
         // Power BI creates hierarchy for date type of data (Year, Quater, Month, Days)
         // For it, Power BI creates a virtual table and gives it generated name as... 'LocalDateTable_bcfa94c1-7c12-4317-9a5f-204f8a9724ca'
         // Visuals have to use a virtual table name as a target of JSON to filter date hierarchy properly
-        if (expr.arg && expr.arg.kind === SQExprKind.Hierarchy && expr.arg && expr.arg.arg &&
-            expr.arg.arg.kind === SQExprKind.PropertyVariationSource) {
-            if ((<any>categoryColumn).identityExprs && (<any>categoryColumn).identityExprs.length) {
-                filterTargetTable = ((<any>categoryColumn).identityExprs[(<any>categoryColumn).identityExprs.length - 1] as any).source.entity;
-            }
-        } else {
-            // otherwise take column name from expr
-            filterTargetTable = expr.arg && expr.arg.arg && expr.arg.arg.entity;
+        if (expr.arg && expr.arg.kind === SQExprKind.Hierarchy && identityExprs && identityExprs.length) {
+            filterTargetTable = (identityExprs[identityExprs.length - 1] as any).source.entity;
+            // Handle virtual table
+            filterTargetColumn = (identityExprs[identityExprs.length - 1] as any).ref;
+            // SSAS MD adds .UniqueName and Key0 ... KeyN as postfix on column names
+            // Visual should not pass them into filter
+            filterTargetColumn = filterTargetColumn.replace(/\.Key\d+$|\.UniqueName$/, "");
         }
     }
 

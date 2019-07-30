@@ -290,6 +290,120 @@ describe("Interactivity service", () => {
             expect(filetColumnTarget.column).toBe("Year");
         });
 
+        it("Extract Filter Column Target for datetime column from OLAP (dataViewMappings: table, source: import mode)", () => {
+            let regularCategoryColumn: any = {
+                roles: {
+                    Fields: true
+                },
+                type: {
+                    underlyingType: 1,
+                    category: null,
+                    primitiveType: 1,
+                    extendedType: 1,
+                    categoryString: null,
+                    text: true,
+                    numeric: false,
+                    integer: false,
+                    bool: false,
+                    dateTime: false,
+                    duration: false,
+                    binary: false,
+                    none: false
+                },
+                displayName: "FiscalYear",
+                queryName: "Dates.FiscalDate.FiscalYear",
+                expr: {
+                    _kind: 7,
+                    arg: {
+                        _kind: 6,
+                        arg: {
+                            _kind: 0,
+                            entity: "Dates",
+                            variable: "d",
+                            kind: 0
+                        },
+                        hierarchy: "FiscalDate",
+                        kind: 6
+                    },
+                    level: "FiscalYear",
+                    kind: 7
+                },
+                index: 0,
+                identityExprs: [
+                    {
+                        _kind: 2,
+                        source: {
+                            _kind: 0,
+                            entity: "Dates",
+                            kind: 0
+                        },
+                        ref: "OLAPFiscalYear",
+                        kind: 2
+                    }
+                ]
+            };
+            let filetColumnTarget: IFilterColumnTarget = extractFilterColumnTarget(regularCategoryColumn);
+            expect(filetColumnTarget.table).toBe("Dates");
+            expect(filetColumnTarget.column).toBe("OLAPFiscalYear");
+        });
+
+        it("Extract Filter Column Target for datetime column from OLAP (dataViewMappings: table, source: import mode)", () => {
+            let regularCategoryColumn: any = {
+                roles: {
+                    Fields: true
+                },
+                type: {
+                    underlyingType: 1,
+                    category: null,
+                    primitiveType: 1,
+                    extendedType: 1,
+                    categoryString: null,
+                    text: true,
+                    numeric: false,
+                    integer: false,
+                    bool: false,
+                    dateTime: false,
+                    duration: false,
+                    binary: false,
+                    none: false
+                },
+                displayName: "Finance Year Name",
+                queryName: "Finance Date Hierarchy.Finance Date Hierarchy.Finance Year Name",
+                expr: {
+                    _kind: 7,
+                    arg: {
+                        _kind: 6,
+                        arg: {
+                            _kind: 0,
+                            entity: "Finance Date Hierarchy",
+                            variable: "f",
+                            kind: 0
+                        },
+                        hierarchy: "Finance Date Hierarchy",
+                        kind: 6
+                    },
+                    level: "Finance Year Name",
+                    kind: 7
+                },
+                index: 0,
+                identityExprs: [
+                    {
+                        _kind: 2,
+                        source: {
+                            _kind: 0,
+                            entity: "Finance Date Hierarchy",
+                            kind: 0
+                        },
+                        ref: "Fiscal Year Name.UniqueName",
+                        kind: 2
+                    }
+                ]
+            };
+            let filetColumnTarget: IFilterColumnTarget = extractFilterColumnTarget(regularCategoryColumn);
+            expect(filetColumnTarget.table).toBe("Finance Date Hierarchy");
+            expect(filetColumnTarget.column).toBe("Fiscal Year Name");
+        });
+
         it("Extract Filter Column Target for single column (dataViewMappings: table, source: import mode)", () => {
             let regularCategoryColumn: any = {
                 roles: {
