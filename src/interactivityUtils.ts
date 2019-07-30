@@ -33,7 +33,7 @@ import { SelectableDataPoint } from "./interactivitySelectionService";
 
 import IPoint = shapesInterfaces.IPoint;
 
-const getEvent = () => require("d3-selection").event;
+export const getEvent = () => require("d3-selection").event;
 
 export function getPositionOfLastInputEvent(): IPoint {
     return {

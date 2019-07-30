@@ -23,6 +23,7 @@
 *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 *  THE SOFTWARE.
 */
+import powerbi from "powerbi-visuals-api";
 
 export interface BaseDataPoint {
     selected: boolean;
@@ -100,6 +101,8 @@ export interface ISelectionHandler {
 
     /** Handles a selection clear, clearing all selection state */
     handleClearSelection(): void;
+    /** Handles a context menu click (right button click on element) */
+    handleContextMenu(dataPoint: BaseDataPoint, point: powerbi.extensibility.IPoint): void;
 }
 
 export interface IBehaviorOptions<SelectableDataPointType extends BaseDataPoint> {
@@ -206,6 +209,11 @@ export abstract class InteractivityBaseService
         this.select(dataPoints, multiSelect);
         this.sendSelectionToHost();
         this.renderAll();
+    }
+
+    public handleContextMenu(dataPoint: SelectableDataPointType, point: powerbi.extensibility.IPoint): void {
+        debugger;
+        return;
     }
 
     public handleClearSelection(): void {

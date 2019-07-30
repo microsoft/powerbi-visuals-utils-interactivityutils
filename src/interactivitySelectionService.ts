@@ -77,6 +77,15 @@ export class InteractivitySelectionService extends InteractivityBaseService<Sele
         super.clearSelection();
     }
 
+    public handleContextMenu(dataPoint: SelectableDataPoint, point: powerbi.extensibility.IPoint): void {
+        debugger;
+        if (!dataPoint) {
+            return;
+        }
+
+        this.selectionManager.showContextMenu(dataPoint.identity, point);
+    }
+
     public applySelectionStateToData(dataPoints: SelectableDataPoint[], hasHighlights?: boolean): boolean {
         if (hasHighlights && this.hasSelection()) {
             this.selectionManager.clear();
