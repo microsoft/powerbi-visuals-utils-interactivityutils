@@ -212,7 +212,8 @@ export abstract class InteractivityBaseService
     }
 
     public handleContextMenu(dataPoint: SelectableDataPointType, point: powerbi.extensibility.IPoint): void {
-        debugger;
+        // don't need to handle context menu here.
+        // see InteractivitySelectionService class
         return;
     }
 

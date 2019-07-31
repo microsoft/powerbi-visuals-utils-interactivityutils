@@ -78,12 +78,7 @@ export class InteractivitySelectionService extends InteractivityBaseService<Sele
     }
 
     public handleContextMenu(dataPoint: SelectableDataPoint, point: powerbi.extensibility.IPoint): void {
-        debugger;
-        if (!dataPoint) {
-            return;
-        }
-
-        this.selectionManager.showContextMenu(dataPoint.identity, point);
+        this.selectionManager.showContextMenu(dataPoint && dataPoint.identity, point);
     }
 
     public applySelectionStateToData(dataPoints: SelectableDataPoint[], hasHighlights?: boolean): boolean {

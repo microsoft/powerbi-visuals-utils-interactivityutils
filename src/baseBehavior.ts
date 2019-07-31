@@ -92,6 +92,7 @@ export class BaseBehavior<SelectableDataPointType extends BaseDataPoint> impleme
                         y: event.clientY
                     });
                 event.preventDefault();
+                event.stopPropagation();
             }
         });
     }
@@ -109,12 +110,20 @@ export class BaseBehavior<SelectableDataPointType extends BaseDataPoint> impleme
     }
 
     public renderSelection(hasSelection: boolean): void {
-        this.options.elementsSelection.style("opacity", (category: any) => {
-            if (category.selected) {
-                return 0.5;
-            } else {
-                return 1;
-            }
-        });
+        if (hasSelection) {
+            this.options.elementsSelection.style("opacity", (category: any) => {
+                if (category.selected) {
+                    return 0.5;
+                } else {
+                    return 1;
+                }
+            });
+        } else {
+            this.options.elementsSelection.style(
+                "opacity", (category: any) => {
+                    return 1;
+                }
+            );
+        }
     }
 }
