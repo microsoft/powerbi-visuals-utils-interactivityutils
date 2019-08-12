@@ -42,14 +42,14 @@ module.exports = {
                 use: 'ts-loader',
                 exclude: /node_modules/
             },
-            // {
-            //     test: /\.tsx|\.ts?$/i,
-            //     enforce: 'post',
-            //     include: /(src)/,
-            //     exclude: /(node_modules|resources\/js\/vendor)/,
-            //     loader: 'istanbul-instrumenter-loader',
-            //     options: { esModules: true }
-            // },
+            {
+                test: /\.tsx|\.ts?$/i,
+                enforce: 'post',
+                include: /(src)/,
+                exclude: /(node_modules|resources\/js\/vendor)/,
+                loader: 'istanbul-instrumenter-loader',
+                options: { esModules: true }
+            },
             {
                 test: /\.json$/,
                 loader: 'json-loader'
