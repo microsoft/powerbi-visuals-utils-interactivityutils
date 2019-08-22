@@ -27,7 +27,7 @@
 import powerbi from "powerbi-visuals-api";
 import {
     IBasicFilter,
-    IFilterColumnTarget,
+    IFilterTarget,
     IFilter,
     FilterType,
     BasicFilter
@@ -61,7 +61,7 @@ export interface IFilterBehaviorOptions extends IBehaviorOptions<FilterDataPoint
     jsonFilters: powerbi.IFilter[];
 }
 
-export function extractFilterColumnTarget(categoryColumn: powerbi.DataViewCategoryColumn | powerbi.DataViewMetadataColumn): IFilterColumnTarget {
+export function extractFilterColumnTarget(categoryColumn: powerbi.DataViewCategoryColumn | powerbi.DataViewMetadataColumn): IFilterTarget {
     // take an expression from source or column metadata
     let expr: any = categoryColumn && (<any>categoryColumn).source && (<any>categoryColumn).source.expr
         ? (<any>categoryColumn).source.expr as any
@@ -79,13 +79,16 @@ export function extractFilterColumnTarget(categoryColumn: powerbi.DataViewCatego
 
     // special cases
     // when data structure is hierarchical
-    if (expr && expr.kind === SQExprKind.HierarchyLevel && (<any>categoryColumn).identityExprs) {
+    if (expr && expr.kind === SQExprKind.HierarchyLevel) {
+        let hierarchy: string = expr.arg.hierarchy;
         filterTargetColumn = expr.level;
+        let hierarchyLevel: string = expr.level;
 
         // Only if we have hierarchical structure with virtual table, take table name from identityExprs
         // Power BI creates hierarchy for date type of data (Year, Quater, Month, Days)
         // For it, Power BI creates a virtual table and gives it generated name as... 'LocalDateTable_bcfa94c1-7c12-4317-9a5f-204f8a9724ca'
         // Visuals have to use a virtual table name as a target of JSON to filter date hierarchy properly
+        filterTargetTable = expr.arg && expr.arg.arg && expr.arg.arg.entity;
         if (expr.arg && expr.arg.kind === SQExprKind.Hierarchy && expr.arg && expr.arg.arg &&
             expr.arg.arg.kind === SQExprKind.PropertyVariationSource) {
             if ((<any>categoryColumn).identityExprs && (<any>categoryColumn).identityExprs.length) {
@@ -95,6 +98,12 @@ export function extractFilterColumnTarget(categoryColumn: powerbi.DataViewCatego
             // otherwise take column name from expr
             filterTargetTable = expr.arg && expr.arg.arg && expr.arg.arg.entity;
         }
+
+        return {
+            table: filterTargetTable,
+            hierarchy: hierarchy,
+            hierarchyLevel: hierarchyLevel
+        };
     }
 
     return {
@@ -108,7 +117,7 @@ export class InteractivityFilterService
     implements IInteractivityService<FilterDataPoint>, ISelectionHandler {
 
     private selectedCategories: powerbi.PrimitiveValue[] = [];
-    private filterColumnTarget: IFilterColumnTarget = null;
+    private filterColumnTarget: IFilterTarget = null;
 
     private filterObjectProperty: { objectName: string, propertyName: string } = {
         objectName: "general",
