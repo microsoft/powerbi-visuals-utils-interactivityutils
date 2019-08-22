@@ -35,7 +35,7 @@ import {
 
 import IVisualHost = powerbi.extensibility.visual.IVisualHost;
 // powerbi.extensibility.utils.type
-import { arrayExtensions } from "powerbi-visuals-utils-typeutils";
+import { arrayExtensions, jsonComparer } from "powerbi-visuals-utils-typeutils";
 import ArrayExtensions = arrayExtensions.ArrayExtensions;
 
 import {
@@ -89,10 +89,10 @@ export function extractFilterColumnTarget(categoryColumn: powerbi.DataViewCatego
         // For it, Power BI creates a virtual table and gives it generated name as... 'LocalDateTable_bcfa94c1-7c12-4317-9a5f-204f8a9724ca'
         // Visuals have to use a virtual table name as a target of JSON to filter date hierarchy properly
         filterTargetTable = expr.arg && expr.arg.arg && expr.arg.arg.entity;
-        if (expr.arg && expr.arg.kind === SQExprKind.Hierarchy && expr.arg && expr.arg.arg &&
-            expr.arg.arg.kind === SQExprKind.PropertyVariationSource) {
+        if (expr.arg && expr.arg.kind === SQExprKind.Hierarchy) {
             if ((<any>categoryColumn).identityExprs && (<any>categoryColumn).identityExprs.length) {
-                filterTargetTable = ((<any>categoryColumn).identityExprs[(<any>categoryColumn).identityExprs.length - 1] as any).source.entity;
+                const identityExprs = ((<any>categoryColumn).identityExprs[(<any>categoryColumn).identityExprs.length - 1] as any);
+                filterTargetTable = identityExprs.source.entity;
             }
         } else {
             // otherwise take column name from expr
@@ -102,7 +102,8 @@ export function extractFilterColumnTarget(categoryColumn: powerbi.DataViewCatego
         return {
             table: filterTargetTable,
             hierarchy: hierarchy,
-            hierarchyLevel: hierarchyLevel
+            hierarchyLevel: hierarchyLevel,
+            column: filterTargetColumn
         };
     }
 

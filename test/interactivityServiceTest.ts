@@ -243,7 +243,7 @@ describe("Interactivity service", () => {
             };
             let filetColumnTarget: IFilterColumnTarget = extractFilterColumnTarget(regularCategoryColumn) as IFilterColumnTarget;
             expect(filetColumnTarget.table).toBe("Sales");
-            expect(filetColumnTarget.column).toBeUndefined();
+            expect(filetColumnTarget.column).toBe("Country");
             expect(((filetColumnTarget as any) as IFilterHierarchyTarget).hierarchyLevel).toBe("Country");
             expect(((filetColumnTarget as any) as IFilterHierarchyTarget).hierarchy).toBe("Channel Partner Hierarchy");
         });
