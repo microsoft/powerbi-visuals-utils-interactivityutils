@@ -36,7 +36,7 @@ import { extractFilterColumnTarget } from "../src/interactivityFilterService";
 import { IBehaviorOptions } from "../src/interactivityBaseService";
 import { createInteractivitySelectionService } from "../src/interactivitySelectionService";
 
-import { IFilterColumnTarget } from "powerbi-models";
+import { IFilterTarget, IFilterHierarchyTarget, IFilterColumnTarget } from "powerbi-models";
 
 interface ChicletSlicerBehaviorOptions extends IBehaviorOptions<SelectableDataPoint> {
     some: string;
@@ -127,32 +127,32 @@ describe("Interactivity service", () => {
                 },
                 values: []
             };
-            let filetColumnTarget: IFilterColumnTarget = extractFilterColumnTarget(regularCategoryColumn);
+            let filetColumnTarget: IFilterColumnTarget = extractFilterColumnTarget(regularCategoryColumn) as IFilterColumnTarget;
             expect(filetColumnTarget.table).toBe("TableName");
             expect(filetColumnTarget.column).toBe("ColumnName");
 
             delete regularCategoryColumn.source.expr.source.entity;
-            filetColumnTarget = extractFilterColumnTarget(regularCategoryColumn);
+            filetColumnTarget = extractFilterColumnTarget(regularCategoryColumn) as IFilterColumnTarget;
             expect(filetColumnTarget.table).toBeNull();
             expect(filetColumnTarget.column).toBe("ColumnName");
 
             delete regularCategoryColumn.source.expr.source;
-            filetColumnTarget = extractFilterColumnTarget(regularCategoryColumn);
+            filetColumnTarget = extractFilterColumnTarget(regularCategoryColumn) as IFilterColumnTarget;
             expect(filetColumnTarget.table).toBeNull();
             expect(filetColumnTarget.column).toBe("ColumnName");
 
             delete regularCategoryColumn.source.expr.ref;
-            filetColumnTarget = extractFilterColumnTarget(regularCategoryColumn);
+            filetColumnTarget = extractFilterColumnTarget(regularCategoryColumn) as IFilterColumnTarget;
             expect(filetColumnTarget.table).toBeNull();
             expect(filetColumnTarget.column).toBeNull();
 
             delete regularCategoryColumn.source.expr;
-            filetColumnTarget = extractFilterColumnTarget(regularCategoryColumn);
+            filetColumnTarget = extractFilterColumnTarget(regularCategoryColumn) as IFilterColumnTarget;
             expect(filetColumnTarget.table).toBeNull();
             expect(filetColumnTarget.column).toBeNull();
 
             delete regularCategoryColumn.source;
-            filetColumnTarget = extractFilterColumnTarget(regularCategoryColumn);
+            filetColumnTarget = extractFilterColumnTarget(regularCategoryColumn) as IFilterColumnTarget;
             expect(filetColumnTarget.table).toBeNull();
             expect(filetColumnTarget.column).toBeNull();
         });
@@ -200,9 +200,10 @@ describe("Interactivity service", () => {
                     }
                 ]
             };
-            let filetColumnTarget: IFilterColumnTarget = extractFilterColumnTarget(regularCategoryColumn);
+            let filetColumnTarget: IFilterHierarchyTarget = extractFilterColumnTarget(regularCategoryColumn) as IFilterHierarchyTarget;
             expect(filetColumnTarget.table).toBe("Organization");
-            expect(filetColumnTarget.column).toBe("Organization Level 02");
+            expect(filetColumnTarget.hierarchy).toBe("Organizations");
+            expect(filetColumnTarget.hierarchyLevel).toBe("Organization Level 02");
         });
 
         it("Extract Filter Column Target for hierarchical data (dataViewMappings: table, source: import mode)", () => {
@@ -240,9 +241,11 @@ describe("Interactivity service", () => {
                     }
                 ]
             };
-            let filetColumnTarget: IFilterColumnTarget = extractFilterColumnTarget(regularCategoryColumn);
+            let filetColumnTarget: IFilterColumnTarget = extractFilterColumnTarget(regularCategoryColumn) as IFilterColumnTarget;
             expect(filetColumnTarget.table).toBe("Sales");
             expect(filetColumnTarget.column).toBe("Country");
+            expect(((filetColumnTarget as any) as IFilterHierarchyTarget).hierarchyLevel).toBe("Country");
+            expect(((filetColumnTarget as any) as IFilterHierarchyTarget).hierarchy).toBe("Channel Partner Hierarchy");
         });
 
         it("Extract Filter Column Target for datetime column with 'auto date/time' set to on (dataViewMappings: table, source: import mode)", () => {
@@ -285,9 +288,10 @@ describe("Interactivity service", () => {
                     }
                 ]
             };
-            let filetColumnTarget: IFilterColumnTarget = extractFilterColumnTarget(regularCategoryColumn);
+            let filetColumnTarget: IFilterHierarchyTarget = extractFilterColumnTarget(regularCategoryColumn) as IFilterHierarchyTarget;
             expect(filetColumnTarget.table).toBe("LocalDateTable_bcfa94c1-7c12-4317-9a5f-204f8a9724ca");
-            expect(filetColumnTarget.column).toBe("Year");
+            expect(filetColumnTarget.hierarchy).toBe("Date Hierarchy");
+            expect(filetColumnTarget.hierarchyLevel).toBe("Year");
         });
 
         it("Extract Filter Column Target for single column (dataViewMappings: table, source: import mode)", () => {
@@ -318,7 +322,7 @@ describe("Interactivity service", () => {
                     }
                 ]
             };
-            let filetColumnTarget: IFilterColumnTarget = extractFilterColumnTarget(regularCategoryColumn);
+            let filetColumnTarget: IFilterColumnTarget = extractFilterColumnTarget(regularCategoryColumn) as IFilterColumnTarget;
             expect(filetColumnTarget.table).toBe("Organization");
             expect(filetColumnTarget.column).toBe("Organization Level 01");
         });
