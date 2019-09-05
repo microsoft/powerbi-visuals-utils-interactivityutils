@@ -97,6 +97,26 @@ export class BaseBehavior<SelectableDataPointType extends BaseDataPoint> impleme
         });
     }
 
+    protected bindContextMenuToClearCatcher() {
+        const {
+            clearCatcherSelection
+        } = this.options;
+
+        clearCatcherSelection.on("contextmenu", () => {
+            const event: MouseEvent = (getEvent() as MouseEvent) || window.event as MouseEvent;
+            if (event) {
+                this.selectionHandler.handleContextMenu(
+                    <any>{},
+                    {
+                        x: event.clientX,
+                        y: event.clientY
+                    });
+                event.preventDefault();
+                event.stopPropagation();
+            }
+        });
+    }
+
     public bindEvents(
         options: BaseBehaviorOptions<SelectableDataPointType>,
         selectionHandler: ISelectionHandler): void {
@@ -107,6 +127,7 @@ export class BaseBehavior<SelectableDataPointType extends BaseDataPoint> impleme
         this.bindClick();
         this.bindClearCatcher();
         this.bindContextMenu();
+        this.bindContextMenuToClearCatcher();
     }
 
     public renderSelection(hasSelection: boolean): void {
