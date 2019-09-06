@@ -101,12 +101,20 @@ export class BaseBehavior<SelectableDataPointType extends BaseDataPoint> impleme
         const {
             clearCatcherSelection
         } = this.options;
+        
+        const emptySelection = {
+            "measures": [],
+            "dataMap": {
+            }
+        }
 
         clearCatcherSelection.on("contextmenu", () => {
             const event: MouseEvent = (getEvent() as MouseEvent) || window.event as MouseEvent;
             if (event) {
                 this.selectionHandler.handleContextMenu(
-                    <any>{},
+                    <any>{
+                        identity: emptySelection
+                    },
                     {
                         x: event.clientX,
                         y: event.clientY
