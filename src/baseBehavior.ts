@@ -54,7 +54,7 @@ export class BaseBehavior<SelectableDataPointType extends BaseDataPoint> impleme
         } = this.options;
 
         elementsSelection.on("click", (datum) => {
-            const mouseEvent: MouseEvent = getEvent() as MouseEvent || window.event as MouseEvent;
+            const mouseEvent: MouseEvent = <MouseEvent>getEvent() || <MouseEvent>window.event;
             mouseEvent && this.selectionHandler.handleSelection(
                 datum,
                 mouseEvent.ctrlKey);
@@ -67,7 +67,7 @@ export class BaseBehavior<SelectableDataPointType extends BaseDataPoint> impleme
             clearCatcherSelection
         } = this.options;
         clearCatcherSelection.on("click", () => {
-            const mouseEvent: MouseEvent = getEvent() as MouseEvent || window.event as MouseEvent;
+            const mouseEvent: MouseEvent = <MouseEvent>getEvent() || <MouseEvent>window.event;
 
             if (mouseEvent && mouseEvent.ctrlKey) {
                 return;
@@ -83,7 +83,7 @@ export class BaseBehavior<SelectableDataPointType extends BaseDataPoint> impleme
         } = this.options;
 
         elementsSelection.on("contextmenu", (datum) => {
-            const event: MouseEvent = (getEvent() as MouseEvent) || window.event as MouseEvent;
+            const event: MouseEvent = <MouseEvent>getEvent() || <MouseEvent>window.event;
             if (event) {
                 this.selectionHandler.handleContextMenu(
                     datum,
@@ -109,11 +109,12 @@ export class BaseBehavior<SelectableDataPointType extends BaseDataPoint> impleme
         };
 
         clearCatcherSelection.on("contextmenu", () => {
-            const event: MouseEvent = (getEvent() as MouseEvent) || window.event as MouseEvent;
+            const event: MouseEvent = <MouseEvent>getEvent() || <MouseEvent>window.event;
             if (event) {
                 this.selectionHandler.handleContextMenu(
-                    <any>{
-                        identity: emptySelection
+                    <BaseDataPoint>{
+                        identity: emptySelection,
+                        selected: false
                     },
                     {
                         x: event.clientX,

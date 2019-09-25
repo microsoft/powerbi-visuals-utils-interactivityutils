@@ -72,22 +72,22 @@ export interface InteractivityServiceOptions {
  * Responsible for managing interactivity between the hosting visual and its peers
  */
 export interface IInteractivityService<SelectableDataPointType extends BaseDataPoint> {
-    /** Binds the visual to the interactivityService */
+    // Binds the visual to the interactivityService
     bind(options: IBehaviorOptions<SelectableDataPointType>): void;
 
-    /** Clears the selection */
+    // Clears the selection
     clearSelection(): void;
 
-    /** Sets the selected state on the given data points. */
+    // Sets the selected state on the given data points.
     applySelectionStateToData(dataPoints: SelectableDataPointType[], hasHighlights?: boolean): boolean;
 
-    /** Checks whether there is at least one item selected */
+    // Checks whether there is at least one item selected
     hasSelection(): boolean;
 
-    /** Checks whether there is at least one item selected within the legend */
+    // Checks whether there is at least one item selected within the legend
     legendHasSelection(): boolean;
 
-    /** Checks whether the selection mode is inverted or normal */
+    // Checks whether the selection mode is inverted or normal
     isSelectionModeInverted(): boolean;
 }
 
@@ -99,9 +99,9 @@ export interface ISelectionHandler {
      */
     handleSelection(dataPoints: BaseDataPoint | BaseDataPoint[], multiSelect: boolean): void;
 
-    /** Handles a selection clear, clearing all selection state */
+    //  Handles a selection clear, clearing all selection state
     handleClearSelection(): void;
-    /** Handles a context menu click (right button click on element) */
+    //  Handles a context menu click (right button click on element)
     handleContextMenu(dataPoint: BaseDataPoint, point: powerbi.extensibility.IPoint): void;
 }
 
@@ -130,7 +130,7 @@ export abstract class InteractivityBaseService
 
     // IInteractivityService Implementation
 
-    /** Binds the visual to the interactivityService */
+    //  Binds the visual to the interactivityService
     public bind(options: IBehaviorOptionsType): void {
         // Bind the data
         if (options.interactivityServiceOptions && options.interactivityServiceOptions.overrideSelectionFromData) {

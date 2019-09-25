@@ -29,7 +29,7 @@
     "postbuild": "npm run lessc",
     "test": "karma start",
     "pretest": "npm run lint",
-    "lint": "tslint -r \"node_modules/tslint-microsoft-contrib\"  \"+(src|test)/**/*.ts\"",
+    "lint": "tslint -c tslint.json -p tsconfig.json --fix",
     "lessc": "lessc src/styles/clearCatcher.less lib/index.css"
   },
   "devDependencies": {
