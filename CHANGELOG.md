@@ -1,3 +1,7 @@
+# 5.6.0 (webpack)
+* Add basic implementataion of `behaviour` for the visual as `BaseBehavior` class
+* Add `contextmenu` support by default for visuals.
+
 ## 5.5.3 (webpack)
 * libraries update
 
