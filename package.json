@@ -1,6 +1,6 @@
 {
   "name": "powerbi-visuals-utils-interactivityutils",
-  "version": "5.5.3",
+  "version": "5.6.0",
   "description": "InteractivityUtils",
   "main": "lib/index.js",
   "module": "lib/index.js",
