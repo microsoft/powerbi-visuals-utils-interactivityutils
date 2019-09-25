@@ -101,12 +101,12 @@ export class BaseBehavior<SelectableDataPointType extends BaseDataPoint> impleme
         const {
             clearCatcherSelection
         } = this.options;
-        
+
         const emptySelection = {
             "measures": [],
             "dataMap": {
             }
-        }
+        };
 
         clearCatcherSelection.on("contextmenu", () => {
             const event: MouseEvent = (getEvent() as MouseEvent) || window.event as MouseEvent;
