@@ -142,17 +142,13 @@ export class BaseBehavior<SelectableDataPointType extends BaseDataPoint> impleme
         if (hasSelection) {
             this.options.elementsSelection.style("opacity", (category: any) => {
                 if (category.selected) {
-                    return 0.5;
-                } else {
                     return 1;
+                } else {
+                    return 0.5;
                 }
             });
         } else {
-            this.options.elementsSelection.style(
-                "opacity", (category: any) => {
-                    return 1;
-                }
-            );
+            this.options.elementsSelection.style("opacity", 1);
         }
     }
 }
