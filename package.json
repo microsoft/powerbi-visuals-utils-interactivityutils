@@ -1,6 +1,6 @@
 {
   "name": "powerbi-visuals-utils-interactivityutils",
-  "version": "5.5.3",
+  "version": "5.6.0",
   "description": "InteractivityUtils",
   "main": "lib/index.js",
   "module": "lib/index.js",
@@ -29,7 +29,7 @@
     "postbuild": "npm run lessc",
     "test": "karma start",
     "pretest": "npm run lint",
-    "lint": "tslint -r \"node_modules/tslint-microsoft-contrib\"  \"+(src|test)/**/*.ts\"",
+    "lint": "tslint -c tslint.json -p tsconfig.json --fix",
     "lessc": "lessc src/styles/clearCatcher.less lib/index.css"
   },
   "devDependencies": {

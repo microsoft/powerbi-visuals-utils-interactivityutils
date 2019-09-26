@@ -64,8 +64,8 @@ export interface IFilterBehaviorOptions extends IBehaviorOptions<FilterDataPoint
 export function extractFilterColumnTarget(categoryColumn: powerbi.DataViewCategoryColumn | powerbi.DataViewMetadataColumn): IFilterColumnTarget {
     // take an expression from source or column metadata
     let expr: any = categoryColumn && (<any>categoryColumn).source && (<any>categoryColumn).source.expr
-        ? (<any>categoryColumn).source.expr as any
-        : (<any>categoryColumn).expr as any;
+        ? <any>(<any>categoryColumn).source.expr
+        : <any>(<any>categoryColumn).expr;
 
     // take table name from source.entity if column definition is simple
     let filterTargetTable: string = expr && expr.source && expr.source.entity
@@ -89,7 +89,7 @@ export function extractFilterColumnTarget(categoryColumn: powerbi.DataViewCatego
         if (expr.arg && expr.arg.kind === SQExprKind.Hierarchy && expr.arg && expr.arg.arg &&
             expr.arg.arg.kind === SQExprKind.PropertyVariationSource) {
             if ((<any>categoryColumn).identityExprs && (<any>categoryColumn).identityExprs.length) {
-                filterTargetTable = ((<any>categoryColumn).identityExprs[(<any>categoryColumn).identityExprs.length - 1] as any).source.entity;
+                filterTargetTable = (<any>(<any>categoryColumn).identityExprs[(<any>categoryColumn).identityExprs.length - 1]).source.entity;
             }
         } else {
             // otherwise take column name from expr
@@ -127,7 +127,7 @@ export class InteractivityFilterService
         if (jsonFilters && jsonFilters.length > 0) {
             jsonFilters.forEach((filter: IFilter) => {
                 if (filter.filterType === FilterType.Basic) {
-                    let basicFilter = filter as IBasicFilter;
+                    let basicFilter = <IBasicFilter>filter;
                     if (basicFilter.values && basicFilter.values.length > 0) {
                         basicFilter.values.forEach((value: powerbi.PrimitiveValue) => {
                             this.selectedCategories.push(value);
@@ -189,13 +189,13 @@ export class InteractivityFilterService
         if (this.selectableLabelsDataPoints) {
             for (let labelsDataPoint of this.selectableLabelsDataPoints) {
                 labelsDataPoint.selected = this.selectedCategories.some((value: powerbi.PrimitiveValue) => {
-                    return value === labelsDataPoint.category as powerbi.PrimitiveValue;
+                    return value === <powerbi.PrimitiveValue>labelsDataPoint.category;
                 });
             }
         }
     }
 
-    /** Marks a data point as selected and syncs selection with the host. */
+    // Marks a data point as selected and syncs selection with the host.
     protected select(dataPoints: FilterDataPoint | FilterDataPoint[], multiSelect: boolean): void {
         const filterDataPoints: FilterDataPoint[] = [].concat(dataPoints);
         const originalSelectedIds = [...this.selectedCategories];
@@ -220,7 +220,7 @@ export class InteractivityFilterService
 
         for (let dataPoint of dataPoints) {
             if (dataPoint.selected) {
-                selectedCategories.push(dataPoint.category as powerbi.PrimitiveValue);
+                selectedCategories.push(<powerbi.PrimitiveValue>dataPoint.category);
             }
         }
     }
@@ -229,7 +229,7 @@ export class InteractivityFilterService
         const filter: IBasicFilter = new BasicFilter(
             this.filterColumnTarget,
             "In",
-            this.selectedCategories as any[]
+            <any[]>this.selectedCategories
         ).toJSON();
 
         if (this.selectedCategories && this.selectedCategories.length) {
@@ -237,14 +237,14 @@ export class InteractivityFilterService
                 filter,
                 this.filterObjectProperty.objectName,
                 this.filterObjectProperty.propertyName,
-                FilterAction.merge as any
+                <any>FilterAction.merge
             );
         } else {
             this.hostServices.applyJsonFilter(
                 filter,
                 this.filterObjectProperty.objectName,
                 this.filterObjectProperty.propertyName,
-                FilterAction.remove as any
+                <any>FilterAction.remove
             );
         }
     }
@@ -263,7 +263,7 @@ export class InteractivityFilterService
         }
         else {
             for (let dataPoint of selectableDataPoints) {
-                if (selectedCategories.some((value: powerbi.PrimitiveValue) => value === dataPoint.category as powerbi.PrimitiveValue)) {
+                if (selectedCategories.some((value: powerbi.PrimitiveValue) => value === <powerbi.PrimitiveValue>dataPoint.category)) {
                     dataPoint.selected = true;
                 }
                 else if (dataPoint.selected) {
@@ -274,7 +274,7 @@ export class InteractivityFilterService
     }
 
     private selectSingleDataPoint(dataPoint: FilterDataPoint, shouldDataPointBeSelected: boolean): void {
-        if (!dataPoint || dataPoint.category == null || typeof dataPoint.category === "undefined") {
+        if (!dataPoint || dataPoint.category == null || dataPoint.category === undefined) {
             return;
         }
 
