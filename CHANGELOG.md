@@ -1,3 +1,8 @@
+# 5.7.0
+* Packages updates
+* Github actions
+* Jquery and jasmine-jquery removed
+
 # 5.6.0 (webpack)
 * Add basic implementataion of `behaviour` for the visual as `BaseBehavior` class
 * Add `contextmenu` support by default for visuals.
