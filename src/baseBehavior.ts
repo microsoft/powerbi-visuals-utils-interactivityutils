@@ -27,7 +27,6 @@ import {
     SelectableDataPoint
 } from "./interactivitySelectionService";
 
-
 import {
     IBehaviorOptions,
     ISelectionHandler,
@@ -37,11 +36,9 @@ import {
 
 import { Selection } from "d3-selection";
 
-import { getEvent } from "./interactivityUtils";
-
 export interface BaseBehaviorOptions<SelectableDataPointType extends BaseDataPoint> extends IBehaviorOptions<SelectableDataPointType> {
     elementsSelection: Selection<any, SelectableDataPoint, any, any>;
-    clearCatcherSelection: d3.Selection<any, any, any, any>;
+    clearCatcherSelection: Selection<any, any, any, any>;
 }
 
 export class BaseBehavior<SelectableDataPointType extends BaseDataPoint> implements IInteractiveBehavior {
@@ -53,8 +50,8 @@ export class BaseBehavior<SelectableDataPointType extends BaseDataPoint> impleme
             elementsSelection
         } = this.options;
 
-        elementsSelection.on("click", (datum) => {
-            const mouseEvent: MouseEvent = <MouseEvent>getEvent() || <MouseEvent>window.event;
+        elementsSelection.on("click", (event, datum) => {
+            const mouseEvent: MouseEvent = <MouseEvent>event || <MouseEvent>window.event;
             mouseEvent && this.selectionHandler.handleSelection(
                 datum,
                 mouseEvent.ctrlKey);
@@ -66,8 +63,8 @@ export class BaseBehavior<SelectableDataPointType extends BaseDataPoint> impleme
         const {
             clearCatcherSelection
         } = this.options;
-        clearCatcherSelection.on("click", () => {
-            const mouseEvent: MouseEvent = <MouseEvent>getEvent() || <MouseEvent>window.event;
+        clearCatcherSelection.on("click", (event) => {
+            const mouseEvent: MouseEvent = <MouseEvent>event || <MouseEvent>window.event;
 
             if (mouseEvent && mouseEvent.ctrlKey) {
                 return;
@@ -82,17 +79,17 @@ export class BaseBehavior<SelectableDataPointType extends BaseDataPoint> impleme
             elementsSelection
         } = this.options;
 
-        elementsSelection.on("contextmenu", (datum) => {
-            const event: MouseEvent = <MouseEvent>getEvent() || <MouseEvent>window.event;
-            if (event) {
+        elementsSelection.on("contextmenu", (event, datum) => {
+            const e: MouseEvent = <MouseEvent>event || <MouseEvent>window.event;
+            if (e) {
                 this.selectionHandler.handleContextMenu(
                     datum,
                     {
-                        x: event.clientX,
-                        y: event.clientY
+                        x: e.clientX,
+                        y: e.clientY
                     });
-                event.preventDefault();
-                event.stopPropagation();
+                e.preventDefault();
+                e.stopPropagation();
             }
         });
     }
@@ -108,20 +105,20 @@ export class BaseBehavior<SelectableDataPointType extends BaseDataPoint> impleme
             }
         };
 
-        clearCatcherSelection.on("contextmenu", () => {
-            const event: MouseEvent = <MouseEvent>getEvent() || <MouseEvent>window.event;
-            if (event) {
+        clearCatcherSelection.on("contextmenu", (event) => {
+            const e: MouseEvent = <MouseEvent>event || <MouseEvent>window.event;
+            if (e) {
                 this.selectionHandler.handleContextMenu(
                     <BaseDataPoint>{
                         identity: emptySelection,
                         selected: false
                     },
                     {
-                        x: event.clientX,
-                        y: event.clientY
+                        x: e.clientX,
+                        y: e.clientY
                     });
-                event.preventDefault();
-                event.stopPropagation();
+                e.preventDefault();
+                e.stopPropagation();
             }
         });
     }
