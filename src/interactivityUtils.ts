@@ -30,18 +30,15 @@ import { ISelectionHandler } from "./interactivityBaseService";
 import { SelectableDataPoint } from "./interactivitySelectionService";
 
 import IPoint = shapesInterfaces.IPoint;
-//!!!!Seems unused
 export function getPositionOfLastInputEvent(): IPoint {
     return {
         x: (<MouseEvent>event).clientX,
         y: (<MouseEvent>event).clientY
     };
 }
-//!!!!Seems unused
 export function registerStandardSelectionHandler(selection: Selection<any, any, any, any>, selectionHandler: ISelectionHandler): void {
     selection.on("click", (event, d: SelectableDataPoint) => handleSelection(d, selectionHandler, event));
 }
-//!!!!Seems unused
 export function registerGroupSelectionHandler(group: Selection<any, any, any, any>, selectionHandler: ISelectionHandler): void {
     group.on("click", (event) => {
         let target: EventTarget = (<MouseEvent>event).target,

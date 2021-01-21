@@ -67,7 +67,6 @@ export function createInteractivityService(hostServices: IVisualHost): IInteract
 /**
 * Creates a clear an svg rect to catch clear clicks.
 */
-//!!!!Seems unused
 export function appendClearCatcher(selection: Selection<any, any, any, any>): Selection<any, any, any, any> {
     return selection
         .append("rect")
