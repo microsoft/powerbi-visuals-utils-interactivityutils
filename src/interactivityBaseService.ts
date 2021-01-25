@@ -99,7 +99,7 @@ export interface ISelectionHandler {
      * identity is undefined, the selection state is cleared. In this case, if specificIdentity
      * exists, it will still be sent to the host.
      */
-    handleSelection(dataPoints: BaseDataPoint | BaseDataPoint[], multiSelect: boolean, event?): void;
+    handleSelection(dataPoints: BaseDataPoint | BaseDataPoint[], multiSelect: boolean): void;
 
     //  Handles a selection clear, clearing all selection state
     handleClearSelection(): void;

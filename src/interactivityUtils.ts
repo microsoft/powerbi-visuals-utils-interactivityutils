@@ -37,17 +37,13 @@ export function getPositionOfLastInputEvent(): IPoint {
     };
 }
 export function registerStandardSelectionHandler(selection: Selection<any, any, any, any>, selectionHandler: ISelectionHandler): void {
-    selection.on("click", (event, d: SelectableDataPoint) => handleSelection(d, selectionHandler, event));
+    selection.on("click", (event, d: SelectableDataPoint) => selectionHandler.handleSelection(d, event.ctrlKey));
 }
 export function registerGroupSelectionHandler(group: Selection<any, any, any, any>, selectionHandler: ISelectionHandler): void {
     group.on("click", (event) => {
         let target: EventTarget = (<MouseEvent>event).target,
             d: SelectableDataPoint = <SelectableDataPoint>select(<BaseType>target).datum();
 
-        handleSelection(d, selectionHandler, event);
+        selectionHandler.handleSelection(d, event.ctrlKey)
     });
-}
-
-function handleSelection(d: SelectableDataPoint, selectionHandler: ISelectionHandler, event?): void {
-    selectionHandler.handleSelection(d, (<MouseEvent>event).ctrlKey);
 }

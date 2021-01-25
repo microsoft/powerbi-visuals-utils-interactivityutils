@@ -34,7 +34,7 @@ import {
     BaseDataPoint
 } from "./interactivityBaseService";
 
-import { Selection } from "d3-selection";
+import { Selection, selectAll } from "d3-selection";
 
 export interface BaseBehaviorOptions<SelectableDataPointType extends BaseDataPoint> extends IBehaviorOptions<SelectableDataPointType> {
     elementsSelection: Selection<any, SelectableDataPoint, any, any>;
@@ -50,8 +50,10 @@ export class BaseBehavior<SelectableDataPointType extends BaseDataPoint> impleme
             elementsSelection
         } = this.options;
 
-        elementsSelection.on("click", (event, datum) => {
-            const mouseEvent: MouseEvent = <MouseEvent>event || <MouseEvent>window.event;
+        let internalSelection: Selection<any, SelectableDataPoint, any, any> = selectAll(elementsSelection.nodes());
+
+        internalSelection.on("click", (event, datum) => {
+            const mouseEvent: MouseEvent = <MouseEvent>event;
             mouseEvent && this.selectionHandler.handleSelection(
                 datum,
                 mouseEvent.ctrlKey);
@@ -63,8 +65,11 @@ export class BaseBehavior<SelectableDataPointType extends BaseDataPoint> impleme
         const {
             clearCatcherSelection
         } = this.options;
-        clearCatcherSelection.on("click", (event) => {
-            const mouseEvent: MouseEvent = <MouseEvent>event || <MouseEvent>window.event;
+
+        let internalSelection: Selection<any, SelectableDataPoint, any, any> = selectAll(clearCatcherSelection.nodes());
+        
+        internalSelection.on("click", (event) => {
+            const mouseEvent: MouseEvent = <MouseEvent>event;
 
             if (mouseEvent && mouseEvent.ctrlKey) {
                 return;
@@ -79,8 +84,10 @@ export class BaseBehavior<SelectableDataPointType extends BaseDataPoint> impleme
             elementsSelection
         } = this.options;
 
-        elementsSelection.on("contextmenu", (event, datum) => {
-            const e: MouseEvent = <MouseEvent>event || <MouseEvent>window.event;
+        let internalSelection: Selection<any, SelectableDataPoint, any, any> = selectAll(elementsSelection.nodes());
+
+        internalSelection.on("contextmenu", (event, datum) => {
+            const e: MouseEvent = <MouseEvent>event;
             if (e) {
                 this.selectionHandler.handleContextMenu(
                     datum,
@@ -105,8 +112,10 @@ export class BaseBehavior<SelectableDataPointType extends BaseDataPoint> impleme
             }
         };
 
-        clearCatcherSelection.on("contextmenu", (event) => {
-            const e: MouseEvent = <MouseEvent>event || <MouseEvent>window.event;
+        let internalSelection: Selection<any, SelectableDataPoint, any, any> = selectAll(clearCatcherSelection.nodes());
+        
+        internalSelection.on("contextmenu", (event) => {
+            const e: MouseEvent = <MouseEvent>event;
             if (e) {
                 this.selectionHandler.handleContextMenu(
                     <BaseDataPoint>{
