@@ -23,10 +23,7 @@
 *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 *  THE SOFTWARE.
 */
-import {
-    SelectableDataPoint
-} from "./interactivitySelectionService";
-
+import { SelectableDataPoint } from "./interactivitySelectionService";
 import {
     IBehaviorOptions,
     ISelectionHandler,
@@ -46,88 +43,63 @@ export class BaseBehavior<SelectableDataPointType extends BaseDataPoint> impleme
     protected selectionHandler: ISelectionHandler;
 
     protected bindClick() {
-        const {
-            elementsSelection
-        } = this.options;
-
+        const { elementsSelection } = this.options;
         let internalSelection: Selection<any, SelectableDataPoint, any, any> = selectAll(elementsSelection.nodes());
-
-        internalSelection.on("click", (event, datum) => {
-            const mouseEvent: MouseEvent = <MouseEvent>event;
-            mouseEvent && this.selectionHandler.handleSelection(
-                datum,
-                mouseEvent.ctrlKey);
+        internalSelection.on("click", (event: MouseEvent, datum) => {
+            event && this.selectionHandler.handleSelection(datum, event.ctrlKey);
         });
-
     }
 
     protected bindClearCatcher() {
-        const {
-            clearCatcherSelection
-        } = this.options;
-
+        const { clearCatcherSelection } = this.options;
         let internalSelection: Selection<any, SelectableDataPoint, any, any> = selectAll(clearCatcherSelection.nodes());
-        
-        internalSelection.on("click", (event) => {
-            const mouseEvent: MouseEvent = <MouseEvent>event;
-
-            if (mouseEvent && mouseEvent.ctrlKey) {
+        internalSelection.on("click", (event: MouseEvent) => {
+            if (event && event.ctrlKey) {
                 return;
             }
-
-            mouseEvent && mouseEvent.preventDefault();
+            event && event.preventDefault();
         });
     }
 
     protected bindContextMenu() {
-        const {
-            elementsSelection
-        } = this.options;
-
+        const { elementsSelection } = this.options;
         let internalSelection: Selection<any, SelectableDataPoint, any, any> = selectAll(elementsSelection.nodes());
-
-        internalSelection.on("contextmenu", (event, datum) => {
-            const e: MouseEvent = <MouseEvent>event;
-            if (e) {
+        internalSelection.on("contextmenu", (event: MouseEvent, datum) => {
+            if (event) {
                 this.selectionHandler.handleContextMenu(
                     datum,
                     {
-                        x: e.clientX,
-                        y: e.clientY
+                        x: event.clientX,
+                        y: event.clientY
                     });
-                e.preventDefault();
-                e.stopPropagation();
+                event.preventDefault();
+                event.stopPropagation();
             }
         });
     }
 
     protected bindContextMenuToClearCatcher() {
-        const {
-            clearCatcherSelection
-        } = this.options;
-
+        const { clearCatcherSelection } = this.options;
         const emptySelection = {
             "measures": [],
             "dataMap": {
             }
         };
-
         let internalSelection: Selection<any, SelectableDataPoint, any, any> = selectAll(clearCatcherSelection.nodes());
-        
-        internalSelection.on("contextmenu", (event) => {
-            const e: MouseEvent = <MouseEvent>event;
-            if (e) {
+        internalSelection.on("contextmenu", (event: MouseEvent) => {
+            if (event) {
                 this.selectionHandler.handleContextMenu(
                     <BaseDataPoint>{
                         identity: emptySelection,
                         selected: false
                     },
                     {
-                        x: e.clientX,
-                        y: e.clientY
-                    });
-                e.preventDefault();
-                e.stopPropagation();
+                        x: event.clientX,
+                        y: event.clientY
+                    }
+                );
+                event.preventDefault();
+                event.stopPropagation();
             }
         });
     }
