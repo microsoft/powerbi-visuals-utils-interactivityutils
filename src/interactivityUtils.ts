@@ -25,7 +25,7 @@
 */
 
 import { shapesInterfaces } from "powerbi-visuals-utils-svgutils";
-import { select, Selection, BaseType } from "d3-selection";
+import { select, Selection, BaseType, selectAll } from "d3-selection";
 import { ISelectionHandler } from "./interactivityBaseService";
 import { SelectableDataPoint } from "./interactivitySelectionService";
 
@@ -37,13 +37,16 @@ export function getPositionOfLastInputEvent(): IPoint {
     };
 }
 export function registerStandardSelectionHandler(selection: Selection<any, any, any, any>, selectionHandler: ISelectionHandler): void {
-    selection.on("click", (event, d: SelectableDataPoint) => selectionHandler.handleSelection(d, event.ctrlKey));
+    let internalSelection: Selection<any, SelectableDataPoint, any, any> = selectAll(selection.nodes());
+    internalSelection.on("click", (event, d: SelectableDataPoint) => {
+        selectionHandler.handleSelection(d, event.ctrlKey)
+    });
 }
 export function registerGroupSelectionHandler(group: Selection<any, any, any, any>, selectionHandler: ISelectionHandler): void {
-    group.on("click", (event) => {
-        let target: EventTarget = (<MouseEvent>event).target,
-            d: SelectableDataPoint = <SelectableDataPoint>select(<BaseType>target).datum();
-
+    let internalSelection: Selection<any, SelectableDataPoint, any, any> = selectAll(group.nodes());
+    internalSelection.on("click", (event) => {
+        let target: EventTarget = (<MouseEvent>event).target;
+        let d: SelectableDataPoint = <SelectableDataPoint>select(<BaseType>target).datum();
         selectionHandler.handleSelection(d, event.ctrlKey)
     });
 }
