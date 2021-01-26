@@ -46,7 +46,7 @@ export class BaseBehavior<SelectableDataPointType extends BaseDataPoint> impleme
         const { elementsSelection } = this.options;
         let internalSelection: Selection<any, SelectableDataPoint, any, any> = selectAll(elementsSelection.nodes());
         internalSelection.on("click", (event: MouseEvent, datum) => {
-            event && this.selectionHandler.handleSelection(datum, event.ctrlKey);
+            this.selectionHandler.handleSelection(datum, event.ctrlKey);
         });
     }
 
@@ -54,10 +54,10 @@ export class BaseBehavior<SelectableDataPointType extends BaseDataPoint> impleme
         const { clearCatcherSelection } = this.options;
         let internalSelection: Selection<any, SelectableDataPoint, any, any> = selectAll(clearCatcherSelection.nodes());
         internalSelection.on("click", (event: MouseEvent) => {
-            if (event && event.ctrlKey) {
+            if (event.ctrlKey) {
                 return;
             }
-            event && event.preventDefault();
+            event.preventDefault();
         });
     }
 
@@ -65,16 +65,14 @@ export class BaseBehavior<SelectableDataPointType extends BaseDataPoint> impleme
         const { elementsSelection } = this.options;
         let internalSelection: Selection<any, SelectableDataPoint, any, any> = selectAll(elementsSelection.nodes());
         internalSelection.on("contextmenu", (event: MouseEvent, datum) => {
-            if (event) {
-                this.selectionHandler.handleContextMenu(
-                    datum,
-                    {
-                        x: event.clientX,
-                        y: event.clientY
-                    });
-                event.preventDefault();
-                event.stopPropagation();
-            }
+            this.selectionHandler.handleContextMenu(
+                datum,
+                {
+                    x: event.clientX,
+                    y: event.clientY
+                });
+            event.preventDefault();
+            event.stopPropagation();
         });
     }
 
@@ -87,20 +85,18 @@ export class BaseBehavior<SelectableDataPointType extends BaseDataPoint> impleme
         };
         let internalSelection: Selection<any, SelectableDataPoint, any, any> = selectAll(clearCatcherSelection.nodes());
         internalSelection.on("contextmenu", (event: MouseEvent) => {
-            if (event) {
-                this.selectionHandler.handleContextMenu(
-                    <BaseDataPoint>{
-                        identity: emptySelection,
-                        selected: false
-                    },
-                    {
-                        x: event.clientX,
-                        y: event.clientY
-                    }
-                );
-                event.preventDefault();
-                event.stopPropagation();
-            }
+            this.selectionHandler.handleContextMenu(
+                <BaseDataPoint>{
+                    identity: emptySelection,
+                    selected: false
+                },
+                {
+                    x: event.clientX,
+                    y: event.clientY
+                }
+            );
+            event.preventDefault();
+            event.stopPropagation();
         });
     }
 

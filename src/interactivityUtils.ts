@@ -25,7 +25,7 @@
 */
 
 import { shapesInterfaces } from "powerbi-visuals-utils-svgutils";
-import { Selection, selectAll } from "d3-selection";
+import { select, Selection, BaseType, selectAll } from "d3-selection";
 import { ISelectionHandler } from "./interactivityBaseService";
 import { SelectableDataPoint } from "./interactivitySelectionService";
 
@@ -44,7 +44,9 @@ export function registerStandardSelectionHandler(selection: Selection<any, any, 
 }
 export function registerGroupSelectionHandler(group: Selection<any, any, any, any>, selectionHandler: ISelectionHandler): void {
     let internalSelection: Selection<any, SelectableDataPoint, any, any> = selectAll(group.nodes());
-    internalSelection.on("click", (event, d: SelectableDataPoint) => {
+    internalSelection.on("click", (event) => {
+        let target: EventTarget = (<MouseEvent>event).target;
+        let d: SelectableDataPoint = <SelectableDataPoint>select(<BaseType>target).datum();
         selectionHandler.handleSelection(d, event.ctrlKey)
     });
 }
