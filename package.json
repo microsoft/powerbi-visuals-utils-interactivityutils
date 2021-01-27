@@ -33,7 +33,7 @@
     "lessc": "lessc src/styles/clearCatcher.less lib/index.css"
   },
   "devDependencies": {
-    "@types/d3": "6.2.0",
+    "@types/d3": "^6.3.0",
     "@types/jasmine": "3.6.3",
     "@types/jasmine-jquery": "1.5.33",
     "@types/jquery": "3.5.5",
@@ -44,7 +44,7 @@
     "jasmine": "3.6.4",
     "jasmine-jquery": "2.1.1",
     "jquery": "^3.5.1",
-    "karma": "^5.1.0",
+    "karma": "^5.2.3",
     "karma-chrome-launcher": "3.1.0",
     "karma-coverage": "2.0.3",
     "karma-coverage-istanbul-reporter": "3.0.3",
