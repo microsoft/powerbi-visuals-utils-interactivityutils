@@ -25,36 +25,28 @@
 */
 
 import { shapesInterfaces } from "powerbi-visuals-utils-svgutils";
-import {
-    select
-} from "d3-selection";
+import { select, Selection, BaseType, selectAll } from "d3-selection";
 import { ISelectionHandler } from "./interactivityBaseService";
 import { SelectableDataPoint } from "./interactivitySelectionService";
 
 import IPoint = shapesInterfaces.IPoint;
-
-export const getEvent = () => require("d3-selection").event;
-
 export function getPositionOfLastInputEvent(): IPoint {
     return {
         x: (<MouseEvent>event).clientX,
         y: (<MouseEvent>event).clientY
     };
 }
-
-export function registerStandardSelectionHandler(selection: d3.Selection<any, any, any, any>, selectionHandler: ISelectionHandler): void {
-    selection.on("click", (d: SelectableDataPoint) => handleSelection(d, selectionHandler));
-}
-
-export function registerGroupSelectionHandler(group: d3.Selection<any, any, any, any>, selectionHandler: ISelectionHandler): void {
-    group.on("click", () => {
-        let target: EventTarget = (<MouseEvent>getEvent()).target,
-            d: SelectableDataPoint = <SelectableDataPoint>select(<d3.BaseType>target).datum();
-
-        handleSelection(d, selectionHandler);
+export function registerStandardSelectionHandler(selection: Selection<any, any, any, any>, selectionHandler: ISelectionHandler): void {
+    let internalSelection: Selection<any, SelectableDataPoint, any, any> = selectAll(selection.nodes());
+    internalSelection.on("click", (event, d: SelectableDataPoint) => {
+        selectionHandler.handleSelection(d, event.ctrlKey);
     });
 }
-
-function handleSelection(d: SelectableDataPoint, selectionHandler: ISelectionHandler): void {
-    selectionHandler.handleSelection(d, (<MouseEvent>getEvent()).ctrlKey);
+export function registerGroupSelectionHandler(group: Selection<any, any, any, any>, selectionHandler: ISelectionHandler): void {
+    let internalSelection: Selection<any, SelectableDataPoint, any, any> = selectAll(group.nodes());
+    internalSelection.on("click", (event) => {
+        let target: EventTarget = (<MouseEvent>event).target;
+        let d: SelectableDataPoint = <SelectableDataPoint>select(<BaseType>target).datum();
+        selectionHandler.handleSelection(d, event.ctrlKey);
+    });
 }

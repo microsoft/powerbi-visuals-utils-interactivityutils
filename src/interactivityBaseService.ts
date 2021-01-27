@@ -25,6 +25,8 @@
 */
 import powerbi from "powerbi-visuals-api";
 
+import { Selection } from "d3-selection";
+
 export interface BaseDataPoint {
     selected: boolean;
 }
@@ -37,7 +39,7 @@ export enum FilterAction {
 /**
 * Creates a clear an svg rect to catch clear clicks.
 */
-export function appendClearCatcher(selection: d3.Selection<any, any, any, any>): d3.Selection<any, any, any, any> {
+export function appendClearCatcher(selection: Selection<any, any, any, any>): Selection<any, any, any, any> {
     return selection
         .append("rect")
         .classed("clearCatcher", true)

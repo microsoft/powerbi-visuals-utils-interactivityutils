@@ -1,3 +1,7 @@
+## 5.7.1
+* Packages update
+* Vulnerabilities fixes
+
 # 5.7.0
 * Packages updates
 * Github actions

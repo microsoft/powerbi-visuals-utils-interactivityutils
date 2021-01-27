@@ -23,11 +23,7 @@
 *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 *  THE SOFTWARE.
 */
-import {
-    SelectableDataPoint
-} from "./interactivitySelectionService";
-
-
+import { SelectableDataPoint } from "./interactivitySelectionService";
 import {
     IBehaviorOptions,
     ISelectionHandler,
@@ -35,13 +31,11 @@ import {
     BaseDataPoint
 } from "./interactivityBaseService";
 
-import { Selection } from "d3-selection";
-
-import { getEvent } from "./interactivityUtils";
+import { Selection, selectAll } from "d3-selection";
 
 export interface BaseBehaviorOptions<SelectableDataPointType extends BaseDataPoint> extends IBehaviorOptions<SelectableDataPointType> {
     elementsSelection: Selection<any, SelectableDataPoint, any, any>;
-    clearCatcherSelection: d3.Selection<any, any, any, any>;
+    clearCatcherSelection: Selection<any, any, any, any>;
 }
 
 export class BaseBehavior<SelectableDataPointType extends BaseDataPoint> implements IInteractiveBehavior {
@@ -49,80 +43,60 @@ export class BaseBehavior<SelectableDataPointType extends BaseDataPoint> impleme
     protected selectionHandler: ISelectionHandler;
 
     protected bindClick() {
-        const {
-            elementsSelection
-        } = this.options;
-
-        elementsSelection.on("click", (datum) => {
-            const mouseEvent: MouseEvent = <MouseEvent>getEvent() || <MouseEvent>window.event;
-            mouseEvent && this.selectionHandler.handleSelection(
-                datum,
-                mouseEvent.ctrlKey);
+        const { elementsSelection } = this.options;
+        let internalSelection: Selection<any, SelectableDataPoint, any, any> = selectAll(elementsSelection.nodes());
+        internalSelection.on("click", (event: MouseEvent, datum) => {
+            this.selectionHandler.handleSelection(datum, event.ctrlKey);
         });
-
     }
 
     protected bindClearCatcher() {
-        const {
-            clearCatcherSelection
-        } = this.options;
-        clearCatcherSelection.on("click", () => {
-            const mouseEvent: MouseEvent = <MouseEvent>getEvent() || <MouseEvent>window.event;
-
-            if (mouseEvent && mouseEvent.ctrlKey) {
+        const { clearCatcherSelection } = this.options;
+        let internalSelection: Selection<any, SelectableDataPoint, any, any> = selectAll(clearCatcherSelection.nodes());
+        internalSelection.on("click", (event: MouseEvent) => {
+            if (event.ctrlKey) {
                 return;
             }
-
-            mouseEvent && mouseEvent.preventDefault();
+            event.preventDefault();
         });
     }
 
     protected bindContextMenu() {
-        const {
-            elementsSelection
-        } = this.options;
-
-        elementsSelection.on("contextmenu", (datum) => {
-            const event: MouseEvent = <MouseEvent>getEvent() || <MouseEvent>window.event;
-            if (event) {
-                this.selectionHandler.handleContextMenu(
-                    datum,
-                    {
-                        x: event.clientX,
-                        y: event.clientY
-                    });
-                event.preventDefault();
-                event.stopPropagation();
-            }
+        const { elementsSelection } = this.options;
+        let internalSelection: Selection<any, SelectableDataPoint, any, any> = selectAll(elementsSelection.nodes());
+        internalSelection.on("contextmenu", (event: MouseEvent, datum) => {
+            this.selectionHandler.handleContextMenu(
+                datum,
+                {
+                    x: event.clientX,
+                    y: event.clientY
+                });
+            event.preventDefault();
+            event.stopPropagation();
         });
     }
 
     protected bindContextMenuToClearCatcher() {
-        const {
-            clearCatcherSelection
-        } = this.options;
-
+        const { clearCatcherSelection } = this.options;
         const emptySelection = {
             "measures": [],
             "dataMap": {
             }
         };
-
-        clearCatcherSelection.on("contextmenu", () => {
-            const event: MouseEvent = <MouseEvent>getEvent() || <MouseEvent>window.event;
-            if (event) {
-                this.selectionHandler.handleContextMenu(
-                    <BaseDataPoint>{
-                        identity: emptySelection,
-                        selected: false
-                    },
-                    {
-                        x: event.clientX,
-                        y: event.clientY
-                    });
-                event.preventDefault();
-                event.stopPropagation();
-            }
+        let internalSelection: Selection<any, SelectableDataPoint, any, any> = selectAll(clearCatcherSelection.nodes());
+        internalSelection.on("contextmenu", (event: MouseEvent) => {
+            this.selectionHandler.handleContextMenu(
+                <BaseDataPoint>{
+                    identity: emptySelection,
+                    selected: false
+                },
+                {
+                    x: event.clientX,
+                    y: event.clientY
+                }
+            );
+            event.preventDefault();
+            event.stopPropagation();
         });
     }
 

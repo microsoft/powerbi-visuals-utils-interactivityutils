@@ -23,6 +23,8 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
+import { Selection } from "d3-selection";
+
 import { shapesInterfaces } from "powerbi-visuals-utils-svgutils";
 import { arrayExtensions } from "powerbi-visuals-utils-typeutils";
 
@@ -65,7 +67,7 @@ export function createInteractivityService(hostServices: IVisualHost): IInteract
 /**
 * Creates a clear an svg rect to catch clear clicks.
 */
-export function appendClearCatcher(selection: d3.Selection<any, any, any, any>): d3.Selection<any, any, any, any> {
+export function appendClearCatcher(selection: Selection<any, any, any, any>): Selection<any, any, any, any> {
     return selection
         .append("rect")
         .classed("clearCatcher", true)
