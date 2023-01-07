@@ -39,9 +39,6 @@ import Selector = powerbi.data.Selector;
 // powerbi.visuals
 import ISelectionId = powerbi.visuals.ISelectionId;
 
-// powerbi.extensibility.utils.type
-import ArrayExtensions = arrayExtensions.ArrayExtensions;
-
 // powerbi.extensibility.utils.svg
 import BoundingRect = shapesInterfaces.BoundingRect;
 
@@ -190,9 +187,11 @@ export class InteractivityService implements IInteractivityService, ISelectionHa
     private selectionManager: ISelectionManager;
 
     // References
+    /* eslint-disable @typescript-eslint/no-empty-function */
     private renderSelectionInVisual = () => { };
     private renderSelectionInLegend = () => { };
     private renderSelectionInLabels = () => { };
+    /* eslint-enable @typescript-eslint/no-empty-function */
 
     // Selection state
     private selectedIds: ISelectionId[] = [];
@@ -247,7 +246,7 @@ export class InteractivityService implements IInteractivityService, ISelectionHa
     }
 
     private clearSelectedIds(): void {
-        ArrayExtensions.clear(this.selectedIds);
+        arrayExtensions.clear(this.selectedIds);
     }
 
     /**
@@ -261,13 +260,13 @@ export class InteractivityService implements IInteractivityService, ISelectionHa
 
     public applySelectionStateToData(dataPoints: SelectableDataPoint[], hasHighlights?: boolean): boolean {
         if (hasHighlights && this.hasSelection()) {
-            let selectionIds: ISelectionId[] = (this.selectionManager.getSelectionIds() || []) as ISelectionId[];
+            const selectionIds: ISelectionId[] = (this.selectionManager.getSelectionIds() || []) as ISelectionId[];
 
-            ArrayExtensions.clear(this.selectedIds);
-            ArrayExtensions.clear(selectionIds);
+            arrayExtensions.clear(this.selectedIds);
+            arrayExtensions.clear(selectionIds);
         }
 
-        for (let dataPoint of dataPoints) {
+        for (const dataPoint of dataPoints) {
             dataPoint.selected = checkDatapointAgainstSelectedIds(dataPoint, this.selectedIds);
         }
 
@@ -359,7 +358,7 @@ export class InteractivityService implements IInteractivityService, ISelectionHa
         }
 
         if (this.selectableLabelsDataPoints) {
-            for (let labelsDataPoint of this.selectableLabelsDataPoints) {
+            for (const labelsDataPoint of this.selectableLabelsDataPoints) {
                 labelsDataPoint.selected = this.selectedIds.some((value: ISelectionId) => {
                     return value.includes(labelsDataPoint.identity as ISelectionId);
                 });
@@ -368,18 +367,18 @@ export class InteractivityService implements IInteractivityService, ISelectionHa
     }
 
     private syncSelectionStateInverted(): void {
-        let selectedIds = this.selectedIds;
-        let selectableDataPoints = this.selectableDataPoints;
+        const selectedIds = this.selectedIds;
+        const selectableDataPoints = this.selectableDataPoints;
         if (!selectableDataPoints)
             return;
 
         if (selectedIds.length === 0) {
-            for (let dataPoint of selectableDataPoints) {
+            for (const dataPoint of selectableDataPoints) {
                 dataPoint.selected = false;
             }
         }
         else {
-            for (let dataPoint of selectableDataPoints) {
+            for (const dataPoint of selectableDataPoints) {
                 if (selectedIds.some((value: ISelectionId) => value.includes(dataPoint.identity as ISelectionId))) {
                     dataPoint.selected = true;
                 }
@@ -399,7 +398,7 @@ export class InteractivityService implements IInteractivityService, ISelectionHa
 
     /** Marks a data point as selected and syncs selection with the host. */
     private select(dataPoints: SelectableDataPoint | SelectableDataPoint[], multiSelect: boolean): void {
-        const selectableDataPoints: SelectableDataPoint[] = [].concat(dataPoints);
+        const selectableDataPoints: SelectableDataPoint[] = [].concat(<any>dataPoints);
 
         const originalSelectedIds = [...this.selectedIds];
 
@@ -440,9 +439,9 @@ export class InteractivityService implements IInteractivityService, ISelectionHa
     }
 
     private removeId(toRemove: ISelectionId): void {
-        let selectedIds = this.selectedIds;
+        const selectedIds = this.selectedIds;
         for (let i = selectedIds.length - 1; i > -1; i--) {
-            let currentId = selectedIds[i];
+            const currentId = selectedIds[i];
 
             if (toRemove.includes(currentId))
                 selectedIds.splice(i, 1);
@@ -462,12 +461,12 @@ export class InteractivityService implements IInteractivityService, ISelectionHa
     }
 
     private takeSelectionStateFromDataPoints(dataPoints: SelectableDataPoint[]): void {
-        let selectedIds: ISelectionId[] = this.selectedIds;
+        const selectedIds: ISelectionId[] = this.selectedIds;
 
         // Replace the existing selectedIds rather than merging.
-        ArrayExtensions.clear(selectedIds);
+        arrayExtensions.clear(selectedIds);
 
-        for (let dataPoint of dataPoints) {
+        for (const dataPoint of dataPoints) {
             if (dataPoint.selected) {
                 selectedIds.push(dataPoint.identity as ISelectionId);
             }
@@ -475,23 +474,23 @@ export class InteractivityService implements IInteractivityService, ISelectionHa
     }
 
     private applyToAllSelectableDataPoints(action: (selectableDataPoint: SelectableDataPoint) => void) {
-        let selectableDataPoints = this.selectableDataPoints;
-        let selectableLegendDataPoints = this.selectableLegendDataPoints;
-        let selectableLabelsDataPoints = this.selectableLabelsDataPoints;
+        const selectableDataPoints = this.selectableDataPoints;
+        const selectableLegendDataPoints = this.selectableLegendDataPoints;
+        const selectableLabelsDataPoints = this.selectableLabelsDataPoints;
         if (selectableDataPoints) {
-            for (let dataPoint of selectableDataPoints) {
+            for (const dataPoint of selectableDataPoints) {
                 action(dataPoint);
             }
         }
 
         if (selectableLegendDataPoints) {
-            for (let dataPoint of selectableLegendDataPoints) {
+            for (const dataPoint of selectableLegendDataPoints) {
                 action(dataPoint);
             }
         }
 
         if (selectableLabelsDataPoints) {
-            for (let dataPoint of selectableLabelsDataPoints) {
+            for (const dataPoint of selectableLabelsDataPoints) {
                 action(dataPoint);
             }
         }
@@ -500,7 +499,7 @@ export class InteractivityService implements IInteractivityService, ISelectionHa
     private static updateSelectableDataPointsBySelectedIds(selectableDataPoints: SelectableDataPoint[], selectedIds: ISelectionId[]): boolean {
         let foundMatchingId = false;
 
-        for (let dataPoint of selectableDataPoints) {
+        for (const dataPoint of selectableDataPoints) {
             dataPoint.selected = checkDatapointAgainstSelectedIds(dataPoint, selectedIds);
 
             if (dataPoint.selected)
