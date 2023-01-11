@@ -29,7 +29,6 @@ import IVisualHost = powerbi.extensibility.visual.IVisualHost;
 import ISelectionManager = powerbi.extensibility.ISelectionManager;
 // powerbi.extensibility.utils.type
 import { arrayExtensions } from "powerbi-visuals-utils-typeutils";
-import ArrayExtensions = arrayExtensions.ArrayExtensions;
 
 // powerbi.visuals
 import ISelectionId = powerbi.visuals.ISelectionId;
@@ -86,7 +85,7 @@ export class InteractivitySelectionService extends InteractivityBaseService<Sele
         }
 
         const selectedIds: ISelectionId[] = <ISelectionId[]>this.selectionManager.getSelectionIds();
-        for (let dataPoint of dataPoints) {
+        for (const dataPoint of dataPoints) {
             dataPoint.selected = this.isDataPointSelected(dataPoint, selectedIds);
         }
 
@@ -144,7 +143,7 @@ export class InteractivitySelectionService extends InteractivityBaseService<Sele
 
         if (this.selectableLabelsDataPoints) {
             // update datapoints for label datapoints
-            for (let labelsDataPoint of this.selectableLabelsDataPoints) {
+            for (const labelsDataPoint of this.selectableLabelsDataPoints) {
                 labelsDataPoint.selected = selectedIds.some((value: ISelectionId) => {
                     return value.includes(<ISelectionId>labelsDataPoint.identity);
                 });
@@ -193,9 +192,9 @@ export class InteractivitySelectionService extends InteractivityBaseService<Sele
         const selectedIds: ISelectionId[] = <ISelectionId[]>this.selectionManager.getSelectionIds();
 
         // Replace the existing selectedIds rather than merging.
-        ArrayExtensions.clear(selectedIds);
+        arrayExtensions.clear(selectedIds);
 
-        for (let dataPoint of dataPoints) {
+        for (const dataPoint of dataPoints) {
             if (dataPoint.selected) {
                 selectedIds.push(<ISelectionId>dataPoint.identity);
             }
@@ -208,19 +207,19 @@ export class InteractivitySelectionService extends InteractivityBaseService<Sele
     }
 
     private syncSelectionStateInverted(): void {
-        let selectedIds = this.selectionManager.getSelectionIds();
-        let selectableDataPoints = this.selectableDataPoints;
+        const selectedIds = this.selectionManager.getSelectionIds();
+        const selectableDataPoints = this.selectableDataPoints;
         if (!selectableDataPoints) {
             return;
         }
 
         if (selectedIds.length === 0) {
-            for (let dataPoint of selectableDataPoints) {
+            for (const dataPoint of selectableDataPoints) {
                 dataPoint.selected = false;
             }
         }
         else {
-            for (let dataPoint of selectableDataPoints) {
+            for (const dataPoint of selectableDataPoints) {
                 if (selectedIds.some((value: ISelectionId) => value.includes(<ISelectionId>dataPoint.identity))) {
                     dataPoint.selected = true;
                 }
@@ -234,7 +233,7 @@ export class InteractivitySelectionService extends InteractivityBaseService<Sele
     private updateSelectableDataPointsBySelectedIds(selectableDataPoints: SelectableDataPoint[], selectedIds: ISelectionId[]): boolean {
         let foundMatchingId = false;
 
-        for (let dataPoint of selectableDataPoints) {
+        for (const dataPoint of selectableDataPoints) {
             dataPoint.selected = this.isDataPointSelected(dataPoint, selectedIds);
 
             if (dataPoint.selected)

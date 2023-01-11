@@ -37,16 +37,16 @@ export function getPositionOfLastInputEvent(): IPoint {
     };
 }
 export function registerStandardSelectionHandler(selection: Selection<any, any, any, any>, selectionHandler: ISelectionHandler): void {
-    let internalSelection: Selection<any, SelectableDataPoint, any, any> = selectAll(selection.nodes());
+    const internalSelection: Selection<any, SelectableDataPoint, any, any> = selectAll(selection.nodes());
     internalSelection.on("click", (event, d: SelectableDataPoint) => {
         selectionHandler.handleSelection(d, event.ctrlKey);
     });
 }
 export function registerGroupSelectionHandler(group: Selection<any, any, any, any>, selectionHandler: ISelectionHandler): void {
-    let internalSelection: Selection<any, SelectableDataPoint, any, any> = selectAll(group.nodes());
+    const internalSelection: Selection<any, SelectableDataPoint, any, any> = selectAll(group.nodes());
     internalSelection.on("click", (event) => {
-        let target: EventTarget = (<MouseEvent>event).target;
-        let d: SelectableDataPoint = <SelectableDataPoint>select(<BaseType>target).datum();
+        const target: EventTarget = (<MouseEvent>event).target;
+        const d: SelectableDataPoint = <SelectableDataPoint>select(<BaseType>target).datum();
         selectionHandler.handleSelection(d, event.ctrlKey);
     });
 }

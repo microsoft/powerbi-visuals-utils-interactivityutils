@@ -36,7 +36,6 @@ import {
 import IVisualHost = powerbi.extensibility.visual.IVisualHost;
 // powerbi.extensibility.utils.type
 import { arrayExtensions } from "powerbi-visuals-utils-typeutils";
-import ArrayExtensions = arrayExtensions.ArrayExtensions;
 
 import {
     IBehaviorOptions,
@@ -63,7 +62,7 @@ export interface IFilterBehaviorOptions extends IBehaviorOptions<FilterDataPoint
 
 export function extractFilterColumnTarget(categoryColumn: powerbi.DataViewCategoryColumn | powerbi.DataViewMetadataColumn): IFilterColumnTarget {
     // take an expression from source or column metadata
-    let expr: any = categoryColumn && (<any>categoryColumn).source && (<any>categoryColumn).source.expr
+    const expr: any = categoryColumn && (<any>categoryColumn).source && (<any>categoryColumn).source.expr
         ? <any>(<any>categoryColumn).source.expr
         : <any>(<any>categoryColumn).expr;
 
@@ -123,11 +122,11 @@ export class InteractivityFilterService
         this.filterColumnTarget = extractFilterColumnTarget(options.category);
 
         const jsonFilters = options.jsonFilters;
-        ArrayExtensions.clear(this.selectedCategories);
+        arrayExtensions.clear(this.selectedCategories);
         if (jsonFilters && jsonFilters.length > 0) {
             jsonFilters.forEach((filter: IFilter) => {
                 if (filter.filterType === FilterType.Basic) {
-                    let basicFilter = <IBasicFilter>filter;
+                    const basicFilter = <IBasicFilter>filter;
                     if (basicFilter.values && basicFilter.values.length > 0) {
                         basicFilter.values.forEach((value: powerbi.PrimitiveValue) => {
                             this.selectedCategories.push(value);
@@ -142,10 +141,10 @@ export class InteractivityFilterService
 
     public applySelectionStateToData(dataPoints: FilterDataPoint[], hasHighlights?: boolean): boolean {
         if (hasHighlights && this.hasSelection()) {
-            ArrayExtensions.clear(this.selectedCategories);
+            arrayExtensions.clear(this.selectedCategories);
         }
 
-        for (let dataPoint of dataPoints) {
+        for (const dataPoint of dataPoints) {
             dataPoint.selected = this.isDataPointSelected(dataPoint, this.selectedCategories);
         }
 
@@ -187,7 +186,7 @@ export class InteractivityFilterService
         }
 
         if (this.selectableLabelsDataPoints) {
-            for (let labelsDataPoint of this.selectableLabelsDataPoints) {
+            for (const labelsDataPoint of this.selectableLabelsDataPoints) {
                 labelsDataPoint.selected = this.selectedCategories.some((value: powerbi.PrimitiveValue) => {
                     return value === <powerbi.PrimitiveValue>labelsDataPoint.category;
                 });
@@ -201,7 +200,7 @@ export class InteractivityFilterService
         const originalSelectedIds = [...this.selectedCategories];
 
         if (!multiSelect || !filterDataPoints.length) {
-            ArrayExtensions.clear(this.selectedCategories);
+            arrayExtensions.clear(this.selectedCategories);
         }
 
         filterDataPoints.forEach((dataPoint: FilterDataPoint) => {
@@ -213,12 +212,12 @@ export class InteractivityFilterService
     }
 
     protected takeSelectionStateFromDataPoints(dataPoints: FilterDataPoint[]): void {
-        let selectedCategories: powerbi.PrimitiveValue[] = this.selectedCategories;
+        const selectedCategories: powerbi.PrimitiveValue[] = this.selectedCategories;
 
         // Replace the existing selecteCategories rather than merging.
-        ArrayExtensions.clear(selectedCategories);
+        arrayExtensions.clear(selectedCategories);
 
-        for (let dataPoint of dataPoints) {
+        for (const dataPoint of dataPoints) {
             if (dataPoint.selected) {
                 selectedCategories.push(<powerbi.PrimitiveValue>dataPoint.category);
             }
@@ -250,19 +249,19 @@ export class InteractivityFilterService
     }
 
     private syncSelectionStateInverted(): void {
-        let selectedCategories = this.selectedCategories;
-        let selectableDataPoints = this.selectableDataPoints;
+        const selectedCategories = this.selectedCategories;
+        const selectableDataPoints = this.selectableDataPoints;
         if (!selectableDataPoints) {
             return;
         }
 
         if (selectedCategories.length === 0) {
-            for (let dataPoint of selectableDataPoints) {
+            for (const dataPoint of selectableDataPoints) {
                 dataPoint.selected = false;
             }
         }
         else {
-            for (let dataPoint of selectableDataPoints) {
+            for (const dataPoint of selectableDataPoints) {
                 if (selectedCategories.some((value: powerbi.PrimitiveValue) => value === <powerbi.PrimitiveValue>dataPoint.category)) {
                     dataPoint.selected = true;
                 }
@@ -291,9 +290,9 @@ export class InteractivityFilterService
     }
 
     private removeCategory(removingCategory: powerbi.PrimitiveValue): void {
-        let selectedCategories = this.selectedCategories;
+        const selectedCategories = this.selectedCategories;
         for (let i = selectedCategories.length - 1; i > -1; i--) {
-            let currentCategory = selectedCategories[i];
+            const currentCategory = selectedCategories[i];
 
             if (removingCategory === currentCategory)
                 selectedCategories.splice(i, 1);
@@ -303,7 +302,7 @@ export class InteractivityFilterService
     private updateSelectableDataPointsBySelectedCategories(selectableDataPoints: FilterDataPoint[], selectedCategories: powerbi.PrimitiveValue[]): boolean {
         let foundMatchingId = false;
 
-        for (let dataPoint of selectableDataPoints) {
+        for (const dataPoint of selectableDataPoints) {
             dataPoint.selected = this.isDataPointSelected(dataPoint, selectedCategories);
 
             if (dataPoint.selected)
