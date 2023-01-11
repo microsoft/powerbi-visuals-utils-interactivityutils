@@ -15,7 +15,8 @@
         "outDir": "./lib"
     },
     "files": [
-        "src/index.ts"
+        "src/index.ts",
+        "src/interactivityService.ts"
     ],
     "include": [
         "src/index.ts"
