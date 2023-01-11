@@ -119,9 +119,11 @@ export abstract class InteractivityBaseService
     implements IInteractivityService<SelectableDataPointType>, ISelectionHandler {
 
     // References
+    /* eslint-disable @typescript-eslint/no-empty-function */
     protected renderSelectionInVisual = () => { };
     protected renderSelectionInLegend = () => { };
     protected renderSelectionInLabels = () => { };
+    /* eslint-enable @typescript-eslint/no-empty-function */
 
     // Selection state
     protected isInvertedSelectionMode: boolean = false;
@@ -213,6 +215,7 @@ export abstract class InteractivityBaseService
         this.renderAll();
     }
 
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
     public handleContextMenu(dataPoint: SelectableDataPointType, point: powerbi.extensibility.IPoint): void {
         // don't need to handle context menu here.
         // see InteractivitySelectionService class
@@ -237,23 +240,23 @@ export abstract class InteractivityBaseService
     }
 
     protected applyToAllSelectableDataPoints(action: (selectableDataPoint: SelectableDataPointType) => void) {
-        let selectableDataPoints = this.selectableDataPoints;
-        let selectableLegendDataPoints = this.selectableLegendDataPoints;
-        let selectableLabelsDataPoints = this.selectableLabelsDataPoints;
+        const selectableDataPoints = this.selectableDataPoints;
+        const selectableLegendDataPoints = this.selectableLegendDataPoints;
+        const selectableLabelsDataPoints = this.selectableLabelsDataPoints;
         if (selectableDataPoints) {
-            for (let dataPoint of selectableDataPoints) {
+            for (const dataPoint of selectableDataPoints) {
                 action(dataPoint);
             }
         }
 
         if (selectableLegendDataPoints) {
-            for (let dataPoint of selectableLegendDataPoints) {
+            for (const dataPoint of selectableLegendDataPoints) {
                 action(dataPoint);
             }
         }
 
         if (selectableLabelsDataPoints) {
-            for (let dataPoint of selectableLabelsDataPoints) {
+            for (const dataPoint of selectableLabelsDataPoints) {
                 action(dataPoint);
             }
         }

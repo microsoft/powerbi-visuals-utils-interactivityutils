@@ -44,7 +44,7 @@ export class BaseBehavior<SelectableDataPointType extends BaseDataPoint> impleme
 
     protected bindClick() {
         const { elementsSelection } = this.options;
-        let internalSelection: Selection<any, SelectableDataPoint, any, any> = selectAll(elementsSelection.nodes());
+        const internalSelection: Selection<any, SelectableDataPoint, any, any> = selectAll(elementsSelection.nodes());
         internalSelection.on("click", (event: MouseEvent, datum) => {
             this.selectionHandler.handleSelection(datum, event.ctrlKey);
         });
@@ -52,7 +52,7 @@ export class BaseBehavior<SelectableDataPointType extends BaseDataPoint> impleme
 
     protected bindClearCatcher() {
         const { clearCatcherSelection } = this.options;
-        let internalSelection: Selection<any, SelectableDataPoint, any, any> = selectAll(clearCatcherSelection.nodes());
+        const internalSelection: Selection<any, SelectableDataPoint, any, any> = selectAll(clearCatcherSelection.nodes());
         internalSelection.on("click", (event: MouseEvent) => {
             if (event.ctrlKey) {
                 return;
@@ -63,7 +63,7 @@ export class BaseBehavior<SelectableDataPointType extends BaseDataPoint> impleme
 
     protected bindContextMenu() {
         const { elementsSelection } = this.options;
-        let internalSelection: Selection<any, SelectableDataPoint, any, any> = selectAll(elementsSelection.nodes());
+        const internalSelection: Selection<any, SelectableDataPoint, any, any> = selectAll(elementsSelection.nodes());
         internalSelection.on("contextmenu", (event: MouseEvent, datum) => {
             this.selectionHandler.handleContextMenu(
                 datum,
@@ -83,7 +83,7 @@ export class BaseBehavior<SelectableDataPointType extends BaseDataPoint> impleme
             "dataMap": {
             }
         };
-        let internalSelection: Selection<any, SelectableDataPoint, any, any> = selectAll(clearCatcherSelection.nodes());
+        const internalSelection: Selection<any, SelectableDataPoint, any, any> = selectAll(clearCatcherSelection.nodes());
         internalSelection.on("contextmenu", (event: MouseEvent) => {
             this.selectionHandler.handleContextMenu(
                 <BaseDataPoint>{
