@@ -1,3 +1,7 @@
+## 6.0.2
+* Packages update
+* Removed coveralls
+
 ## 6.0.1
 * Updated packages
 
