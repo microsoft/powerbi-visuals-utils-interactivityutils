@@ -1,3 +1,6 @@
+## 6.0.3
+* Vulnerabilities fixes
+
 ## 6.0.2
 * Packages update
 * Removed coveralls
