@@ -54,7 +54,7 @@
     "less": "4.2.0",
     "playwright-chromium": "1.40.1",
     "powerbi-visuals-api": "5.7.0",
-    "powerbi-visuals-utils-testutils": "^6.0.2",
+    "powerbi-visuals-utils-testutils": "^6.0.3",
     "eslint-plugin-powerbi-visuals": "^0.8.1",
     "ts-loader": "9.5.1",
     "ts-node": "10.9.2",
@@ -65,7 +65,7 @@
   "dependencies": {
     "d3-selection": "^3.0.0",
     "powerbi-models": "1.13.0",
-    "powerbi-visuals-utils-svgutils": "^6.0.2",
+    "powerbi-visuals-utils-svgutils": "^6.0.3",
     "powerbi-visuals-utils-typeutils": "^6.0.2"
   }
 }
