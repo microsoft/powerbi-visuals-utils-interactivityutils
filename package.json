@@ -1,6 +1,6 @@
 {
   "name": "powerbi-visuals-utils-interactivityutils",
-  "version": "6.0.3",
+  "version": "6.0.4",
   "description": "InteractivityUtils",
   "main": "lib/index.js",
   "module": "lib/index.js",
@@ -37,12 +37,13 @@
     "@types/jasmine": "5.1.4",
     "@types/karma": "6.3.8",
     "@types/webpack": "5.28.5",
-    "@typescript-eslint/eslint-plugin": "^5.57.0",
-    "@typescript-eslint/parser": "^5.57.0",
-    "eslint": "^8.37.0",
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "@typescript-eslint/parser": "^5.62.0",
     "coverage-istanbul-loader": "^3.0.5",
+    "eslint": "^8.57.0",
+    "eslint-plugin-powerbi-visuals": "^0.8.1",
     "jasmine": "4.6.0",
-    "karma": "^6.4.2",
+    "karma": "^6.4.3",
     "karma-chrome-launcher": "3.2.0",
     "karma-coverage": "2.2.1",
     "karma-coverage-istanbul-reporter": "3.0.3",
@@ -53,9 +54,8 @@
     "karma-webpack": "5.0.0",
     "less": "4.2.0",
     "playwright-chromium": "1.40.1",
-    "powerbi-visuals-api": "5.7.0",
-    "powerbi-visuals-utils-testutils": "^6.0.3",
-    "eslint-plugin-powerbi-visuals": "^0.8.1",
+    "powerbi-visuals-api": "^5.9.0",
+    "powerbi-visuals-utils-testutils": "^6.1.1",
     "ts-loader": "9.5.1",
     "ts-node": "10.9.2",
     "typescript": "4.9.5",
@@ -65,7 +65,7 @@
   "dependencies": {
     "d3-selection": "^3.0.0",
     "powerbi-models": "1.13.0",
-    "powerbi-visuals-utils-svgutils": "^6.0.3",
-    "powerbi-visuals-utils-typeutils": "^6.0.2"
+    "powerbi-visuals-utils-svgutils": "^6.0.4",
+    "powerbi-visuals-utils-typeutils": "^6.0.3"
   }
 }
