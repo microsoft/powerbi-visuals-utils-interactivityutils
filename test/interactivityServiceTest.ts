@@ -63,7 +63,7 @@ describe("Interactivity service", () => {
     };
 
     beforeEach(() => {
-        host = createVisualHost();
+        host = createVisualHost({});
 
         interactivityService = createInteractivitySelectionService(host) as InteractivitySelectionService;
 
